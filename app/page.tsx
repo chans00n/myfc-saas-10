@@ -18,26 +18,39 @@ interface StripeProduct {
 export const revalidate = 3600 // Revalidate every hour
 
 async function getStripeProducts(): Promise<StripeProduct[]> {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2024-06-20'
-  });
+  // Add try/catch to prevent build errors
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2024-06-20'
+    });
 
-  const products = await stripe.products.list({
-    active: true,
-    expand: ['data.default_price']
-  });
+    const products = await stripe.products.list({
+      active: true,
+      expand: ['data.default_price']
+    });
 
-  return products.data.map(product => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    features: product.metadata?.features ? JSON.parse(product.metadata.features) : [],
-    price: product.default_price as Stripe.Price
-  }));
+    return products.data.map(product => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      features: product.metadata?.features ? JSON.parse(product.metadata.features) : [],
+      price: product.default_price as Stripe.Price
+    }));
+  } catch (error) {
+    console.error('Error fetching Stripe products:', error);
+    // Return empty array to prevent build failures
+    return [];
+  }
 }
 
 export default async function LandingPage() {
-  const products = await getStripeProducts();
+  // Try to get products but use empty array as fallback
+  let products: StripeProduct[] = [];
+  try {
+    products = await getStripeProducts();
+  } catch (error) {
+    console.error('Error in LandingPage:', error);
+  }
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -166,9 +179,9 @@ export default async function LandingPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-3xl font-bold">
-                      {product.price.unit_amount 
+                      {product.price && product.price.unit_amount 
                         ? `$${(product.price.unit_amount / 100).toFixed(2)}/${product.price.recurring?.interval}`
-                        : 'Custom'}
+                        : 'Contact Us'}
                     </p>
                     <ul className="mt-4 space-y-2">
                       {product.features?.map((feature, index) => (
