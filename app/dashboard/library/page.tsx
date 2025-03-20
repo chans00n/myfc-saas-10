@@ -47,7 +47,7 @@ export default async function WorkoutLibraryPage({
   const searchQuery = searchParams.q || null;
 
   // Get workouts with filters
-  const { data: workouts, count, totalPages } = await getWorkoutsLibrary({
+  const { data: workouts, count = 0, totalPages = 0 } = await getWorkoutsLibrary({
     page,
     limit: 12,
     sortBy,
