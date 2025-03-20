@@ -67,3 +67,48 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* MYFC Custom Styles */
+@layer components {
+  .myfc-card {
+    @apply bg-white rounded-xl shadow-md p-6 transition-all hover:shadow-lg;
+  }
+  
+  .myfc-button-primary {
+    @apply bg-neutral-800 hover:bg-neutral-900 text-white font-medium py-2 px-6 rounded-lg transition-colors;
+  }
+  
+  .myfc-button-secondary {
+    @apply bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-800 font-medium py-2 px-6 rounded-lg transition-colors;
+  }
+  
+  .myfc-badge {
+    @apply inline-block px-2 py-1 text-xs font-semibold rounded;
+  }
+  
+  .myfc-badge-blue {
+    @apply bg-neutral-100 text-neutral-800;
+  }
+  
+  .myfc-badge-green {
+    @apply bg-neutral-200 text-neutral-800;
+  }
+  
+  .myfc-badge-yellow {
+    @apply bg-neutral-300 text-neutral-800;
+  }
+}
+
+/* Fix for mobile viewport issues */
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Make sure images in Image components display properly */
+span[style*="box-sizing: border-box; display: block; overflow: hidden;"] img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Technical Stack
+
+
+- Frontend
+
+- Next.js 14 - React framework with App Router
+- React - UI library
+- TypeScript - Type-safe JavaScript
+- Tailwind CSS - Utility-first CSS framework
+- shadcn/ui - UI component library
+
+- Backend & API
+
+- Next.js API Routes - Serverless functions
+- Middleware - Auth protection and routing
+
+- Authentication
+
+- Supabase Auth - Authentication service
+- OAuth Providers - Google, GitHub integration
+
+- Database
+
+- PostgreSQL - Relational database
+- Drizzle ORM - Type-safe database toolkit
+- Supabase - Database service (optional)
+
+- Payments
+
+- Stripe - Payment processing
+- Stripe Checkout - Payment UI
+- Stripe Pricing Tables - Subscription plan display
+- Stripe Webhooks - Payment event handling
+
+- Deployment & DevOps
+
+- Vercel - Hosting and deployment platform
+- Git - Version control
+
+- Development Tools
+
+- ESLint - Code linting
+- Prettier - Code formatting

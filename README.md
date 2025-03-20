@@ -1,140 +1,114 @@
-# Next.js SaaS Starter
+# MYFC (My Face Coach)
 
-![SaaS App Preview](https://github.com/user-attachments/assets/63e761c4-aece-47c2-a320-f1cc18bf916b)
+A mobile web application for facial fitness workouts with daily exercises, progress tracking, and membership features.
 
-A complete, production-ready SaaS starter template built with Next.js 14, Supabase Auth, Stripe subscriptions, and PostgreSQL with Drizzle ORM.
+## Overview
+
+MYFC helps users improve their facial fitness through guided daily workouts. Users can follow along with video instructions, track their progress, and achieve facial fitness goals.
 
 ## Features
 
-- **Authentication & Authorization**
-  - Complete auth flow with Supabase (login, signup, password reset)
-  - Social authentication with Google and GitHub
-  - Protected routes for authenticated users
+- Daily facial fitness workouts with video instructions
+- Comprehensive movement library targeting different facial areas
+- Progress tracking with streaks and achievements
+- User history and workout completion tracking
+- Responsive design optimized for mobile and desktop
+- Membership system integrated with Stripe payments
 
-- **Payment Processing**
-  - Stripe integration for subscription management
-  - Stripe Pricing Tables for elegant plan selection
-  - Customer portal for managing billing details
-  - Webhook handling for payment events
+## Tech Stack
 
-- **Database**
-  - PostgreSQL database with Drizzle ORM
-  - User and subscription data management
-  - Simple schema migration and management
+- **Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Next.js API Routes, Serverless Functions
+- **Database:** PostgreSQL with Supabase
+- **Authentication:** Supabase Auth
+- **Styling:** Tailwind CSS with custom design system
+- **Deployment:** Vercel
 
-- **Modern Stack**
-  - Next.js 14 with App Router
-  - TypeScript for type safety
-  - Tailwind CSS with shadcn/ui components
-  - Server and client components
+## Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Supabase account (for database and auth)
+- Stripe account (for payments)
 
 ## Getting Started
 
-### Prerequisites
-- Node.js (v18+)
-- PostgreSQL database
-- Stripe account
-- Supabase account
-
-### Local Development Setup
+### Installation
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/next-js-saas-starter.git
-   cd next-js-saas-starter
+   git clone https://github.com/your-username/myfc.git
+   cd myfc
    ```
 
 2. Install dependencies
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
 3. Set up environment variables
-   Copy `.env.example` to `.env.local` and fill in the required values:
-   
+   ```bash
+   cp .env.example .env.local
    ```
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   DATABASE_URL=your_postgres_connection_string
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-   STRIPE_PRICING_TABLE_ID=your_stripe_pricing_table_id
-   NEXT_PUBLIC_WEBSITE_URL=http://localhost:3000
-   ```
+   Then fill in the required environment variables in `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - Other environment variables as needed
 
 4. Set up the database
-   ```bash
-   npm run db:migrate
-   ```
+   - Run the SQL migrations in `database/migrations.sql` in your Supabase project
 
-5. Set up Stripe products (Optional - for subscription features)
-   ```bash
-   npm run stripe:setup
-   ```
-
-6. Start the development server
+5. Start the development server
    ```bash
    npm run dev
+   # or
+   yarn dev
    ```
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-### Configuration
-
-#### Supabase Auth
-
-1. Create a new project on [Supabase](https://app.supabase.io/)
-2. Configure authentication providers in the Supabase dashboard
-3. Add your site URL and redirect URLs for OAuth providers
-
-#### Stripe Integration
-
-1. Create a [Stripe](https://dashboard.stripe.com/register) account
-2. Set up products and pricing in the Stripe dashboard
-3. Create a pricing table in Stripe and configure the redirect URL to `/subscribe/success`
-4. Set up webhooks to handle subscription events
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Project Structure
 
 ```
-├── app/                  # Next.js app directory
-│   ├── auth/             # Auth-related routes
-│   ├── dashboard/        # Protected dashboard routes
-│   ├── subscribe/        # Subscription management
-│   ├── webhook/          # API endpoints for webhooks
-│   ├── layout.tsx        # Root layout
-│   └── page.tsx          # Landing page
-├── components/           # Reusable UI components
-├── lib/                  # Utility functions and libraries
-├── public/               # Static assets
-├── utils/                # Helper functions and utilities
-│   ├── db/               # Database utilities
-│   │   ├── schema.ts     # Drizzle schema definitions
-│   │   └── db.ts         # Database connection
-│   └── supabase/         # Supabase client functions
-├── middleware.ts         # Next.js middleware for auth
-├── drizzle.config.ts     # Drizzle ORM configuration
-└── stripeSetup.ts        # Stripe setup script
+myfc/
+├── app/                # Next.js App Router
+├── components/         # Reusable components
+├── lib/                # Utility libraries
+├── types/              # TypeScript type definitions
+├── database/           # Database files
+├── styles/             # Additional styles
+└── public/             # Static assets
 ```
 
-## Deployment
+Detailed structure can be found in [project-structure.md](./project-structure.md).
 
-This application can be easily deployed on [Vercel](https://vercel.com):
+## Development Workflow
 
-1. Push your repository to GitHub
-2. Import the project in Vercel
-3. Configure environment variables
-4. Deploy
+1. Track tasks in the [project tracker](./MYFC-ProjectTracker.md)
+2. Create components according to the mobile-first design principles
+3. Implement features in the order defined in the project tracker
+4. Test on both mobile and desktop viewports
+
+## Mobile-First Design
+
+This project follows a mobile-first design approach:
+- Core layouts optimized for mobile (320px-480px)
+- Progressive enhancement for larger screens
+- Touch-friendly UI elements
+- Responsive adaptations for tablet and desktop
 
 ## License
 
-This project is licensed under the MIT License.
+[MIT](LICENSE)
 
 ## Acknowledgements
 
 - [Next.js](https://nextjs.org/)
-- [Supabase](https://supabase.com/)
-- [Stripe](https://stripe.com/)
-- [Drizzle ORM](https://github.com/drizzle-team/drizzle-orm)
+- [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [shadcn/ui](https://ui.shadcn.com/)
+- [Supabase](https://supabase.io/)
+- [Stripe](https://stripe.com/)
