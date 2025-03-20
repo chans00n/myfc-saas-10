@@ -88,7 +88,7 @@ export default async function Dashboard() {
                         <div className="p-6 relative z-10 bg-white dark:bg-neutral-800">
                             <p className="uppercase text-xs tracking-wide text-neutral-500 dark:text-neutral-400 mb-2">TODAY'S LIFT</p>
                             <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-1">{todaysWorkout.title}</h2>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">{todaysWorkout.description?.split('.')[0] || 'Focus on your form and breathing during this workout'}</p>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">{todaysWorkout.description?.split('.')[0] || "Focus on your form and breathing during this workout"}</p>
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
