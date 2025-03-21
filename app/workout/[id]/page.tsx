@@ -82,7 +82,7 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
         </div>
         
         {/* Top navigation */}
-        <div className="relative z-10 flex justify-between items-start p-6">
+        <div className="relative z-10 flex justify-between items-start p-6 pt-12 md:pt-6 safe-top">
           {/* Bookmark button */}
           <button className="text-white hover:text-indigo-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
