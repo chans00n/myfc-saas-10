@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+// Add type definition for standalone property on navigator
+declare global {
+  interface Navigator {
+    standalone?: boolean;
+  }
+}
 
 export default function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -18,6 +26,11 @@ export default function InstallPWA() {
     // Always show for iOS devices
     if (isIOS) {
       setShowInstallButton(true);
+      
+      // Check if we're running in standalone mode
+      if (window.navigator.standalone === true) {
+        setShowInstallButton(false);
+      }
     }
 
     // Listen for beforeinstallprompt event (fired on Chrome/Edge/Android before install prompt)
@@ -83,10 +96,16 @@ export default function InstallPWA() {
                       <li>Tap <strong>Add</strong> in the top right</li>
                       <li>The app will now appear on your home screen</li>
                     </ol>
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex flex-col items-center">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                         For a full app experience, launch directly from your home screen icon, not from your browser.
                       </p>
+                      <Link 
+                        href="/ios-redirect.html" 
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        Use Installation Page
+                      </Link>
                     </div>
                   </div>
                 </>
