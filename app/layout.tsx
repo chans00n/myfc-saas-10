@@ -12,16 +12,48 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "MYFC",
     startupImage: [
       {
-        url: "/icons/180.png",
+        url: "/icons/512.png",
+        media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+      },
+      {
+        url: "/icons/512.png",
         media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
       },
       {
-        url: "/icons/152.png",
+        url: "/icons/512.png",
+        media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+      },
+      {
+        url: "/icons/512.png",
         media: "(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/512.png",
+        media: "(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
       }
     ]
   },
@@ -49,7 +81,7 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
     "apple-mobile-web-app-title": "MYFC"
   }
 };
@@ -100,6 +132,34 @@ export default function RootLayout({
         id="standalone-detector"
         src="/standalone.js"
         strategy="beforeInteractive"
+      />
+      
+      {/* iOS Standalone Mode Fix */}
+      <Script
+        id="ios-standalone-fix"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            // Check if we're on iOS and not in standalone mode
+            if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone) {
+              // Check if we're not already on the redirect page or installation page
+              if (!window.location.pathname.includes('ios-redirect') && 
+                  !window.location.pathname.includes('index-ios')) {
+                // Remember this URL for after installation
+                sessionStorage.setItem('pwaRedirectUrl', window.location.pathname);
+              }
+            }
+            
+            // If we're in standalone mode and there's a saved URL, go there
+            if (window.navigator.standalone && sessionStorage.getItem('pwaRedirectUrl')) {
+              const savedUrl = sessionStorage.getItem('pwaRedirectUrl');
+              sessionStorage.removeItem('pwaRedirectUrl');
+              if (savedUrl && savedUrl !== window.location.pathname) {
+                window.location.replace(savedUrl);
+              }
+            }
+          `,
+        }}
       />
       
       <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>

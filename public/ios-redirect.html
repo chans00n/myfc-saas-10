@@ -1,87 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="MYFC">
-  <title>MYFC - My Face Coach</title>
-  <link rel="apple-touch-icon" href="/apple-icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/icons/167.png">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      background-color: #4f46e5;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 2rem;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    p {
-      margin-bottom: 2rem;
-      opacity: 0.8;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-  <script>
-    // Check if we're running as a standalone app
-    if (window.navigator.standalone === true) {
-      // Already in standalone mode, redirect to dashboard
-      window.location.href = '/dashboard';
-    } else {
-      // If not in standalone mode, show the instructions
-      window.onload = function() {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('instructions').style.display = 'block';
-      };
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Install MYFC App</title>
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/120.png">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            margin-right: 16px;
+        }
+        
+        .app-title {
+            flex: 1;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 4px;
+            color: #4f46e5;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #6c757d;
+        }
+        
+        .instructions {
+            margin-bottom: 32px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #4f46e5;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 24px;
+        }
+        
+        .step-number {
+            background-color: #4f46e5;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .demo-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .note {
+            background-color: #f8f9fa;
+            padding: 16px;
+            border-left: 4px solid #4f46e5;
+            border-radius: 4px;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+        
+        .continue-button {
+            display: block;
+            background-color: #4f46e5;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 24px;
+            transition: background-color 0.2s;
+        }
+        
+        .continue-button:hover {
+            background-color: #4338ca;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+            
+            header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+            
+            .logo {
+                width: 56px;
+                height: 56px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .step {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <img src="/icon.png" alt="MYFC Logo" class="logo">
-  <h1>MYFC</h1>
-  
-  <div id="loading">
-    <p>Loading app...</p>
-    <div class="spinner"></div>
-  </div>
-  
-  <div id="instructions" style="display: none;">
-    <p>For the best experience, please install this app to your home screen.</p>
-    <ol style="text-align: left; max-width: 80%; margin: 0 auto;">
-      <li style="margin-bottom: 10px;">Tap the share button at the bottom of your screen</li>
-      <li style="margin-bottom: 10px;">Scroll down and tap "Add to Home Screen"</li>
-      <li style="margin-bottom: 10px;">Tap "Add" in the top right corner</li>
-      <li>Open the app from your home screen icon</li>
-    </ol>
-  </div>
+    <div class="container">
+        <header>
+            <img src="/icons/512.png" alt="MYFC Logo" class="logo">
+            <div class="app-title">
+                <h1>MYFC - My Face Coach</h1>
+                <div class="subtitle">Install the app for the best experience</div>
+            </div>
+        </header>
+        
+        <div class="instructions">
+            <h2>How to Install on iOS:</h2>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <p>Tap the <strong>Share button</strong> at the bottom of Safari.</p>
+                    <p><img src="/install-images/ios-share.png" alt="iOS Share Button" class="demo-image"></p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <p>Scroll down and tap <strong>Add to Home Screen</strong>.</p>
+                    <p><img src="/install-images/ios-add-to-home.png" alt="Add to Home Screen" class="demo-image"></p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <p>Tap <strong>Add</strong> in the top right corner.</p>
+                    <p><img src="/install-images/ios-tap-add.png" alt="Tap Add" class="demo-image"></p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <p>Find the app icon on your home screen and tap to open.</p>
+                </div>
+            </div>
+            
+            <div class="note">
+                <p><strong>Important:</strong> After installation, please open the app from the home screen icon to use it in full-screen mode without browser controls.</p>
+            </div>
+        </div>
+        
+        <a href="/dashboard" class="continue-button">Continue to Website</a>
+    </div>
+    
+    <script>
+        // Store current page URL for later redirect after installation
+        if (sessionStorage && !sessionStorage.getItem('pwaRedirectUrl')) {
+            sessionStorage.setItem('pwaRedirectUrl', '/dashboard');
+        }
+        
+        // Check if the app is already running in standalone mode
+        if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+            window.location.replace('/dashboard');
+        }
+    </script>
 </body>
 </html> 

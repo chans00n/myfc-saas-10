@@ -1,71 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="MYFC">
-  <title>MYFC - My Face Coach</title>
-  <link rel="apple-touch-icon" href="/apple-icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/icons/167.png">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #4f46e5;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: white;
-      text-align: center;
-    }
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 20px;
-    }
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top: 4px solid white;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin-top: 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-  <script>
-    // Redirect to the dashboard immediately
-    window.onload = function() {
-      // Short delay to ensure app is ready
-      setTimeout(function() {
-        window.location.href = '/dashboard';
-      }, 500);
-    };
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MYFC - My Face Coach</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="MYFC - My Face Coach">
+    <meta name="description" content="Daily facial exercises and tracking">
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MYFC">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/120.png">
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="/icons/512.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: fixed;
+            /* iOS-specific styles for notched devices */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 100%;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <img src="/icon.png" alt="MYFC" class="logo">
-  <h1>MYFC</h1>
-  <div class="loading">
-    <p>Loading your workout...</p>
-    <div class="spinner"></div>
-  </div>
+    <div class="container">
+        <img src="/icons/512.png" alt="MYFC Logo" class="logo">
+        <h1>MYFC - My Face Coach</h1>
+        <p>Loading your facial workout app...</p>
+        <div class="loading">
+            <div class="spinner"></div>
+            <span>Please wait</span>
+        </div>
+    </div>
+
+    <script>
+        // Check if the app is running in standalone mode (from home screen)
+        const isInStandaloneMode = () => 
+            (window.navigator.standalone) || 
+            (window.matchMedia('(display-mode: standalone)').matches);
+        
+        // If not running in standalone mode, redirect to installation page
+        if (!isInStandaloneMode()) {
+            window.location.href = '/ios-redirect.html';
+        } else {
+            // Store current time for splash screen timing
+            const startTime = new Date().getTime();
+            
+            // Ensure minimum splash screen time (1 second)
+            const redirectToApp = () => {
+                const currentTime = new Date().getTime();
+                const elapsedTime = currentTime - startTime;
+                
+                if (elapsedTime > 1000) {
+                    // Redirect to dashboard
+                    window.location.replace('/dashboard');
+                } else {
+                    // Wait until minimum time has passed
+                    setTimeout(redirectToApp, 1000 - elapsedTime);
+                }
+            };
+            
+            // Wait for page load and redirect
+            window.addEventListener('load', redirectToApp);
+            
+            // Fallback in case load event doesn't fire
+            setTimeout(redirectToApp, 2000);
+        }
+    </script>
 </body>
 </html> 
