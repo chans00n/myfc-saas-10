@@ -1,0 +1,65 @@
+{
+  "name": "MYFC - My Face Coach",
+  "short_name": "MYFC",
+  "description": "Daily facial exercises and tracking",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/196.png",
+      "sizes": "196x196",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Workout",
+      "url": "/dashboard",
+      "description": "View and start today's workout",
+      "icons": [
+        {
+          "src": "/icons/96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Workout Library",
+      "url": "/dashboard/library",
+      "description": "Browse all workouts",
+      "icons": [
+        {
+          "src": "/icons/96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/hero.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+} 

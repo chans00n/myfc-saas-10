@@ -9,7 +9,9 @@ import MYFCNavigation from "@/components/MYFCNavigation";
 import Link from 'next/link';
 import Image from 'next/image';
 import { MobileAvatar } from '@/components/MobileAvatar';
-import { useTheme } from "@/contexts/ThemeContext";
+import dynamic from 'next/dynamic';
+
+const InstallPWA = dynamic(() => import('@/components/InstallPWA'), { ssr: false });
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -83,6 +85,9 @@ export default async function DashboardLayout({
             <div className="flex-1 md:ml-64 pb-24 md:pb-8">
                 {children}
             </div>
+            
+            {/* PWA Install Prompt */}
+            <InstallPWA />
             
             {/* Mobile Navigation */}
             <div className="md:hidden flex justify-around items-center fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-700 h-16 z-10">
