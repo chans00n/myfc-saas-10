@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { SimpleAvatar } from "@/components/ui/simple-avatar";
 import { SimpleSheet, SimpleSheetTitle, SimpleSheetDescription } from "@/components/ui/simple-sheet";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // Client component for the avatar with sheet functionality
 function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | undefined, userAvatarUrl: string | undefined }) {
@@ -129,85 +129,46 @@ export default function MYFCNavigation() {
     avatarUrl?: string;
   }>({});
   
-  // Add a mount tracker to debug mounting cycles
+  // Remove debug log in production
   useEffect(() => {
-    console.log('MYFCNavigation component mounted');
-    return () => {
-      console.log('MYFCNavigation component unmounted');
-    };
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('MYFCNavigation component mounted');
+      return () => {
+        console.log('MYFCNavigation component unmounted');
+      };
+    }
+  }, []);
+  
+  const fetchUserData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/profile', { 
+        headers: { 'Cache-Control': 'max-age=300' }
+      });
+      const data = await response.json();
+      
+      if (data.auth) {
+        setUserData({
+          email: data.auth.email,
+          avatarUrl: data.profile?.avatar_url || data.auth.metadata?.avatar_url,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
   }, []);
   
   useEffect(() => {
     let isMounted = true;
     
-    // Fetch user data on the client side - only once
-    async function fetchUserData() {
-      // Prevent duplicate calls by tracking if component is still mounted
+    // Fetch data once on mount
+    fetchUserData().finally(() => {
       if (!isMounted) return;
-      
-      console.log('Fetching user data in MYFCNavigation');
-      
-      try {
-        // Get user auth data
-        const response = await fetch('/api/auth/user', { 
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        const data = await response.json();
-        
-        // Also fetch user record from database
-        let dbData = null;
-        try {
-          const dbResponse = await fetch('/api/profile/user-data', {
-            cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' }
-          });
-          dbData = await dbResponse.json();
-        } catch (dbError) {
-          console.error('Error fetching DB user data:', dbError);
-        }
-        
-        if (isMounted && data.user) {
-          // Prioritize database avatar_url, fall back to metadata
-          const avatarUrl = 
-            (dbData?.user?.avatar_url) || 
-            (data.user.user_metadata?.avatar_url);
-          
-          setUserData({
-            email: data.user.email,
-            avatarUrl: avatarUrl,
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    }
+    });
     
-    // Only fetch once when component mounts
-    fetchUserData();
-    
-    // Clean up function
     return () => {
       isMounted = false;
     };
-    
-    // TEMPORARY: Disable all polling and visibility change listeners to debug
-    // const interval = setInterval(fetchUserData, 300000); // 5 minutes = 300000ms
-    
-    // // Refresh when the component becomes visible again (user returns to tab)
-    // const handleVisibilityChange = () => {
-    //   if (document.visibilityState === 'visible') {
-    //     fetchUserData();
-    //   }
-    // };
-    
-    // document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // return () => {
-    //   clearInterval(interval);
-    //   document.removeEventListener('visibilitychange', handleVisibilityChange);
-    // };
-  }, []);
+  }, [fetchUserData]);
   
   // Get the user's initials for the avatar fallback
   const getInitials = (email: string) => {

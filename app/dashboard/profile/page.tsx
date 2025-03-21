@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { SimpleAvatar } from "@/components/ui/simple-avatar";
 import { redirect, useRouter } from 'next/navigation';
@@ -23,87 +23,67 @@ export default function ProfilePage() {
     avatar_url?: string;
   }>({});
   
-  // Add mount tracking
+  // Only log in development
   useEffect(() => {
-    console.log('ProfilePage component mounted');
-    return () => {
-      console.log('ProfilePage component unmounted');
-    };
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('ProfilePage component mounted');
+      return () => {
+        console.log('ProfilePage component unmounted');
+      };
+    }
   }, []);
   
-  // Fetch user data
+  // Fetch user data with consolidated API
+  const fetchUserData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/profile', {
+        headers: { 'Cache-Control': 'max-age=300' }
+      });
+      const data = await response.json();
+      
+      if (!data.auth) {
+        router.push('/login');
+        return;
+      }
+      
+      // Extract user data from consolidated response
+      const authUser = data.auth;
+      const profileData = data.profile;
+      
+      // Set avatar URL
+      const userAvatarUrl = profileData?.avatar_url || authUser.metadata?.avatar_url;
+      
+      if (userAvatarUrl) {
+        setAvatarUrl(userAvatarUrl);
+      }
+      
+      // Set user data
+      setUserData({
+        id: authUser.id,
+        email: authUser.email,
+        name: authUser.metadata?.name || authUser.email?.split('@')[0] || 'User',
+        plan: profileData?.plan || authUser.metadata?.plan || 'free',
+        plan_name: profileData?.plan_name || 'Basic Plan',
+        created_at: authUser.created_at,
+        avatar_url: userAvatarUrl,
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }, [router]);
+  
   useEffect(() => {
     let isMounted = true;
     
-    console.log('Starting user data fetch in ProfilePage');
-    
-    async function fetchUserData() {
-      // Prevent fetches if component unmounted
+    // Fetch data once when component mounts
+    fetchUserData().finally(() => {
       if (!isMounted) return;
-      
-      try {
-        // Get user auth data
-        const response = await fetch('/api/auth/user', {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        const data = await response.json();
-        
-        // Also fetch user record from database
-        let dbData = null;
-        try {
-          const dbResponse = await fetch('/api/profile/user-data', {
-            cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' }
-          });
-          dbData = await dbResponse.json();
-        } catch (dbError) {
-          console.error('Error fetching DB user data:', dbError);
-        }
-        
-        if (!isMounted) return; // Exit if unmounted during fetch
-        
-        if (data?.user) {
-          // Prioritize database avatar_url, fall back to metadata
-          const avatarUrl = 
-            (dbData?.user?.avatar_url) || 
-            (data.user.user_metadata?.avatar_url);
-            
-          console.log('Profile using avatar URL:', avatarUrl);
-          
-          setUserData({
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',
-            plan: dbData?.user?.plan || data.user.user_metadata?.plan || 'free',
-            plan_name: dbData?.user?.plan_name || 'Basic Plan',
-            created_at: data.user.created_at,
-            avatar_url: avatarUrl,
-          });
-          
-          if (avatarUrl) {
-            setAvatarUrl(avatarUrl);
-          }
-        } else {
-          // Redirect to login if no user data
-          router.push('/login');
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    }
-    
-    fetchUserData();
-    
-    // No need for frequent polling on profile page - only fetch once
-    // If you absolutely need polling, use a much longer interval like 30 seconds
-    // const interval = setInterval(fetchUserData, 30000);
-    // return () => clearInterval(interval);
+    });
     
     return () => {
-      isMounted = false; // Clean up
+      isMounted = false;
     };
-  }, [router]);
+  }, [fetchUserData]);
   
   // Get the user's initials for the avatar fallback
   const getInitials = (email: string) => {

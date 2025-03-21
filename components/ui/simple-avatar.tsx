@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import Image from "next/image";
+import { getImageSizes } from "@/utils/image-sizes";
 
 interface AvatarProps {
   src?: string;
@@ -11,7 +11,7 @@ interface AvatarProps {
   size?: number;
 }
 
-export function SimpleAvatar({ 
+export const SimpleAvatar = React.memo(function SimpleAvatar({ 
   src, 
   alt = "Avatar", 
   fallback = "U", 
@@ -20,17 +20,9 @@ export function SimpleAvatar({
 }: AvatarProps) {
   const [imageError, setImageError] = React.useState(!src);
   
-  const handleImageError = () => {
-    console.error("Failed to load avatar image:", src);
+  const handleImageError = React.useCallback(() => {
     setImageError(true);
-  };
-  
-  // For debugging
-  React.useEffect(() => {
-    if (src) {
-      console.log("Avatar attempting to load image:", src);
-    }
-  }, [src]);
+  }, []);
   
   return (
     <div 
@@ -45,6 +37,7 @@ export function SimpleAvatar({
           onError={handleImageError}
           referrerPolicy="no-referrer"
           crossOrigin="anonymous"
+          loading="lazy"
         />
       ) : (
         <span className="text-neutral-800 font-medium text-sm">
@@ -53,4 +46,4 @@ export function SimpleAvatar({
       )}
     </div>
   );
-} 
+}); 
