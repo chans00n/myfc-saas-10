@@ -11,10 +11,18 @@
     <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/icons/120.png">
     
+    <!-- iOS meta tags for PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MYFC">
+    
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
     
     <style>
         * {
@@ -105,14 +113,6 @@
             flex: 1;
         }
         
-        .demo-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 12px;
-            border: 1px solid #e9ecef;
-        }
-        
         .icon-desc {
             display: inline-flex;
             align-items: center;
@@ -137,6 +137,22 @@
             font-size: 14px;
         }
         
+        .important-note {
+            background-color: #fff4e5;
+            padding: 16px;
+            border-left: 4px solid #ff9800;
+            border-radius: 4px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
         .continue-button {
             display: block;
             background-color: #4f46e5;
@@ -146,12 +162,27 @@
             border-radius: 8px;
             font-weight: bold;
             text-decoration: none;
-            margin-top: 24px;
             transition: background-color 0.2s;
         }
         
         .continue-button:hover {
             background-color: #4338ca;
+        }
+        
+        .pwa-button {
+            display: block;
+            background-color: #34d399;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .pwa-button:hover {
+            background-color: #10b981;
         }
         
         @media (max-width: 480px) {
@@ -190,11 +221,27 @@
             </div>
         </header>
         
+        <div class="important-note">
+            <p><strong>iOS Users:</strong> For the best experience, please use our special PWA installation page designed specifically for iOS devices.</p>
+        </div>
+        
+        <div class="button-container">
+            <a href="/index-pwa.html" class="pwa-button">Use iOS Installation Page</a>
+            <a href="/dashboard" class="continue-button">Continue to Website</a>
+        </div>
+        
         <div class="instructions">
             <h2>How to Install on iOS:</h2>
             
             <div class="step">
                 <div class="step-number">1</div>
+                <div class="step-content">
+                    <p>Click the <strong>iOS Installation Page</strong> button above.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
                 <div class="step-content">
                     <p>Tap the <strong>Share button</strong> at the bottom of Safari.</p>
                     <div class="icon-desc">
@@ -205,7 +252,7 @@
             </div>
             
             <div class="step">
-                <div class="step-number">2</div>
+                <div class="step-number">3</div>
                 <div class="step-content">
                     <p>Scroll down and tap <strong>Add to Home Screen</strong>.</p>
                     <div class="icon-desc">
@@ -216,7 +263,7 @@
             </div>
             
             <div class="step">
-                <div class="step-number">3</div>
+                <div class="step-number">4</div>
                 <div class="step-content">
                     <p>Tap <strong>Add</strong> in the top right corner.</p>
                     <div class="icon-desc">
@@ -227,7 +274,7 @@
             </div>
             
             <div class="step">
-                <div class="step-number">4</div>
+                <div class="step-number">5</div>
                 <div class="step-content">
                     <p>Find the app icon on your home screen and tap to open.</p>
                     <div class="icon-desc">
@@ -241,8 +288,6 @@
                 <p><strong>Important:</strong> After installation, please open the app from the home screen icon to use it in full-screen mode without browser controls.</p>
             </div>
         </div>
-        
-        <a href="/dashboard" class="continue-button">Continue to Website</a>
     </div>
     
     <script>
@@ -251,8 +296,15 @@
             sessionStorage.setItem('pwaRedirectUrl', '/dashboard');
         }
         
+        // Check if we're on iOS and store special flag
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            localStorage.setItem('isIOS', 'true');
+        }
+        
         // Check if the app is already running in standalone mode
         if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+            // If we're in standalone mode, go to dashboard
             window.location.replace('/dashboard');
         }
     </script>

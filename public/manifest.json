@@ -2,10 +2,10 @@
   "name": "MYFC - My Face Coach",
   "short_name": "MYFC",
   "description": "Daily facial exercises and tracking",
-  "start_url": "/dashboard",
+  "start_url": "/index-pwa.html",
   "id": "/dashboard",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "fullscreen", "minimal-ui"],
+  "display_override": ["standalone"],
   "background_color": "#4f46e5",
   "theme_color": "#4f46e5",
   "orientation": "portrait",
@@ -24,20 +24,9 @@
       "purpose": "any"
     },
     {
-      "src": "/icon.png",
+      "src": "/apple-touch-icon.png",
       "sizes": "192x192",
       "type": "image/png"
-    },
-    {
-      "src": "/apple-icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/196.png",
-      "sizes": "196x196",
-      "type": "image/png",
-      "purpose": "maskable"
     },
     {
       "src": "/icons/180.png",
@@ -69,26 +58,12 @@
     {
       "name": "Today's Workout",
       "url": "/dashboard",
-      "description": "View and start today's workout",
-      "icons": [
-        {
-          "src": "/icons/96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "description": "View and start today's workout"
     },
     {
       "name": "Workout Library",
       "url": "/dashboard/library",
-      "description": "Browse all workouts",
-      "icons": [
-        {
-          "src": "/icons/96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "description": "Browse all workouts"
     }
   ],
   "screenshots": [

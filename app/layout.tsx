@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProviderServer } from "@/components/ThemeProviderServer";
 import Script from "next/script";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -106,6 +107,46 @@ export default function RootLayout({
       {/* Required for pricing table */}
       <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
       
+      {/* Direct iOS Standalone Mode Meta Tags */}
+      <Script
+        id="ios-meta-tags"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            // Add direct meta tags to head
+            const metaTags = [
+              { name: "apple-mobile-web-app-capable", content: "yes" },
+              { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+              { name: "apple-mobile-web-app-title", content: "MYFC" },
+              { name: "format-detection", content: "telephone=no" }
+            ];
+            
+            metaTags.forEach(tag => {
+              const meta = document.createElement('meta');
+              meta.name = tag.name;
+              meta.content = tag.content;
+              document.head.appendChild(meta);
+            });
+            
+            // Add direct link tags for icons
+            const linkTags = [
+              { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+              { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/180.png" },
+              { rel: "apple-touch-icon", sizes: "152x152", href: "/icons/152.png" },
+              { rel: "apple-touch-icon", sizes: "120x120", href: "/icons/120.png" }
+            ];
+            
+            linkTags.forEach(tag => {
+              const link = document.createElement('link');
+              link.rel = tag.rel;
+              if (tag.sizes) link.sizes = tag.sizes;
+              link.href = tag.href;
+              document.head.appendChild(link);
+            });
+          `,
+        }}
+      />
+      
       {/* PWA Service Worker Registration */}
       <Script
         id="register-sw"
@@ -114,12 +155,10 @@ export default function RootLayout({
           __html: `
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                  console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(function(err) {
                   console.error('Service Worker registration failed:', err);
-                  // Try to register fallback service worker
-                  navigator.serviceWorker.register('/fallback-sw.js').catch(function(err) {
-                    console.error('Fallback Service Worker registration failed:', err);
-                  });
                 });
               });
             }
@@ -140,21 +179,39 @@ export default function RootLayout({
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-            // Check if we're on iOS and not in standalone mode
-            if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone) {
-              // Check if we're not already on the redirect page or installation page
+            // Helper function to check if we're on iOS
+            function isIOS() {
+              return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            }
+            
+            // Check if app is in standalone mode (installed to home screen)
+            function isInStandaloneMode() {
+              return window.navigator.standalone || 
+                window.matchMedia('(display-mode: standalone)').matches ||
+                localStorage.getItem('pwaStandalone') === 'true';
+            }
+            
+            // If we're on iOS in standalone mode, store the flag
+            if (isIOS() && isInStandaloneMode()) {
+              localStorage.setItem('pwaStandalone', 'true');
+              console.log('Running in iOS standalone mode');
+            }
+            
+            // Remember URL after installation
+            if (isIOS() && !isInStandaloneMode()) {
+              // Save current URL unless we're on special pages
               if (!window.location.pathname.includes('ios-redirect') && 
                   !window.location.pathname.includes('index-ios')) {
-                // Remember this URL for after installation
                 sessionStorage.setItem('pwaRedirectUrl', window.location.pathname);
               }
             }
             
             // If we're in standalone mode and there's a saved URL, go there
-            if (window.navigator.standalone && sessionStorage.getItem('pwaRedirectUrl')) {
+            if (isInStandaloneMode() && sessionStorage.getItem('pwaRedirectUrl')) {
               const savedUrl = sessionStorage.getItem('pwaRedirectUrl');
               sessionStorage.removeItem('pwaRedirectUrl');
               if (savedUrl && savedUrl !== window.location.pathname) {
+                console.log('Redirecting to saved URL:', savedUrl);
                 window.location.replace(savedUrl);
               }
             }
