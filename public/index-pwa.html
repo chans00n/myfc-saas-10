@@ -36,6 +36,9 @@
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
     
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -48,9 +51,12 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            background-color: #4f46e5;
+            background-color: #171717; /* neutral-900 dark background */
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Safe area insets for notched devices */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
         .container {
@@ -61,6 +67,10 @@
             height: 100%;
             padding: 20px;
             text-align: center;
+            
+            /* Add safe area spacing */
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         .logo {
@@ -70,8 +80,8 @@
             border-radius: 20px;
         }
         
-        h1 {
-            font-size: 24px;
+        p {
+            font-size: 16px;
             margin-bottom: 10px;
         }
         
@@ -93,8 +103,7 @@
 <body>
     <div class="container">
         <img src="/icons/512.png" alt="MYFC Logo" class="logo">
-        <h1>MYFC - My Face Coach</h1>
-        <p>Loading your workout app...</p>
+        <p>Loading your facial fitness app...</p>
         <div class="spinner"></div>
     </div>
     
