@@ -155,11 +155,65 @@ export default function RootLayout({
           __html: `
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                navigator.serviceWorker.register('/sw.js', {
+                  updateViaCache: 'none' // Prevent browser cache from interfering with updates
+                }).then(function(registration) {
                   console.log('Service Worker registered with scope:', registration.scope);
+                  
+                  // Check for updates on page load
+                  registration.update();
+                  
+                  // Check for updates periodically
+                  setInterval(() => {
+                    registration.update();
+                  }, 60 * 60 * 1000); // Check every hour
+                  
+                  // Update on page transitions
+                  let refreshing = false;
+                  
+                  // When a new SW is waiting, handle refresh
+                  navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                  });
+                  
+                  // Listen for messages from service worker
+                  navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'RELOAD_PAGE') {
+                      window.location.reload();
+                    }
+                  });
                 }).catch(function(err) {
                   console.error('Service Worker registration failed:', err);
+                  
+                  // Fall back to the fallback service worker if main one fails
+                  navigator.serviceWorker.register('/fallback-sw.js')
+                    .then(reg => console.log('Fallback SW registered'))
+                    .catch(e => console.error('Even fallback SW failed:', e));
                 });
+              });
+              
+              // Handle connectivity changes to update cached content
+              window.addEventListener('online', () => {
+                console.log('App is online again');
+                // Inform service worker of online status
+                if (navigator.serviceWorker.controller) {
+                  navigator.serviceWorker.controller.postMessage({
+                    type: 'ONLINE_STATUS',
+                    status: 'online'
+                  });
+                }
+              });
+              
+              window.addEventListener('offline', () => {
+                console.log('App is offline');
+                if (navigator.serviceWorker.controller) {
+                  navigator.serviceWorker.controller.postMessage({
+                    type: 'ONLINE_STATUS',
+                    status: 'offline'
+                  });
+                }
               });
             }
           `,
