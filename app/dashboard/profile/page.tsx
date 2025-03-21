@@ -16,6 +16,7 @@ export default function ProfilePage() {
     email?: string;
     name?: string;
     plan?: string;
+    plan_name?: string;
     created_at?: string;
     avatar_url?: string;
   }>({});
@@ -73,6 +74,7 @@ export default function ProfilePage() {
             email: data.user.email,
             name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',
             plan: dbData?.user?.plan || data.user.user_metadata?.plan || 'free',
+            plan_name: dbData?.user?.plan_name || 'Basic Plan',
             created_at: data.user.created_at,
             avatar_url: avatarUrl,
           });
@@ -193,7 +195,7 @@ export default function ProfilePage() {
         <p className="text-neutral-500 dark:text-neutral-400">Manage your account information</p>
       </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-neutral-100 dark:border-gray-700 p-6 mb-8">
+      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 mb-8">
         <div className="flex flex-col items-center mb-6">
           <div className="relative group mb-4">
             {avatarUrl ? (
@@ -264,7 +266,9 @@ export default function ProfilePage() {
               <p className="text-xs text-neutral-500 dark:text-neutral-400">Day Streak</p>
             </div>
             <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-3 text-center">
-              <p className="text-xl font-semibold capitalize dark:text-neutral-100">{userData.plan}</p>
+              <p className="text-xl font-semibold capitalize dark:text-neutral-100">
+                {userData.plan_name || 'Basic Plan'}
+              </p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">Plan</p>
             </div>
           </div>
@@ -274,7 +278,7 @@ export default function ProfilePage() {
       </div>
       
       {/* Theme Settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-neutral-100 dark:border-gray-700 p-6 mb-8">
+      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 mb-8">
         <h2 className="font-semibold text-lg mb-4 text-neutral-900 dark:text-white">Appearance</h2>
         
         <div className="flex items-center justify-between">

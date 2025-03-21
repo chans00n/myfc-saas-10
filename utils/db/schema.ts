@@ -5,6 +5,7 @@ export const usersTable = pgTable('users_table', {
     name: text('name').notNull(),
     email: text('email').notNull().unique(),
     plan: text('plan').notNull(),
+    plan_name: text('plan_name').default('Basic Plan'),
     stripe_id: text('stripe_id').notNull(),
     avatar_url: text('avatar_url'),
     theme_preference: text('theme_preference').default('light'),
