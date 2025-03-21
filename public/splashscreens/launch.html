@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
+  <title>MYFC - My Face Coach</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #4f46e5;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 24px;
+    }
+    
+    .app-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .loading {
+      margin-top: 24px;
+    }
+    
+    .spinner {
+      margin: 0 auto;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.location.href = '/dashboard';
+      }, 1000);
+    };
+  </script>
+</head>
+<body>
+  <img class="logo" src="/icon.png" alt="MYFC Logo">
+  <div class="app-name">MYFC</div>
+  <div class="subtitle">My Face Coach</div>
+  <div class="loading">
+    <div class="spinner"></div>
+  </div>
+</body>
+</html> 

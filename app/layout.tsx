@@ -14,13 +14,30 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "MYFC",
+    startupImage: [
+      {
+        url: "/icons/180.png",
+        media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+      },
+      {
+        url: "/icons/152.png",
+        media: "(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+      }
+    ]
   },
   applicationName: "MYFC - My Face Coach",
   formatDetection: {
     telephone: false,
   },
   icons: {
-    apple: '/apple-icon.png',
+    apple: [
+      { url: '/apple-icon.png' },
+      { url: '/apple-touch-icon.png' },
+      { url: '/apple-touch-icon-precomposed.png' },
+      { url: '/icons/180.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icons/152.png', sizes: '152x152', type: 'image/png' },
+      { url: '/icons/120.png', sizes: '120x120', type: 'image/png' }
+    ],
     icon: [
       { url: '/favicon.ico', sizes: '16x16' },
       { url: '/icons/16.png', sizes: '16x16' },
@@ -31,6 +48,9 @@ export const metadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "MYFC"
   }
 };
 
@@ -39,6 +59,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   minimumScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -71,6 +93,13 @@ export default function RootLayout({
             }
           `,
         }}
+      />
+      
+      {/* Standalone mode detector */}
+      <Script
+        id="standalone-detector"
+        src="/standalone.js"
+        strategy="beforeInteractive"
       />
       
       <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>
