@@ -39,14 +39,24 @@
       "short_name": "Dashboard",
       "description": "View your dashboard",
       "url": "/dashboard",
-      "icons": [{ "src": "/icons/192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Profile",
       "short_name": "Profile",
       "description": "View your profile",
       "url": "/profile",
-      "icons": [{ "src": "/icons/192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
-} 
+}
