@@ -59,14 +59,14 @@ export default async function Dashboard() {
             <div className="mt-8 mb-6 flex justify-between items-center">
                 <div>
                     <p className="text-neutral-500 text-sm">Welcome back</p>
-                    <h1 className="text-2xl font-semibold text-neutral-200">{userName}</h1>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">{userName}</h1>
                 </div>
                 {/* We assume the avatar is coming from MYFCNavigation */}
             </div>
 
             {/* Today's Workout */}
             {todaysWorkout ? (
-                <div className="rounded-xl shadow-sm border border-neutral-900 overflow-hidden mb-8">
+                <div className="rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden mb-8">
                     <div className="relative">
                         {todaysWorkout.thumbnail_url ? (
                             <div className="relative h-48 w-full">
@@ -107,7 +107,7 @@ export default async function Dashboard() {
                                 </span>
                             </div>
                             <Link href={`/workout/${todaysWorkout.id}`} className="block w-full">
-                                <button className="w-full bg-neutral-900 hover:bg-neutral-700 text-white font-medium py-3 rounded-lg transition duration-300">
+                                <button className="w-full bg-neutral-900 dark:bg-neutral-100 hover:bg-neutral-700 dark:hover:bg-neutral-600 text-white dark:text-neutral-800 font-medium py-3 rounded-lg transition duration-300">
                                     Start Workout
                                 </button>
                             </Link>
@@ -144,12 +144,12 @@ export default async function Dashboard() {
                 {/* Statistics with simplified design */}
                 <div className="mt-4">
                     <p className="text-sm text-neutral-500 mb-2">General tasks</p>
-                    <div className="grid grid-cols-3 border-t border-b border-neutral-200">
-                        <div className="py-4 border-r border-neutral-200">
+                    <div className="grid grid-cols-3 border-t border-b border-neutral-200 dark:border-neutral-800">
+                        <div className="py-4 border-r border-neutral-200 dark:border-neutral-800">
                             <p className="text-4xl font-semibold">{dailyExercises}</p>
                             <p className="text-sm text-neutral-500 mt-1">Daily lifts</p>
                         </div>
-                        <div className="py-4 px-4 border-r border-neutral-200">
+                        <div className="py-4 px-4 border-r border-neutral-200 dark:border-neutral-800">
                             <p className="text-4xl font-semibold">{weeklyExercises}</p>
                             <p className="text-sm text-neutral-500 mt-1">Weekly plan</p>
                         </div>
@@ -182,12 +182,12 @@ export default async function Dashboard() {
             <div className="mb-10">
                 <p className="text-sm text-neutral-600 mb-2">Completion rate</p>
                 
-                <div className="grid grid-cols-3 border-t border-b border-neutral-200">
-                    <div className="py-4 border-r border-neutral-200">
+                <div className="grid grid-cols-3 border-t border-b border-neutral-200 dark:border-neutral-800">
+                    <div className="py-4 border-r border-neutral-200 dark:border-neutral-800">
                         <p className="text-sm text-neutral-500 mb-1">Daily</p>
                         <p className="text-4xl font-semibold">{dailyCompletionRate}%</p>
                     </div>
-                    <div className="py-4 px-4 border-r border-neutral-200">
+                    <div className="py-4 px-4 border-r border-neutral-200 dark:border-neutral-800">
                         <p className="text-sm text-neutral-500 mb-1">Weekly</p>
                         <p className="text-4xl font-semibold">{weeklyCompletionRate}%</p>
                     </div>

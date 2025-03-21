@@ -71,10 +71,10 @@ export default async function WorkoutHistoryPage() {
             {Object.keys(groupedWorkouts).length > 0 ? (
                 Object.entries(groupedWorkouts).map(([monthYear, workouts]) => (
                     <div key={monthYear} className="mb-8">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-800">{monthYear}</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-neutral-800 dark:text-neutral-200">{monthYear}</h2>
                         <div className="space-y-4">
                             {workouts.map((workout: WorkoutHistoryItem) => (
-                                <div key={workout.id} className="bg-white rounded-lg shadow-sm p-4">
+                                <div key={workout.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm p-4">
                                     <div className="flex flex-col md:flex-row md:items-center">
                                         <div className="md:w-1/4 mb-3 md:mb-0">
                                             {workout.workouts?.thumbnail_url ? (
@@ -95,13 +95,13 @@ export default async function WorkoutHistoryPage() {
                                         
                                         <div className="md:w-3/4 md:pl-4">
                                             <div className="flex justify-between items-start mb-2">
-                                                <h3 className="font-medium text-gray-900">{workout.workouts?.title || 'Unknown workout'}</h3>
+                                                <h3 className="font-medium text-neutral-800 dark:text-neutral-200">{workout.workouts?.title || 'Unknown workout'}</h3>
                                                 <span className="text-xs bg-green-100 text-green-800 py-1 px-2 rounded">
                                                     Completed
                                                 </span>
                                             </div>
                                             
-                                            <div className="text-sm text-gray-600 mb-2">
+                                            <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
                                                 {workout.completed_at && (
                                                     <div className="flex items-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,17 +115,17 @@ export default async function WorkoutHistoryPage() {
                                             <div className="text-sm">
                                                 <div className="flex flex-wrap">
                                                     <div className="flex items-center mr-4">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-neutral-500 dark:text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        <span className="text-gray-600">{workout.duration_taken || workout.workouts?.duration_minutes || '-'} minutes</span>
+                                                        <span className="text-neutral-600 dark:text-neutral-400">{workout.duration_taken || workout.workouts?.duration_minutes || '-'} minutes</span>
                                                     </div>
                                                     
                                                     <div className="flex items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-neutral-500 dark:text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                                         </svg>
-                                                        <span className="text-gray-600">{workout.workouts?.intensity || 'Normal'}</span>
+                                                        <span className="text-neutral-600 dark:text-neutral-400">{workout.workouts?.intensity || 'Normal'}</span>
                                                     </div>
                                                 </div>
                                             </div>

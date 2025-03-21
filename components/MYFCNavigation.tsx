@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/utils/supabase/server';
 import { SimpleAvatar } from "@/components/ui/simple-avatar";
 import { SimpleSheet, SimpleSheetTitle, SimpleSheetDescription } from "@/components/ui/simple-sheet";
 import { useState, useEffect } from "react";
@@ -10,6 +9,7 @@ import { useState, useEffect } from "react";
 // Client component for the avatar with sheet functionality
 function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | undefined, userAvatarUrl: string | undefined }) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [billingUrl, setBillingUrl] = useState<string>('#');
   
   // Get the user's initials for the avatar fallback
   const getInitials = (email: string) => {
@@ -17,6 +17,34 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
     const namePart = email.split('@')[0];
     return namePart.charAt(0).toUpperCase();
   };
+  
+  // Get billing portal URL when sheet is opened
+  useEffect(() => {
+    if (isSheetOpen) {
+      const fetchBillingUrl = async () => {
+        try {
+          const response = await fetch('/api/billing/portal', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch billing portal URL');
+          }
+          
+          const data = await response.json();
+          setBillingUrl(data.url);
+        } catch (error) {
+          console.error('Error fetching billing URL:', error);
+        }
+      };
+      
+      fetchBillingUrl();
+    }
+  }, [isSheetOpen]);
   
   return (
     <div>
@@ -67,15 +95,14 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
             </Link>
             
             <Link 
-              href="/dashboard/settings" 
+              href={billingUrl} 
               className="flex items-center py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100"
               onClick={() => setIsSheetOpen(false)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
-              Settings
+              Billing
             </Link>
             
             <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-4">
@@ -238,17 +265,6 @@ export default function MYFCNavigation() {
             </li>
             <li>
               <Link 
-                href="/dashboard/achievements" 
-                className="flex items-center px-6 py-3 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-2 border-transparent hover:border-neutral-800 dark:hover:border-neutral-200"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                Achievements
-              </Link>
-            </li>
-            <li>
-              <Link 
                 href="/dashboard/progress" 
                 className="flex items-center px-6 py-3 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-2 border-transparent hover:border-neutral-800 dark:hover:border-neutral-200"
               >
@@ -317,11 +333,11 @@ export default function MYFCNavigation() {
               <span className="text-xs mt-1">History</span>
             </Link>
             
-            <Link href="/dashboard/achievements" className="flex flex-col items-center justify-center w-full h-full">
+            <Link href="/dashboard/library" className="flex flex-col items-center justify-center w-full h-full">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              <span className="text-xs mt-1">Badges</span>
+              <span className="text-xs mt-1">Library</span>
             </Link>
             
             <Link href="/dashboard/progress" className="flex flex-col items-center justify-center w-full h-full">

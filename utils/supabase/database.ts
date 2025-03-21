@@ -1,5 +1,5 @@
 import { createClient } from './server';
-import type { User, Workout, UserWorkout, DailyWorkout, Achievement, UserAchievement, UserStreak } from '../../types/database';
+import type { User, Workout, UserWorkout, DailyWorkout, Achievement, UserAchievement, UserStreak, Movement, FocusArea } from '../../types/database';
 
 // Helper function to get the authenticated user from the session
 export async function getCurrentUser(): Promise<User | null> {
@@ -410,6 +410,156 @@ export async function getFocusAreas() {
     return data;
   } catch (err) {
     console.error('Unexpected error in getFocusAreas:', err);
+    return [];
+  }
+}
+
+// Get all movements with filtering and sorting options
+export async function getMovementsLibrary({
+  page = 1,
+  limit = 12,
+  sortBy = 'name',
+  sortOrder = 'asc',
+  difficulty = null,
+  focusAreaId = null,
+  search = null,
+}: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  difficulty?: 'beginner' | 'intermediate' | 'advanced' | null;
+  focusAreaId?: string | null;
+  search?: string | null;
+} = {}) {
+  try {
+    const supabase = createClient();
+    const offset = (page - 1) * limit;
+    
+    let query = supabase
+      .from('movements')
+      .select(`
+        *,
+        focus_areas(id, name, description, image_url)
+      `, { count: 'exact' });
+    
+    // Apply filters
+    if (difficulty) {
+      query = query.eq('difficulty_level', difficulty);
+    }
+    
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+    
+    // Filter by focus area if provided
+    if (focusAreaId) {
+      query = query.eq('focus_area_id', focusAreaId);
+    }
+    
+    // Apply sorting
+    if (sortBy && sortOrder) {
+      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+    }
+    
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+    
+    const { data, error, count } = await query;
+    
+    if (error) {
+      console.error('Error fetching movements library:', error);
+      return { data: [], count: 0 };
+    }
+    
+    // Process the data to include focus area information
+    const processedData = data.map(movement => {
+      return {
+        ...movement,
+        focus_area: movement.focus_areas,
+        // Remove nested data to keep it clean
+        focus_areas: undefined
+      };
+    });
+    
+    return { 
+      data: processedData, 
+      count: count || 0,
+      totalPages: count ? Math.ceil(count / limit) : 0
+    };
+  } catch (err) {
+    console.error('Unexpected error in getMovementsLibrary:', err);
+    return { data: [], count: 0, totalPages: 0 };
+  }
+}
+
+// Get a specific movement by ID
+export async function getMovementById(movementId: string): Promise<Movement | null> {
+  try {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('movements')
+      .select(`
+        *,
+        focus_areas(id, name, description, image_url)
+      `)
+      .eq('id', movementId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching movement:', error);
+      return null;
+    }
+    
+    // Format the response
+    const movement = {
+      ...data,
+      focus_area: data.focus_areas,
+      focus_areas: undefined
+    };
+    
+    return movement as unknown as Movement;
+  } catch (err) {
+    console.error('Unexpected error in getMovementById:', err);
+    return null;
+  }
+}
+
+// Get movements for a specific workout with sequence order and details
+export async function getWorkoutMovements(workoutId: string): Promise<any[]> {
+  try {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('workout_movements')
+      .select(`
+        id,
+        sequence_order,
+        duration_seconds,
+        repetitions,
+        sets,
+        movements(
+          id,
+          name,
+          description,
+          thumbnail_url,
+          video_url,
+          difficulty_level,
+          focus_areas(id, name, description, image_url)
+        )
+      `)
+      .eq('workout_id', workoutId)
+      .order('sequence_order', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching workout movements:', error);
+      return [];
+    }
+    
+    return data;
+  } catch (err) {
+    console.error('Unexpected error in getWorkoutMovements:', err);
     return [];
   }
 } 

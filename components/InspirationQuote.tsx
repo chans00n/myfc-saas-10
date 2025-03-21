@@ -132,7 +132,7 @@ export default function InspirationQuote() {
   }
   
   return (
-    <div className="py-8 px-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
+    <div className="py-8 px-4 mt-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
       <h3 className="text-sm uppercase text-neutral-500 dark:text-neutral-400 font-medium tracking-wider mb-4">Daily Inspiration</h3>
       <blockquote className="text-lg italic font-normal text-neutral-700 dark:text-neutral-300 mb-3">
         &ldquo;{quote.text}&rdquo;

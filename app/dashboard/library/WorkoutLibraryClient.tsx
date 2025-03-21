@@ -139,7 +139,7 @@ export default function WorkoutLibraryClient({
   return (
     <div>
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
+      <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-gray-100 dark:border-neutral-800 p-4 mb-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="relative flex-grow">
@@ -148,7 +148,7 @@ export default function WorkoutLibraryClient({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search workouts..."
-              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent"
             />
             <button 
               type="submit" 
@@ -165,7 +165,7 @@ export default function WorkoutLibraryClient({
           <div className="flex items-center space-x-2">
             <button 
               onClick={() => toggleView('list')}
-              className={`p-2 border rounded-md ${view === 'list' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-700'}`}
+              className={`p-2 border rounded-md ${view === 'list' ? 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200' : 'bg-white dark:bg-neutral-600 border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-200'}`}
               aria-label="List view"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,7 +174,7 @@ export default function WorkoutLibraryClient({
             </button>
             <button 
               onClick={() => toggleView('calendar')}
-              className={`p-2 border rounded-md ${view === 'calendar' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-700'}`}
+              className={`p-2 border rounded-md ${view === 'calendar' ? 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200' : 'bg-white dark:bg-neutral-600 border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-200'}`}
               aria-label="Calendar view"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,7 +190,7 @@ export default function WorkoutLibraryClient({
             <select
               value={intensity || ''}
               onChange={(e) => handleFilterChange('intensity', e.target.value || null)}
-              className="appearance-none px-3 py-2 border border-gray-300 rounded-lg pr-8 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="">All Intensities</option>
               <option value="beginner">Beginner</option>
@@ -209,7 +209,7 @@ export default function WorkoutLibraryClient({
             <select
               value={focusArea || ''}
               onChange={(e) => handleFilterChange('focusArea', e.target.value || null)}
-              className="appearance-none px-3 py-2 border border-gray-300 rounded-lg pr-8 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="">All Focus Areas</option>
               {focusAreas.map((area) => (
@@ -228,7 +228,7 @@ export default function WorkoutLibraryClient({
             <select
               value={sort}
               onChange={(e) => handleFilterChange('sort', e.target.value)}
-              className="appearance-none px-3 py-2 border border-gray-300 rounded-lg pr-8 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="created_at">Date Added</option>
               <option value="title">Title</option>
@@ -244,7 +244,7 @@ export default function WorkoutLibraryClient({
           {/* Sort Order */}
           <button 
             onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-            className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="px-3 py-2 border border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-neutral-200 focus:border-transparent"
             aria-label={order === 'asc' ? 'Sort descending' : 'Sort ascending'}
           >
             {order === 'asc' ? (
@@ -262,7 +262,7 @@ export default function WorkoutLibraryClient({
       
       {/* Results Summary */}
       <div className="mb-6">
-        <p className="text-gray-600">
+        <p className="text-neutral-600 dark:text-neutral-400">
           {totalWorkouts} workout{totalWorkouts !== 1 ? 's' : ''} found
           {currentSearch ? ` for "${currentSearch}"` : ''}
           {currentIntensity ? ` • ${currentIntensity.charAt(0).toUpperCase() + currentIntensity.slice(1)} intensity` : ''}
@@ -274,12 +274,12 @@ export default function WorkoutLibraryClient({
       {view === 'list' && (
         <div>
           {workouts.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-gray-100 dark:border-neutral-800 p-8 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 dark:text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workouts found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your filters or search criteria.</p>
+              <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2">No workouts found</h3>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4">Try adjusting your filters or search criteria.</p>
               <button 
                 onClick={() => {
                   setSearch('');
@@ -300,7 +300,7 @@ export default function WorkoutLibraryClient({
                 <Link 
                   href={`/workout/${workout.id}`} 
                   key={workout.id} 
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition duration-300"
+                  className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-gray-100 dark:border-neutral-800 overflow-hidden hover:shadow-md transition duration-300"
                 >
                   <div className="relative h-40">
                     {workout.thumbnail_url ? (
@@ -329,19 +329,19 @@ export default function WorkoutLibraryClient({
                   </div>
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">{workout.title}</h3>
+                      <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200">{workout.title}</h3>
                       {getIntensityLabel(workout.intensity)}
                     </div>
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{workout.description}</p>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2">{workout.description}</p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center text-gray-700">
+                      <div className="flex items-center text-neutral-700 dark:text-neutral-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="text-sm">{workout.duration_minutes} min</span>
                       </div>
                       {workout.focus_areas && workout.focus_areas.length > 0 && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-neutral-700 dark:text-neutral-400">
                           {workout.focus_areas.slice(0, 2).join(', ')}
                           {workout.focus_areas.length > 2 && '...'}
                         </div>
@@ -415,7 +415,7 @@ export default function WorkoutLibraryClient({
       
       {/* Calendar View */}
       {view === 'calendar' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-20">
+        <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 mb-20">
           <div className="grid grid-cols-7 gap-1 text-sm">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
               <div key={day} className="font-medium text-center py-2">{day}</div>
@@ -426,7 +426,7 @@ export default function WorkoutLibraryClient({
                 <div 
                   key={`${weekIndex}-${dayIndex}`} 
                   className={`min-h-24 border rounded-md p-1 flex flex-col ${
-                    day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'
+                    day.isCurrentMonth ? 'bg-white dark:bg-neutral-800' : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-400'
                   }`}
                 >
                   <div className="text-right text-xs mb-1">{day.date.getDate()}</div>
@@ -437,7 +437,7 @@ export default function WorkoutLibraryClient({
                         <Link 
                           key={workout.id} 
                           href={`/workout/${workout.id}`}
-                          className="block text-xs mb-1 p-1 rounded bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 truncate"
+                          className="block text-xs mb-1 p-1 rounded bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 truncate"
                         >
                           {workout.title}
                         </Link>
@@ -453,7 +453,7 @@ export default function WorkoutLibraryClient({
           
           {workouts.length === 0 && (
             <div className="mt-8 text-center">
-              <p className="text-gray-600 mb-4">No workouts scheduled for the current filters.</p>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4">No workouts scheduled for the current filters.</p>
               <button 
                 onClick={() => {
                   setSearch('');
@@ -463,7 +463,7 @@ export default function WorkoutLibraryClient({
                   setOrder('desc');
                   setPage(1);
                 }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="px-4 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
               >
                 Clear All Filters
               </button>

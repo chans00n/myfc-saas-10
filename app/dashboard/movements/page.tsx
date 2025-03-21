@@ -1,21 +1,20 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { getWorkoutsLibrary, getFocusAreas } from '@/utils/supabase/database';
+import { getMovementsLibrary, getFocusAreas } from '@/utils/supabase/database';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from "drizzle-orm";
 import Link from 'next/link';
-import WorkoutLibraryClient from './WorkoutLibraryClient';
+import MovementLibraryClient from './MovementLibraryClient';
 
-export default async function WorkoutLibraryPage({
+export default async function MovementLibraryPage({
   searchParams
 }: {
   searchParams: { 
     page?: string;
-    view?: string;
     sort?: string;
     order?: string;
-    intensity?: string;
+    difficulty?: string;
     focus?: string;
     q?: string;
   }
@@ -37,46 +36,51 @@ export default async function WorkoutLibraryPage({
 
   // Get and validate query parameters
   const page = parseInt(searchParams.page || '1', 10);
-  const view = searchParams.view === 'calendar' ? 'calendar' : 'list';
-  const sortBy = searchParams.sort || 'created_at';
+  const sortBy = searchParams.sort || 'name';
   const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
-  const intensityFilter = ['beginner', 'intermediate', 'advanced'].includes(searchParams.intensity || '') 
-    ? searchParams.intensity as 'beginner' | 'intermediate' | 'advanced'
+  const difficultyFilter = ['beginner', 'intermediate', 'advanced'].includes(searchParams.difficulty || '') 
+    ? searchParams.difficulty as 'beginner' | 'intermediate' | 'advanced'
     : null;
   const focusAreaFilter = searchParams.focus || null;
   const searchQuery = searchParams.q || null;
 
-  // Get workouts with filters
-  const { data: workouts, count = 0, totalPages = 0 } = await getWorkoutsLibrary({
+  // Get focus areas for filter options
+  const focusAreas = await getFocusAreas();
+  
+  // Find focus area ID if a focus area name is provided
+  let focusAreaId = null;
+  if (focusAreaFilter) {
+    const matchingFocusArea = focusAreas.find(area => area.name === focusAreaFilter);
+    focusAreaId = matchingFocusArea?.id || null;
+  }
+
+  // Get movements with filters
+  const { data: movements, count = 0, totalPages = 0 } = await getMovementsLibrary({
     page,
     limit: 12,
     sortBy,
     sortOrder,
-    intensity: intensityFilter,
-    focusArea: focusAreaFilter,
+    difficulty: difficultyFilter,
+    focusAreaId,
     search: searchQuery
   });
-
-  // Get focus areas for filter options
-  const focusAreas = await getFocusAreas();
 
   return (
     <main className="container max-w-6xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Workout Library</h1>
-        <p className="text-gray-600 dark:text-gray-400">Discover and explore our collection of workouts</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Movement Library</h1>
+        <p className="text-gray-600 dark:text-gray-400">Browse and explore facial exercises by area and difficulty</p>
       </div>
       
       {/* Pass all data to the client component for interactive features */}
-      <WorkoutLibraryClient 
-        initialWorkouts={workouts}
-        totalWorkouts={count}
+      <MovementLibraryClient 
+        initialMovements={movements}
+        totalMovements={count}
         totalPages={totalPages}
         currentPage={page}
-        currentView={view}
         currentSort={sortBy}
         currentOrder={sortOrder}
-        currentIntensity={intensityFilter}
+        currentDifficulty={difficultyFilter}
         currentFocusArea={focusAreaFilter}
         currentSearch={searchQuery}
         focusAreas={focusAreas}
