@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FocusArea, Workout } from '@/types/database';
+import { getImageSizes, getPlaceholderImage } from '@/utils/image-sizes';
 
 interface WorkoutLibraryClientProps {
   initialWorkouts: any[];
@@ -296,7 +297,7 @@ export default function WorkoutLibraryClient({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {workouts.map((workout) => (
+              {workouts.map((workout, index) => (
                 <Link 
                   href={`/workout/${workout.id}`} 
                   key={workout.id} 
@@ -308,18 +309,12 @@ export default function WorkoutLibraryClient({
                         src={workout.thumbnail_url} 
                         alt={workout.title}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        placeholder="blur"
+                        blurDataURL={getPlaceholderImage('indigo')}
+                        sizes={getImageSizes('thumbnail')}
                         className="object-cover"
-                        onError={(e) => {
-                          // Replace with fallback on error
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.parentElement!.classList.add('bg-gradient-to-b', 'from-indigo-500', 'to-indigo-700', 'flex', 'items-center', 'justify-center');
-                          const span = document.createElement('span');
-                          span.className = 'text-white text-2xl font-bold';
-                          span.innerText = 'MYFC';
-                          target.parentElement!.appendChild(span);
-                        }}
+                        quality={75}
+                        priority={index < 6} // Prioritize first 6 images
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-b from-indigo-500 to-indigo-700 flex items-center justify-center">
