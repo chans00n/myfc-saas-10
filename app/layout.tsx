@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProviderServer } from "@/components/ThemeProviderServer";
 import Script from "next/script";
 import Head from "next/head";
+import { Suspense, useEffect } from 'react'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -102,8 +103,142 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Register service worker for PWA functionality
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const registerServiceWorker = async () => {
+        try {
+          // Check if we're on a subdomain
+          const hostname = window.location.hostname;
+          const isSubdomain = hostname.split('.').length > 2;
+          
+          console.log(`[PWA] Running on ${hostname}, subdomain: ${isSubdomain}`);
+          
+          // Choose the appropriate service worker based on environment
+          const swPath = isSubdomain ? '/root-sw.js' : '/sw.js';
+          const initialScope = '/';
+          
+          console.log(`[PWA] Attempting to register service worker from ${swPath} with scope ${initialScope}`);
+          
+          try {
+            // Try to register with the primary service worker and root scope
+            const registration = await navigator.serviceWorker.register(swPath, {
+              scope: initialScope,
+              updateViaCache: 'none' // Prevent the browser from using cached versions
+            });
+            
+            console.log(`[PWA] Service worker registered successfully with scope: ${registration.scope}`);
+            
+            // Listen for new service workers and notify the user
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              
+              if (!newWorker) return;
+              
+              console.log('[PWA] New service worker is being installed');
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[PWA] New service worker available, refresh to update');
+                  
+                  // Show notification to the user about the update
+                  if (window.confirm('A new version of the app is available. Refresh to update?')) {
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          } catch (primaryError) {
+            console.error(`[PWA] Primary service worker registration failed: ${primaryError}`);
+            
+            // If the primary registration failed, try with different scopes
+            const fallbackScopes = ['/', '/app/', window.location.pathname];
+            
+            for (const scope of fallbackScopes) {
+              try {
+                console.log(`[PWA] Trying to register with scope: ${scope}`);
+                const registration = await navigator.serviceWorker.register(swPath, {
+                  scope: scope,
+                  updateViaCache: 'none'
+                });
+                
+                console.log(`[PWA] Service worker registered with fallback scope: ${registration.scope}`);
+                return; // Exit if successful
+              } catch (scopeError) {
+                console.error(`[PWA] Registration with scope ${scope} failed: ${scopeError}`);
+              }
+            }
+            
+            // If all attempts with primary service worker failed, try the fallback service worker
+            try {
+              console.log('[PWA] Trying fallback service worker');
+              const fallbackRegistration = await navigator.serviceWorker.register('/fallback-sw.js', {
+                scope: '/',
+                updateViaCache: 'none'
+              });
+              
+              console.log(`[PWA] Fallback service worker registered with scope: ${fallbackRegistration.scope}`);
+            } catch (fallbackError) {
+              console.error(`[PWA] Fallback service worker registration also failed: ${fallbackError}`);
+              console.log('[PWA] Service worker registration failed completely');
+            }
+          }
+        } catch (error) {
+          console.error('[PWA] Service worker registration error:', error);
+        }
+      };
+
+      // Register the service worker when the app loads
+      registerServiceWorker();
+      
+      // Set up online/offline status handling
+      const handleOnlineStatus = () => {
+        const isOnline = navigator.onLine;
+        console.log(`[PWA] Network status changed. Online: ${isOnline}`);
+        
+        // Notify the service worker about the connection status change
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: 'ONLINE_STATUS_CHANGE',
+            isOnline
+          });
+        }
+        
+        // Optionally show a toast notification to the user
+        if (!isOnline) {
+          // You can implement a toast component here
+          console.log('[PWA] You are offline. The app will continue to work with limited functionality.');
+        } else {
+          console.log('[PWA] You are back online.');
+        }
+      };
+      
+      // Listen for online/offline events
+      window.addEventListener('online', handleOnlineStatus);
+      window.addEventListener('offline', handleOnlineStatus);
+      
+      // Initial check
+      handleOnlineStatus();
+      
+      // Cleanup listeners on component unmount
+      return () => {
+        window.removeEventListener('online', handleOnlineStatus);
+        window.removeEventListener('offline', handleOnlineStatus);
+      };
+    }
+  }, []);
+
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        
+        {/* Theme colors */}
+        <meta name="theme-color" content="#4f46e5" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       {/* Required for pricing table */}
       <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
       
@@ -155,7 +290,12 @@ export default function RootLayout({
           __html: `
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js', {
+                // Determine if we're on a subdomain
+                const isSubdomain = window.location.hostname.split('.').length > 2;
+                const swPath = isSubdomain ? '/root-sw.js' : '/sw.js';
+                console.log('Registering service worker from:', swPath);
+                
+                navigator.serviceWorker.register(swPath, {
                   scope: '/', // Explicitly set scope to root
                   updateViaCache: 'none' // Prevent browser cache from interfering with updates
                 }).then(function(registration) {
@@ -190,29 +330,42 @@ export default function RootLayout({
                 }).catch(function(err) {
                   console.error('Service Worker registration failed:', err);
                   
-                  // Try with a different scope if the main registration fails
-                  navigator.serviceWorker.register('/sw.js', { 
-                    scope: '/dashboard/', 
-                    updateViaCache: 'none'
-                  }).then(reg => {
-                    console.log('Fallback SW registered with scope:', reg.scope);
-                  }).catch(e => {
-                    console.error('Alternative scope registration failed:', e);
-                    
-                    // Fall back to the fallback service worker if main one fails
-                    navigator.serviceWorker.register('/fallback-sw.js', {
-                      scope: '/'
-                    }).then(reg => console.log('Fallback SW registered'))
-                    .catch(e => console.error('Even fallback SW failed:', e));
+                  // Try different scope options if main registration fails
+                  const scopeOptions = ['/', '/dashboard/', window.location.pathname];
+                  console.log('Trying alternative scopes:', scopeOptions);
+                  
+                  let registerPromise = Promise.reject();
+                  
+                  // Try each scope option in sequence
+                  scopeOptions.forEach(scope => {
+                    registerPromise = registerPromise.catch(() => {
+                      console.log('Trying registration with scope:', scope);
+                      return navigator.serviceWorker.register(swPath, { 
+                        scope: scope, 
+                        updateViaCache: 'none'
+                      });
+                    });
                   });
+                  
+                  registerPromise
+                    .then(reg => {
+                      console.log('Successfully registered with alternative scope:', reg.scope);
+                    })
+                    .catch(error => {
+                      console.error('All scope alternatives failed:', error);
+                      
+                      // Fall back to the fallback service worker if all attempts fail
+                      navigator.serviceWorker.register('/fallback-sw.js', {
+                        scope: '/'
+                      }).then(reg => console.log('Fallback SW registered'))
+                      .catch(e => console.error('Even fallback SW failed:', e));
+                    });
                 });
               });
               
               // Handle connectivity changes to update cached content
               window.addEventListener('online', () => {
                 console.log('App is online again');
-                // Refresh page on reconnect for fresh content
-                // window.location.reload();
                 
                 // Inform service worker of online status
                 if (navigator.serviceWorker.controller) {
