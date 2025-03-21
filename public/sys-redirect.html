@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f7f7f7;
+      color: #333;
+      text-align: center;
+    }
+    h1 {
+      color: #4f46e5;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Redirecting...</h1>
+    <p>You'll be redirected to the appropriate page in a moment.</p>
+    <p id="location"></p>
+  </div>
+
+  <script>
+    function getParameterByName(name, url = window.location.href) {
+      name = name.replace(/[\[\]]/g, '\\$&');
+      const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+      const results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get redirection parameter
+      const rs = getParameterByName('rs');
+      let redirectTo = '/';
+      
+      // Handle specific redirection codes
+      if (rs === '1338') {
+        // Specific redirection for code 1338
+        redirectTo = '/dashboard';
+      } else if (rs) {
+        // Handle other redirection codes if needed
+        try {
+          const code = parseInt(rs, 10);
+          switch (code) {
+            case 1001:
+              redirectTo = '/login';
+              break;
+            case 1002:
+              redirectTo = '/register';
+              break;
+            case 1003:
+              redirectTo = '/profile';
+              break;
+            case 1004:
+              redirectTo = '/settings';
+              break;
+            default:
+              redirectTo = '/';
+          }
+        } catch (e) {
+          console.error('Invalid redirection code', e);
+          redirectTo = '/';
+        }
+      }
+      
+      document.getElementById('location').textContent = `Redirecting to: ${redirectTo}`;
+      
+      // Perform redirection after a short delay
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 1000);
+    });
+  </script>
+</body>
+</html> 
