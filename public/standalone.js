@@ -3,7 +3,7 @@
   // Detect if the app is in standalone mode (installed to home screen)
   window.isInStandaloneMode = function() {
     return (
-      // iOS detection
+      // iOS detection - highest priority
       window.navigator.standalone || 
       // Other browser detection
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -19,6 +19,15 @@
   
   // Check if we need to redirect on iOS
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  
+  // For iOS devices, check if we're on the iOS entry page and need to redirect
+  if (isIOS && window.location.pathname.includes('index-ios')) {
+    // Always go to dashboard from iOS entry page
+    window.location.replace('/dashboard');
+    return;
+  }
+  
+  // Normal standalone mode handling
   const isStandalone = window.isInStandaloneMode();
   
   // If on iOS and in standalone mode, handle any saved redirect

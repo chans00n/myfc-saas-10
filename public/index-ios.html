@@ -116,38 +116,18 @@
     </div>
 
     <script>
-        // Check if the app is running in standalone mode (from home screen)
-        const isInStandaloneMode = () => 
-            (window.navigator.standalone) || 
-            (window.matchMedia('(display-mode: standalone)').matches);
-        
-        // If not running in standalone mode, redirect to installation page
-        if (!isInStandaloneMode()) {
-            window.location.href = '/ios-redirect.html';
-        } else {
-            // Store current time for splash screen timing
-            const startTime = new Date().getTime();
+        // When launched from home screen icon on iOS, this page should always redirect to the dashboard
+        // iOS home screen launches are ALWAYS in standalone mode
+        window.addEventListener('load', function() {
+            // Set a flag to indicate we're in standalone mode
+            localStorage.setItem('pwaStandalone', 'true');
             
-            // Ensure minimum splash screen time (1 second)
-            const redirectToApp = () => {
-                const currentTime = new Date().getTime();
-                const elapsedTime = currentTime - startTime;
-                
-                if (elapsedTime > 1000) {
-                    // Redirect to dashboard
-                    window.location.replace('/dashboard');
-                } else {
-                    // Wait until minimum time has passed
-                    setTimeout(redirectToApp, 1000 - elapsedTime);
-                }
-            };
-            
-            // Wait for page load and redirect
-            window.addEventListener('load', redirectToApp);
-            
-            // Fallback in case load event doesn't fire
-            setTimeout(redirectToApp, 2000);
-        }
+            // Short delay to ensure app is ready
+            setTimeout(function() {
+                // Always redirect to dashboard when this page is loaded from app icon
+                window.location.replace('/dashboard');
+            }, 1000);
+        });
     </script>
 </body>
 </html> 
