@@ -156,16 +156,17 @@ export default function RootLayout({
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js', {
+                  scope: '/', // Explicitly set scope to root
                   updateViaCache: 'none' // Prevent browser cache from interfering with updates
                 }).then(function(registration) {
                   console.log('Service Worker registered with scope:', registration.scope);
                   
                   // Check for updates on page load
-                  registration.update();
+                  registration.update().catch(err => console.log('Update check failed:', err));
                   
                   // Check for updates periodically
                   setInterval(() => {
-                    registration.update();
+                    registration.update().catch(err => console.log('Periodic update failed:', err));
                   }, 60 * 60 * 1000); // Check every hour
                   
                   // Update on page transitions
@@ -175,11 +176,13 @@ export default function RootLayout({
                   navigator.serviceWorker.addEventListener('controllerchange', () => {
                     if (refreshing) return;
                     refreshing = true;
+                    console.log('Service worker controller changed, reloading page');
                     window.location.reload();
                   });
                   
                   // Listen for messages from service worker
                   navigator.serviceWorker.addEventListener('message', (event) => {
+                    console.log('Message from service worker:', event.data);
                     if (event.data && event.data.type === 'RELOAD_PAGE') {
                       window.location.reload();
                     }
@@ -187,16 +190,30 @@ export default function RootLayout({
                 }).catch(function(err) {
                   console.error('Service Worker registration failed:', err);
                   
-                  // Fall back to the fallback service worker if main one fails
-                  navigator.serviceWorker.register('/fallback-sw.js')
-                    .then(reg => console.log('Fallback SW registered'))
+                  // Try with a different scope if the main registration fails
+                  navigator.serviceWorker.register('/sw.js', { 
+                    scope: '/dashboard/', 
+                    updateViaCache: 'none'
+                  }).then(reg => {
+                    console.log('Fallback SW registered with scope:', reg.scope);
+                  }).catch(e => {
+                    console.error('Alternative scope registration failed:', e);
+                    
+                    // Fall back to the fallback service worker if main one fails
+                    navigator.serviceWorker.register('/fallback-sw.js', {
+                      scope: '/'
+                    }).then(reg => console.log('Fallback SW registered'))
                     .catch(e => console.error('Even fallback SW failed:', e));
+                  });
                 });
               });
               
               // Handle connectivity changes to update cached content
               window.addEventListener('online', () => {
                 console.log('App is online again');
+                // Refresh page on reconnect for fresh content
+                // window.location.reload();
+                
                 // Inform service worker of online status
                 if (navigator.serviceWorker.controller) {
                   navigator.serviceWorker.controller.postMessage({
@@ -213,6 +230,37 @@ export default function RootLayout({
                     type: 'ONLINE_STATUS',
                     status: 'offline'
                   });
+                  
+                  // Show a notification to the user
+                  const offlineNotif = document.createElement('div');
+                  offlineNotif.style.position = 'fixed';
+                  offlineNotif.style.bottom = '20px';
+                  offlineNotif.style.left = '20px';
+                  offlineNotif.style.right = '20px';
+                  offlineNotif.style.backgroundColor = '#ffc107';
+                  offlineNotif.style.color = '#000';
+                  offlineNotif.style.padding = '12px 16px';
+                  offlineNotif.style.borderRadius = '8px';
+                  offlineNotif.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+                  offlineNotif.style.zIndex = '9999';
+                  offlineNotif.style.textAlign = 'center';
+                  offlineNotif.textContent = 'You are offline. Some features may not be available.';
+                  
+                  document.body.appendChild(offlineNotif);
+                  
+                  // Remove notification when online again
+                  window.addEventListener('online', function() {
+                    if (document.body.contains(offlineNotif)) {
+                      document.body.removeChild(offlineNotif);
+                    }
+                  }, { once: true });
+                  
+                  // Remove after 5 seconds
+                  setTimeout(() => {
+                    if (document.body.contains(offlineNotif)) {
+                      document.body.removeChild(offlineNotif);
+                    }
+                  }, 5000);
                 }
               });
             }

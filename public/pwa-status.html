@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYFC PWA Status</title>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 20px;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    h1, h2 { 
+      color: #4f46e5; 
+      margin-top: 24px;
+    }
+    .status { 
+      padding: 12px; 
+      margin: 12px 0; 
+      border-radius: 6px; 
+      border-left: 5px solid;
+    }
+    .ok { 
+      background: #d4edda; 
+      color: #155724; 
+      border-left-color: #28a745;
+    }
+    .error { 
+      background: #f8d7da; 
+      color: #721c24; 
+      border-left-color: #dc3545;
+    }
+    .warning { 
+      background: #fff3cd; 
+      color: #856404; 
+      border-left-color: #ffc107;
+    }
+    .info {
+      background: #e7f5ff;
+      color: #0d6efd;
+      border-left-color: #0d6efd;
+    }
+    button { 
+      padding: 10px 18px; 
+      margin: 8px 8px 8px 0; 
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      color: white;
+      transition: background-color 0.2s;
+    }
+    button.primary {
+      background-color: #4f46e5;
+    }
+    button.danger {
+      background-color: #dc3545;
+    }
+    button.warning {
+      background-color: #ffc107;
+      color: #333;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    pre {
+      background: #f1f1f1;
+      padding: 10px;
+      overflow: auto;
+      border-radius: 4px;
+    }
+    .buttons {
+      margin: 20px 0;
+    }
+    .cache-entry {
+      margin-left: 20px;
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+    .cache-name {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #navigation {
+      margin-top: 30px;
+    }
+    a {
+      color: #4f46e5;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>MYFC PWA Status</h1>
+  <p>This page helps diagnose issues with the PWA service worker and caching.</p>
+  
+  <div class="buttons">
+    <button id="check" class="primary">Run Diagnostics</button>
+    <button id="clear" class="danger">Clear All Caches</button>
+    <button id="update" class="warning">Update Service Worker</button>
+  </div>
+  
+  <div id="results"></div>
+  
+  <div id="cache-contents"></div>
+  
+  <div id="navigation">
+    <h2>Navigation</h2>
+    <p><a href="/dashboard">Go to Dashboard</a></p>
+    <p><a href="/offline.html">View Offline Page</a></p>
+    <p><a href="/">Go to Home</a></p>
+  </div>
+  
+  <script>
+    const results = document.getElementById('results');
+    const cacheContents = document.getElementById('cache-contents');
+    
+    // Helper to add a result message
+    function addResult(message, type = 'ok') {
+      const div = document.createElement('div');
+      div.className = `status ${type}`;
+      div.textContent = message;
+      results.appendChild(div);
+      console.log(`[${type}] ${message}`);
+    }
+    
+    // Display cache entries nicely
+    function displayCacheEntries(cacheName, entries) {
+      const cacheNameEl = document.createElement('div');
+      cacheNameEl.className = 'cache-name';
+      cacheNameEl.textContent = `Cache: ${cacheName} (${entries.length} entries)`;
+      cacheContents.appendChild(cacheNameEl);
+      
+      entries.slice(0, 20).forEach(entry => {
+        const entryEl = document.createElement('div');
+        entryEl.className = 'cache-entry';
+        entryEl.textContent = entry.url || entry;
+        cacheContents.appendChild(entryEl);
+      });
+      
+      if (entries.length > 20) {
+        const moreEl = document.createElement('div');
+        moreEl.className = 'cache-entry';
+        moreEl.textContent = `... and ${entries.length - 20} more entries`;
+        cacheContents.appendChild(moreEl);
+      }
+    }
+    
+    // Run diagnostics
+    document.getElementById('check').addEventListener('click', async () => {
+      results.innerHTML = '';
+      cacheContents.innerHTML = '';
+      addResult('Starting diagnostics...', 'info');
+      
+      // Check service worker support
+      if (!('serviceWorker' in navigator)) {
+        addResult('Service Worker not supported in this browser', 'error');
+        return;
+      }
+      
+      addResult('Service Worker supported');
+      
+      // Online status
+      if (navigator.onLine) {
+        addResult('Browser reports online status: ONLINE');
+      } else {
+        addResult('Browser reports online status: OFFLINE', 'warning');
+      }
+      
+      // Check registration
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        if (registrations.length === 0) {
+          addResult('No service worker registrations found', 'error');
+        } else {
+          addResult(`Found ${registrations.length} service worker registrations`);
+          
+          registrations.forEach(reg => {
+            addResult(`Registration scope: ${reg.scope}`);
+            
+            if (reg.active) {
+              addResult(`Active worker: state=${reg.active.state}`);
+            } else {
+              addResult('No active service worker', 'error');
+            }
+            
+            if (reg.installing) {
+              addResult(`Installing worker: state=${reg.installing.state}`, 'info');
+            }
+            
+            if (reg.waiting) {
+              addResult(`Waiting worker: state=${reg.waiting.state}`, 'warning');
+            }
+            
+            if (reg.updateViaCache) {
+              addResult(`Update via cache: ${reg.updateViaCache}`);
+            }
+          });
+        }
+      } catch (e) {
+        addResult(`Error checking registrations: ${e.message}`, 'error');
+      }
+      
+      // Check caches
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          
+          if (cacheNames.length === 0) {
+            addResult('No caches found', 'warning');
+          } else {
+            addResult(`Found ${cacheNames.length} caches`);
+            
+            cacheContents.innerHTML = '<h2>Cache Contents</h2>';
+            
+            for (const name of cacheNames) {
+              try {
+                const cache = await caches.open(name);
+                const keys = await cache.keys();
+                addResult(`Cache "${name}" has ${keys.length} entries`);
+                
+                // Show entries for inspection
+                displayCacheEntries(name, keys);
+              } catch (e) {
+                addResult(`Error reading cache "${name}": ${e.message}`, 'error');
+              }
+            }
+          }
+        } catch (e) {
+          addResult(`Error listing caches: ${e.message}`, 'error');
+        }
+      } else {
+        addResult('Cache API not supported', 'error');
+      }
+      
+      addResult('Diagnostics complete', 'info');
+    });
+    
+    // Clear caches
+    document.getElementById('clear').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to clear all caches? This will remove offline functionality until pages are visited again.')) {
+        return;
+      }
+      
+      results.innerHTML = '';
+      cacheContents.innerHTML = '';
+      
+      if ('caches' in window) {
+        try {
+          addResult('Clearing caches...', 'warning');
+          const keys = await caches.keys();
+          
+          if (keys.length === 0) {
+            addResult('No caches to clear', 'info');
+          } else {
+            await Promise.all(keys.map(key => caches.delete(key)));
+            addResult(`Cleared ${keys.length} caches`, 'warning');
+          }
+        } catch (e) {
+          addResult(`Error clearing caches: ${e.message}`, 'error');
+        }
+      }
+      
+      // Also send message to service worker
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHES' });
+        addResult('Sent clear message to service worker', 'info');
+      } else {
+        addResult('No controlling service worker to message', 'warning');
+      }
+      
+      addResult('Cache clearing complete', 'info');
+    });
+    
+    // Update service worker
+    document.getElementById('update').addEventListener('click', async () => {
+      results.innerHTML = '';
+      
+      try {
+        addResult('Triggering service worker update...', 'info');
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        
+        if (registrations.length === 0) {
+          addResult('No service worker registrations found', 'error');
+        } else {
+          await Promise.all(registrations.map(reg => {
+            addResult(`Updating registration: ${reg.scope}`, 'info');
+            return reg.update();
+          }));
+          addResult('Update triggered successfully', 'info');
+        }
+      } catch (e) {
+        addResult(`Error updating service worker: ${e.message}`, 'error');
+      }
+    });
+    
+    // Run diagnostics on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('check').click();
+      }, 1000);
+    });
+  </script>
+</body>
+</html> 
