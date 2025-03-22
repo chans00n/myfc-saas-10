@@ -10,14 +10,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MYFC">
   
-  <!-- Icons -->
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Icons with relative paths for subdomain support -->
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./icons/152.png">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
   
-  <!-- Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- Manifest with relative path -->
+  <link rel="manifest" href="./manifest.json">
   
   <style>
     body {
@@ -54,7 +54,7 @@
   </style>
 </head>
 <body>
-  <img src="/icons/512.png" alt="MYFC Logo" class="logo">
+  <img src="./icons/512.png" alt="MYFC Logo" class="logo">
   <h1>MYFC</h1>
   <p>Loading your application...</p>
   <div class="spinner"></div>
@@ -67,16 +67,24 @@
              document.referrer.includes('android-app://');
     }
     
-    // Always redirect to dashboard in standalone mode
+    function isMembersSubdomain() {
+      return window.location.hostname === 'members.myfc.app';
+    }
+    
+    // Log the current hostname
+    console.log('Running on hostname:', window.location.hostname);
+    console.log('Is members subdomain:', isMembersSubdomain());
+    
+    // Always redirect to dashboard, but use relative path on subdomain
     if (isStandalone()) {
       console.log('Standalone mode detected, redirecting to dashboard');
       localStorage.setItem('pwaStandalone', 'true');
-      window.location.replace('/dashboard');
+      window.location.replace('./dashboard');
     } else {
       // In regular browser - normal Next.js routing will handle
       console.log('Browser mode detected, loading normally');
       // Let the normal Next.js app load
-      window.location.replace('/dashboard');
+      window.location.replace('./dashboard');
     }
   </script>
 </body>

@@ -4,27 +4,31 @@ const STATIC_CACHE = 'myfc-static-' + CACHE_VERSION;
 const DYNAMIC_CACHE = 'myfc-dynamic-' + CACHE_VERSION;
 const API_CACHE = 'myfc-api-' + CACHE_VERSION;
 const IMAGE_CACHE = 'myfc-images-' + CACHE_VERSION;
-const OFFLINE_URL = '/offline.html';
+const OFFLINE_URL = './offline.html';
 
 // Make sure we have the scope
 const SCOPE = self.registration ? self.registration.scope : self.location.origin;
+const IS_SUBDOMAIN = new URL(SCOPE).hostname === 'members.myfc.app';
+
+console.log('[Service Worker] Initializing with scope:', SCOPE);
+console.log('[Service Worker] Is subdomain:', IS_SUBDOMAIN);
 
 // Assets to cache immediately - critical files
 const STATIC_ASSETS = [
-  '/',
-  '/dashboard',
-  '/manifest.json',
-  '/offline.html',
-  '/pwa-status.html',
-  '/apple-touch-icon.png',
-  '/icons/512.png',
-  '/icons/192.png',
-  '/icons/180.png',
-  '/icons/152.png',
-  '/icons/120.png',
-  '/logo.png',
-  '/logo_white.png',
-  '/standalone.js'
+  './',
+  './dashboard',
+  './manifest.json',
+  './offline.html',
+  './pwa-status.html',
+  './apple-touch-icon.png',
+  './icons/512.png',
+  './icons/192.png',
+  './icons/180.png',
+  './icons/152.png',
+  './icons/120.png',
+  './logo.png',
+  './logo_white.png',
+  './standalone.js'
 ];
 
 // Install event - cache critical assets
@@ -232,7 +236,7 @@ self.addEventListener('fetch', (event) => {
                     
                     // If it's an image, try to return a fallback
                     if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|webp|avif)$/)) {
-                      return caches.match('/icons/192.png');
+                      return caches.match('./icons/192.png');
                     }
                     
                     throw error;

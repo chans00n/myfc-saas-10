@@ -164,4 +164,96 @@
     isStandalone: isInStandaloneMode,
     checkStandaloneStatus: checkStandaloneStatus
   };
-})(); 
+})();
+
+// MYFC PWA Standalone Mode Helper
+
+// Detect if running on the members subdomain
+function isMembersSubdomain() {
+  return window.location.hostname === 'members.myfc.app';
+}
+
+// Detect iOS standalone mode (added to home screen)
+function isIOSStandalone() {
+  return window.navigator.standalone === true;
+}
+
+// Detect Android standalone mode (added to home screen)
+function isAndroidStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches;
+}
+
+// Combined standalone detection
+function isStandalone() {
+  return isIOSStandalone() || isAndroidStandalone();
+}
+
+// Log current environment details
+console.log('[MYFC] Environment info:');
+console.log('- URL:', window.location.href);
+console.log('- Hostname:', window.location.hostname);
+console.log('- Is members subdomain:', isMembersSubdomain());
+console.log('- Is iOS standalone:', isIOSStandalone());
+console.log('- Is Android standalone:', isAndroidStandalone());
+console.log('- Is standalone:', isStandalone());
+
+// Store standalone status in localStorage for other scripts to use
+if (isStandalone()) {
+  localStorage.setItem('pwaStandalone', 'true');
+  
+  // If on root path, redirect to dashboard (using relative path for subdomain compatibility)
+  if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+    console.log('[MYFC] Redirecting from root to dashboard in standalone mode');
+    window.location.replace('./dashboard');
+  }
+}
+
+// Handle external links in standalone mode
+document.addEventListener('click', function(event) {
+  // Only handle clicks in standalone mode
+  if (!isStandalone()) return;
+  
+  let target = event.target;
+  
+  // Find the closest anchor tag
+  while (target && target.tagName !== 'A') {
+    target = target.parentElement;
+  }
+  
+  // If we found an anchor tag
+  if (target && target.tagName === 'A') {
+    const href = target.getAttribute('href');
+    const target_type = target.getAttribute('target');
+    
+    // Skip if no href or it's a hash link
+    if (!href || href.startsWith('#')) return;
+    
+    // Handle external links
+    if (
+      href.startsWith('http') && 
+      !href.includes(window.location.hostname)
+    ) {
+      console.log('[MYFC] Opening external link in system browser:', href);
+      window.open(href, '_system');
+      event.preventDefault();
+    }
+    // Handle target="_blank" links
+    else if (target_type === '_blank') {
+      console.log('[MYFC] Opening _blank link in system browser:', href);
+      window.open(href, '_system');
+      event.preventDefault();
+    }
+  }
+});
+
+// Register the service worker if not already registered
+if ('serviceWorker' in navigator) {
+  const swPath = './sw.js';
+  navigator.serviceWorker.register(swPath, { scope: './' })
+    .then(registration => {
+      console.log('[MYFC] Service worker registered with scope:', registration.scope);
+    })
+    .catch(error => {
+      console.error('[MYFC] Service worker registration failed:', error);
+    });
+} 
