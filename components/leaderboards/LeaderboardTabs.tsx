@@ -50,20 +50,22 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
 
   return (
     <Tabs defaultValue={categories[0]?.id} className="w-full" onValueChange={handleTabChange}>
-      <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
-        {categories.map((category) => (
-          <TabsTrigger key={category.id} value={category.id}>
-            {category.name}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8 w-full min-w-[300px]">
+          {categories.map((category) => (
+            <TabsTrigger key={category.id} value={category.id} className="text-center">
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       
       {categories.map((category) => (
         <TabsContent key={category.id} value={category.id} className="mt-0">
-          <div className="bg-card rounded-lg shadow-sm border p-4">
+          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-4">
             <div className="mb-4">
               <h2 className="text-xl font-semibold">{category.name}</h2>
-              <p className="text-muted-foreground text-sm">{category.description}</p>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm">{category.description}</p>
             </div>
             
             {loading ? (
@@ -77,7 +79,7 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
             ) : (
               <>
                 {userId && userRank && (
-                  <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg mb-4 border">
+                  <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg mb-4 border border-neutral-200 dark:border-neutral-700">
                     <p className="font-medium">Your Ranking</p>
                     <div className="flex justify-between items-center mt-2">
                       <div className="flex items-center gap-2">
@@ -97,7 +99,7 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
                 
                 {entries.length === 0 && !loading && (
                   <div className="text-center py-8">
-                    <p className="text-muted-foreground">No entries yet. Be the first to make the leaderboard!</p>
+                    <p className="text-neutral-600 dark:text-neutral-400">No entries yet. Be the first to make the leaderboard!</p>
                   </div>
                 )}
               </>
