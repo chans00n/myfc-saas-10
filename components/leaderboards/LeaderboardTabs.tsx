@@ -50,26 +50,18 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
 
   return (
     <Tabs defaultValue={categories[0]?.id} className="w-full" onValueChange={handleTabChange}>
-      {/* Improved horizontal scrollable tab container */}
-      <div className="relative mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
-        {/* Smooth scrolling horizontal container with elegant scrollbar */}
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 -mx-2 px-2">
-          <TabsList className="inline-flex h-11 min-w-full mb-2 p-1">
-            {categories.map((category) => (
-              <TabsTrigger 
-                key={category.id} 
-                value={category.id} 
-                className="px-6 py-2.5 mx-1 whitespace-nowrap text-sm font-medium min-w-[120px] flex-shrink-0 first:ml-0 last:mr-0"
-              >
-                {category.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-        
-        {/* Optional fade effect indicators to show scrollability - can be removed if not needed */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none sm:hidden"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden"></div>
+      <div className="mb-6">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-1 w-full">
+          {categories.map((category) => (
+            <TabsTrigger 
+              key={category.id} 
+              value={category.id} 
+              className="whitespace-nowrap text-sm px-3 py-2"
+            >
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
       </div>
       
       {categories.map((category) => (
