@@ -106,4 +106,66 @@ export interface UserStreak {
   current_streak: number;
   longest_streak: number;
   last_workout_date: string | null;
+}
+
+// =====================
+// COMMUNITY FEATURES
+// =====================
+
+// Workout Comments
+export interface WorkoutComment {
+  id: string;
+  workout_id: string;
+  user_id: string;
+  content: string;
+  is_edited: boolean;
+  is_hidden: boolean;
+  likes_count: number;
+  created_at: string;
+  updated_at: string;
+  user?: User; // Populated on query with joins
+  workout?: Workout; // Populated on query with joins
+}
+
+// Comment Likes
+export interface CommentLike {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+// Comment Reports
+export interface CommentReport {
+  id: string;
+  comment_id: string;
+  reporter_user_id: string;
+  reason: string;
+  status: 'pending' | 'reviewed' | 'actioned' | 'dismissed';
+  created_at: string;
+  updated_at: string;
+}
+
+// Leaderboard Categories
+export interface LeaderboardCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  sort_field: string;
+  sort_order: 'asc' | 'desc';
+  is_active: boolean;
+  refresh_frequency: 'hourly' | 'daily' | 'weekly';
+  created_at: string;
+}
+
+// Leaderboard Entries
+export interface LeaderboardEntry {
+  id: string;
+  category_id: string;
+  user_id: string;
+  rank: number;
+  score: number;
+  last_updated: string;
+  user?: User; // Populated on query with joins
+  category?: LeaderboardCategory; // Populated on query with joins
 } 
