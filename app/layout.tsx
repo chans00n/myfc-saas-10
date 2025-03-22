@@ -164,145 +164,6 @@ export default function RootLayout({
         }}
       />
       
-      {/* PWA Service Worker Registration */}
-      <Script
-        id="register-sw"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                // Determine if we're on a subdomain
-                const isSubdomain = window.location.hostname.split('.').length > 2;
-                const swPath = isSubdomain ? '/root-sw.js' : '/sw.js';
-                console.log('Registering service worker from:', swPath);
-                
-                navigator.serviceWorker.register(swPath, {
-                  scope: '/', // Explicitly set scope to root
-                  updateViaCache: 'none' // Prevent browser cache from interfering with updates
-                }).then(function(registration) {
-                  console.log('Service Worker registered with scope:', registration.scope);
-                  
-                  // Check for updates on page load
-                  registration.update().catch(err => console.log('Update check failed:', err));
-                  
-                  // Check for updates periodically
-                  setInterval(() => {
-                    registration.update().catch(err => console.log('Periodic update failed:', err));
-                  }, 60 * 60 * 1000); // Check every hour
-                  
-                  // Update on page transitions
-                  let refreshing = false;
-                  
-                  // When a new SW is waiting, handle refresh
-                  navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    if (refreshing) return;
-                    refreshing = true;
-                    console.log('Service worker controller changed, reloading page');
-                    window.location.reload();
-                  });
-                  
-                  // Listen for messages from service worker
-                  navigator.serviceWorker.addEventListener('message', (event) => {
-                    console.log('Message from service worker:', event.data);
-                    if (event.data && event.data.type === 'RELOAD_PAGE') {
-                      window.location.reload();
-                    }
-                  });
-                }).catch(function(err) {
-                  console.error('Service Worker registration failed:', err);
-                  
-                  // Try different scope options if main registration fails
-                  const scopeOptions = ['/', '/dashboard/', window.location.pathname];
-                  console.log('Trying alternative scopes:', scopeOptions);
-                  
-                  let registerPromise = Promise.reject();
-                  
-                  // Try each scope option in sequence
-                  scopeOptions.forEach(scope => {
-                    registerPromise = registerPromise.catch(() => {
-                      console.log('Trying registration with scope:', scope);
-                      return navigator.serviceWorker.register(swPath, { 
-                        scope: scope, 
-                        updateViaCache: 'none'
-                      });
-                    });
-                  });
-                  
-                  registerPromise
-                    .then(reg => {
-                      console.log('Successfully registered with alternative scope:', reg.scope);
-                    })
-                    .catch(error => {
-                      console.error('All scope alternatives failed:', error);
-                      
-                      // Fall back to the fallback service worker if all attempts fail
-                      navigator.serviceWorker.register('/fallback-sw.js', {
-                        scope: '/'
-                      }).then(reg => console.log('Fallback SW registered'))
-                      .catch(e => console.error('Even fallback SW failed:', e));
-                    });
-                });
-              });
-              
-              // Handle connectivity changes to update cached content
-              window.addEventListener('online', () => {
-                console.log('App is online again');
-                
-                // Inform service worker of online status
-                if (navigator.serviceWorker.controller) {
-                  navigator.serviceWorker.controller.postMessage({
-                    type: 'ONLINE_STATUS',
-                    status: 'online'
-                  });
-                }
-              });
-              
-              window.addEventListener('offline', () => {
-                console.log('App is offline');
-                if (navigator.serviceWorker.controller) {
-                  navigator.serviceWorker.controller.postMessage({
-                    type: 'ONLINE_STATUS',
-                    status: 'offline'
-                  });
-                  
-                  // Show a notification to the user
-                  const offlineNotif = document.createElement('div');
-                  offlineNotif.style.position = 'fixed';
-                  offlineNotif.style.bottom = '20px';
-                  offlineNotif.style.left = '20px';
-                  offlineNotif.style.right = '20px';
-                  offlineNotif.style.backgroundColor = '#ffc107';
-                  offlineNotif.style.color = '#000';
-                  offlineNotif.style.padding = '12px 16px';
-                  offlineNotif.style.borderRadius = '8px';
-                  offlineNotif.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-                  offlineNotif.style.zIndex = '9999';
-                  offlineNotif.style.textAlign = 'center';
-                  offlineNotif.textContent = 'You are offline. Some features may not be available.';
-                  
-                  document.body.appendChild(offlineNotif);
-                  
-                  // Remove notification when online again
-                  window.addEventListener('online', function() {
-                    if (document.body.contains(offlineNotif)) {
-                      document.body.removeChild(offlineNotif);
-                    }
-                  }, { once: true });
-                  
-                  // Remove after 5 seconds
-                  setTimeout(() => {
-                    if (document.body.contains(offlineNotif)) {
-                      document.body.removeChild(offlineNotif);
-                    }
-                  }, 5000);
-                }
-              });
-            }
-          `,
-        }}
-      />
-      
       {/* Standalone mode detector */}
       <Script
         id="standalone-detector"
@@ -332,6 +193,17 @@ export default function RootLayout({
             if (isIOS() && isInStandaloneMode()) {
               localStorage.setItem('pwaStandalone', 'true');
               console.log('Running in iOS standalone mode');
+              
+              // Also set a temporary flag in sessionStorage for this session
+              sessionStorage.setItem('iosStandaloneSession', 'true');
+              
+              // Redirect to dashboard if we're on the root URL
+              if (window.location.pathname === '/' || 
+                  window.location.pathname === '/index.html' ||
+                  window.location.pathname === '/index-ios.html') {
+                console.log('Redirecting standalone session to dashboard');
+                window.location.replace('/dashboard');
+              }
             }
             
             // Remember URL after installation

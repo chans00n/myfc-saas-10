@@ -13,7 +13,8 @@
   function isInStandaloneMode() {
     return window.navigator.standalone || 
       window.matchMedia('(display-mode: standalone)').matches ||
-      localStorage.getItem('pwaStandalone') === 'true';
+      localStorage.getItem('pwaStandalone') === 'true' ||
+      sessionStorage.getItem('iosStandaloneSession') === 'true';
   }
   
   // Check and set standalone status
@@ -32,9 +33,29 @@
       if (isIOS()) {
         fixIOSStandaloneLinks();
       }
+      
+      // If we're on an entry point or the root page, redirect to dashboard
+      if (window.location.pathname === '/' || 
+          window.location.pathname === '/index.html' || 
+          window.location.pathname === '/index-ios.html' ||
+          window.location.pathname === '/index-pwa.html') {
+        console.log('[PWA] Redirecting entry point to dashboard');
+        window.location.replace('/dashboard');
+      }
     } else {
       document.documentElement.classList.add('browser-mode');
       console.log('[PWA] Running in browser mode');
+      
+      // When navigating to the app in browser mode on iOS, 
+      // save current URL for post-installation redirect
+      if (isIOS() && !isInStandaloneMode()) {
+        // Save current URL unless we're on special pages
+        if (!window.location.pathname.includes('redirect') && 
+            !window.location.pathname.includes('index-ios')) {
+          sessionStorage.setItem('pwaRedirectUrl', window.location.pathname + window.location.search);
+          console.log('[PWA] Saved URL for post-install:', window.location.pathname + window.location.search);
+        }
+      }
     }
     
     return standalone;
@@ -91,16 +112,8 @@
     httpReq.send();
   }
   
-  // URLs to remember after installation
-  function handleUrlRedirects() {
-    if (isIOS() && !isInStandaloneMode()) {
-      // Save current URL unless we're on special pages
-      if (!window.location.pathname.includes('ios-redirect') && 
-          !window.location.pathname.includes('index-ios')) {
-        sessionStorage.setItem('pwaRedirectUrl', window.location.pathname + window.location.search);
-      }
-    }
-    
+  // Handle redirection when in standalone mode
+  function handleStandaloneRedirects() {
     // If we're in standalone mode and there's a saved URL, redirect to it
     if (isInStandaloneMode()) {
       const savedUrl = sessionStorage.getItem('pwaRedirectUrl');
@@ -113,20 +126,36 @@
         // Only redirect if we're not already on that URL
         if (savedUrl !== window.location.pathname + window.location.search) {
           window.location.replace(savedUrl);
+          return true; // Indicate that a redirect is happening
         }
       }
     }
+    return false; // No redirect happened
   }
   
   // Run the standalone check when DOM is ready
+  function initialize() {
+    const isStandalone = checkStandaloneStatus();
+    
+    // Only proceed with further checks if no redirect happened
+    if (!handleStandaloneRedirects() && isStandalone && isIOS()) {
+      console.log('[PWA] Setup complete for iOS standalone mode');
+      
+      // Additional iOS tweaks can go here
+      
+      // Fix iOS safe area insets for notched devices
+      document.body.style.paddingTop = 'env(safe-area-inset-top)';
+      document.body.style.paddingBottom = 'env(safe-area-inset-bottom)';
+      document.body.style.paddingLeft = 'env(safe-area-inset-left)';
+      document.body.style.paddingRight = 'env(safe-area-inset-right)';
+    }
+  }
+  
+  // Run initialization
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      checkStandaloneStatus();
-      handleUrlRedirects();
-    });
+    document.addEventListener('DOMContentLoaded', initialize);
   } else {
-    checkStandaloneStatus();
-    handleUrlRedirects();
+    initialize();
   }
   
   // Expose utilities for other scripts

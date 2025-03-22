@@ -9,7 +9,7 @@
     <meta name="application-name" content="MYFC - My Face Coach">
     <meta name="description" content="Daily facial exercises and tracking">
     
-    <!-- iOS PWA Meta Tags -->
+    <!-- iOS PWA Meta Tags - Critical for standalone mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MYFC">
@@ -116,15 +116,36 @@
     </div>
 
     <script>
-        // When launched from home screen icon on iOS, this page should always redirect to the dashboard
-        // iOS home screen launches are ALWAYS in standalone mode
+        // Detect if we're in standalone mode - this is the entry point from home screen icon
+        function isStandalone() {
+            return window.navigator.standalone || 
+                window.matchMedia('(display-mode: standalone)').matches ||
+                localStorage.getItem('pwaStandalone') === 'true';
+        }
+        
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+        
         window.addEventListener('load', function() {
-            // Set a flag to indicate we're in standalone mode
-            localStorage.setItem('pwaStandalone', 'true');
+            console.log('iOS entry page loaded');
+            console.log('Standalone mode:', isStandalone());
+            console.log('iOS device:', isIOS());
             
-            // Short delay to ensure app is ready
+            // When this page is loaded, we're most likely launched from the home screen
+            // Set flags to indicate we're in standalone mode
+            localStorage.setItem('pwaStandalone', 'true');
+            sessionStorage.setItem('iosStandaloneSession', 'true');
+            
+            // If this is iOS in standalone mode (which is almost certain), log it
+            if (isIOS() && isStandalone()) {
+                console.log('Running in iOS standalone mode');
+            }
+            
+            // Short delay to ensure app state is registered
             setTimeout(function() {
-                // Always redirect to dashboard when this page is loaded from app icon
+                // Always redirect to dashboard from this entry point
+                console.log('Redirecting to dashboard from iOS entry point');
                 window.location.replace('/dashboard');
             }, 1000);
         });
