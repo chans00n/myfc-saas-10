@@ -1,3 +1,9 @@
+-- First drop existing functions before recreating them
+DROP FUNCTION IF EXISTS public.update_streak_leaderboard();
+DROP FUNCTION IF EXISTS public.calculate_total_workouts_leaderboard(uuid);
+DROP FUNCTION IF EXISTS public.calculate_weekly_workouts_leaderboard(uuid);
+DROP FUNCTION IF EXISTS public.calculate_monthly_workouts_leaderboard(uuid);
+
 -- Fixed Streak Leaderboard Function for users_table
 CREATE OR REPLACE FUNCTION public.update_streak_leaderboard()
 RETURNS void AS $$
@@ -30,12 +36,12 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Fixed Total Workouts Leaderboard Function
-CREATE OR REPLACE FUNCTION public.calculate_total_workouts_leaderboard(cat_id UUID)
+CREATE OR REPLACE FUNCTION public.calculate_total_workouts_leaderboard(p_category_id UUID)
 RETURNS void AS $$
 BEGIN
   -- Clear existing entries
   DELETE FROM public.leaderboard_entries 
-  WHERE category_id = cat_id;
+  WHERE category_id = p_category_id;
   
   -- Check if workouts_completed table exists
   IF EXISTS (SELECT 1 FROM information_schema.tables 
@@ -44,7 +50,7 @@ BEGIN
     -- Insert new entries using users_table
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT
-      cat_id,
+      p_category_id,
       wc.user_id,
       ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) as rank,
       COUNT(*) as score,
@@ -61,7 +67,7 @@ BEGIN
     -- Placeholder data if workouts_completed doesn't exist
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT 
-      cat_id,
+      p_category_id,
       ut.id,
       ROW_NUMBER() OVER (ORDER BY RANDOM()) as rank,
       1 as score,
@@ -78,7 +84,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Fixed Weekly Workouts Leaderboard Function
-CREATE OR REPLACE FUNCTION public.calculate_weekly_workouts_leaderboard(cat_id UUID)
+CREATE OR REPLACE FUNCTION public.calculate_weekly_workouts_leaderboard(p_category_id UUID)
 RETURNS void AS $$
 DECLARE
   week_start TIMESTAMP WITH TIME ZONE;
@@ -88,7 +94,7 @@ BEGIN
   
   -- Clear existing entries
   DELETE FROM public.leaderboard_entries 
-  WHERE category_id = cat_id;
+  WHERE category_id = p_category_id;
   
   -- Check if workouts_completed table exists
   IF EXISTS (SELECT 1 FROM information_schema.tables 
@@ -97,7 +103,7 @@ BEGIN
     -- Insert new entries using users_table
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT
-      cat_id,
+      p_category_id,
       wc.user_id,
       ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) as rank,
       COUNT(*) as score,
@@ -116,7 +122,7 @@ BEGIN
     -- Placeholder data if workouts_completed doesn't exist
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT 
-      cat_id,
+      p_category_id,
       ut.id,
       ROW_NUMBER() OVER (ORDER BY RANDOM()) as rank,
       1 as score,
@@ -133,7 +139,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Fixed Monthly Workouts Leaderboard Function
-CREATE OR REPLACE FUNCTION public.calculate_monthly_workouts_leaderboard(cat_id UUID)
+CREATE OR REPLACE FUNCTION public.calculate_monthly_workouts_leaderboard(p_category_id UUID)
 RETURNS void AS $$
 DECLARE
   month_start TIMESTAMP WITH TIME ZONE;
@@ -143,7 +149,7 @@ BEGIN
   
   -- Clear existing entries
   DELETE FROM public.leaderboard_entries 
-  WHERE category_id = cat_id;
+  WHERE category_id = p_category_id;
   
   -- Check if workouts_completed table exists
   IF EXISTS (SELECT 1 FROM information_schema.tables 
@@ -152,7 +158,7 @@ BEGIN
     -- Insert new entries using users_table
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT
-      cat_id,
+      p_category_id,
       wc.user_id,
       ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) as rank,
       COUNT(*) as score,
@@ -171,7 +177,7 @@ BEGIN
     -- Placeholder data if workouts_completed doesn't exist
     INSERT INTO public.leaderboard_entries (category_id, user_id, rank, score, last_updated)
     SELECT 
-      cat_id,
+      p_category_id,
       ut.id,
       ROW_NUMBER() OVER (ORDER BY RANDOM()) as rank,
       1 as score,
