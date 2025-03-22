@@ -142,6 +142,7 @@
       <div class="info-value" id="manifest-status">-</div>
     </div>
     <button class="btn" id="check-manifest">Check Manifest</button>
+    <button class="btn" id="register-sw" style="margin-left: 10px;">Register Service Worker</button>
     <div id="manifest-details" style="display:none">
       <h2>Manifest Details</h2>
       <div class="log-area" id="manifest-log"></div>
@@ -196,25 +197,49 @@
       $('sw-status').textContent = 'Supported';
       $('sw-status').className = 'info-value success';
       
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        if (registrations.length > 0) {
-          const registration = registrations[0];
-          $('sw-status').textContent = 'Registered';
-          $('sw-scope').textContent = registration.scope;
-          
-          logToConsole('Service Worker registered with scope: ' + registration.scope);
-          if (registrations.length > 1) {
-            logToConsole(`Warning: ${registrations.length} service workers registered`, 'warning');
+      function checkServiceWorker() {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          if (registrations.length > 0) {
+            const registration = registrations[0];
+            $('sw-status').textContent = 'Registered';
+            $('sw-status').className = 'info-value success';
+            $('sw-scope').textContent = registration.scope;
+            
+            logToConsole('Service Worker registered with scope: ' + registration.scope);
+            if (registrations.length > 1) {
+              logToConsole(`Warning: ${registrations.length} service workers registered`, 'warning');
+            }
+          } else {
+            $('sw-status').textContent = 'Not Registered';
+            $('sw-status').className = 'info-value warning';
+            logToConsole('No Service Worker registered', 'warning');
           }
-        } else {
-          $('sw-status').textContent = 'Not Registered';
-          $('sw-status').className = 'info-value warning';
-          logToConsole('No Service Worker registered', 'warning');
-        }
-      }).catch(err => {
-        $('sw-status').textContent = 'Error';
-        $('sw-status').className = 'info-value error';
-        logToConsole('Service Worker error: ' + err.message, 'error');
+        }).catch(err => {
+          $('sw-status').textContent = 'Error';
+          $('sw-status').className = 'info-value error';
+          logToConsole('Service Worker error: ' + err.message, 'error');
+        });
+      }
+      
+      // Initial check
+      checkServiceWorker();
+      
+      // Register SW button handler
+      $('register-sw').addEventListener('click', function() {
+        const isMembersSubdomain = window.location.hostname === 'members.myfc.app';
+        const swPath = isMembersSubdomain ? './sw.js' : '/sw.js';
+        const swScope = isMembersSubdomain ? './' : '/';
+        
+        logToConsole(`Manually registering service worker from ${swPath} with scope ${swScope}`);
+        
+        navigator.serviceWorker.register(swPath, {
+          scope: swScope
+        }).then(function(registration) {
+          logToConsole('Service worker registered successfully: ' + registration.scope, 'success');
+          checkServiceWorker();
+        }).catch(function(error) {
+          logToConsole('Service worker registration failed: ' + error, 'error');
+        });
       });
     } else {
       $('sw-status').textContent = 'Not Supported';

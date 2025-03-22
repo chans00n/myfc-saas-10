@@ -1,5 +1,5 @@
 // MYFC Service Worker - Optimized for PWA Performance
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = 'myfc-static-' + CACHE_VERSION;
 const DYNAMIC_CACHE = 'myfc-dynamic-' + CACHE_VERSION;
 const API_CACHE = 'myfc-api-' + CACHE_VERSION;
@@ -35,6 +35,9 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing optimized service worker with scope:', SCOPE);
   
+  // Skip waiting to become active immediately
+  self.skipWaiting();
+  
   event.waitUntil(
     Promise.all([
       // Cache static assets
@@ -59,8 +62,6 @@ self.addEventListener('install', (event) => {
       caches.open(API_CACHE),
       caches.open(IMAGE_CACHE)
     ])
-    .then(() => self.skipWaiting())
-    .catch(err => console.error('[Service Worker] Install error:', err))
   );
 });
 
@@ -68,6 +69,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating optimized service worker with scope:', SCOPE);
   
+  // Claim clients immediately
   event.waitUntil(
     caches.keys()
       .then(keyList => {

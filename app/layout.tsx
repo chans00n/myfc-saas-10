@@ -104,7 +104,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="./manifest.json" />
+        <link rel="manifest" href="./manifest.json" crossOrigin="use-credentials" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="MYFC" />
@@ -114,6 +114,26 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="152x152" href="./icons/152.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="./icons/180.png" />
         <link rel="apple-touch-icon" sizes="167x167" href="./icons/167.png" />
+        
+        {/* Early service worker registration */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              const isMembersSubdomain = window.location.hostname === 'members.myfc.app';
+              const swPath = isMembersSubdomain ? './sw.js' : '/sw.js';
+              const swScope = isMembersSubdomain ? './' : '/';
+              
+              console.log('[PWA] Registering service worker from layout.tsx');
+              navigator.serviceWorker.register(swPath, {
+                scope: swScope
+              }).then(function(reg) {
+                console.log('[PWA] Service worker registered:', reg.scope);
+              }).catch(function(err) {
+                console.error('[PWA] Service worker registration failed:', err);
+              });
+            }
+          `
+        }} />
       </head>
       
       {/* Required for pricing table */}
