@@ -129,3 +129,39 @@ span[style*="box-sizing: border-box; display: block; overflow: hidden;"] img {
 .safe-right {
   padding-right: env(safe-area-inset-right, 0);
 }
+
+/* Custom scrollbar styles */
+@layer utilities {
+  /* Hide scrollbar by default but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari and Opera */
+  }
+  
+  /* Thin scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;     /* Firefox */
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 5px;               /* Horizontal scrollbar height */
+    width: 5px;                /* Vertical scrollbar width */
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(155, 155, 155, 0.5);
+    border-radius: 20px;
+  }
+  
+  /* Custom scrollbar thumb colors */
+  .scrollbar-thumb-neutral-300::-webkit-scrollbar-thumb {
+    background-color: rgb(212, 212, 212);
+  }
+  .scrollbar-thumb-neutral-700::-webkit-scrollbar-thumb {
+    background-color: rgb(64, 64, 64);
+  }
+}
