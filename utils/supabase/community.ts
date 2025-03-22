@@ -334,7 +334,7 @@ export async function getLeaderboardCategories() {
 /**
  * Get leaderboard entries for a specific category
  */
-export async function getLeaderboardEntries(categoryId: string, limit: number = 100) {
+export async function getLeaderboardEntries(categoryId: string, limit: number = 10) {
   const supabase = createBrowserClient();
   
   try {

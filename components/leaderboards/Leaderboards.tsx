@@ -37,7 +37,7 @@ export default function Leaderboards({ categories, userId }: LeaderboardsProps) 
       for (const category of categories) {
         try {
           // Get leaderboard entries for this category
-          const entries = await getLeaderboardEntries(category.id)
+          const entries = await getLeaderboardEntries(category.id, 10)
           
           // Get the current user's rank if they're logged in
           let userRank = null
