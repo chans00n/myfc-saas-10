@@ -57,6 +57,13 @@ export async function POST(request: NextRequest) {
     // Revalidate the leaderboards page to show updated data
     revalidatePath('/leaderboards')
     
+    // Check if this is a form submission (from our admin form)
+    const contentType = request.headers.get('content-type') || ''
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      // Redirect back to the leaderboards page
+      return NextResponse.redirect(new URL('/leaderboards', request.url))
+    }
+    
     return NextResponse.json({ 
       success: true, 
       message: 'Leaderboards updated successfully',
