@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MyFC App</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- iOS PWA Meta Tags (Critical) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MyFC">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- iOS Icons (All required sizes) -->
+  <link rel="apple-touch-icon" href="/icons/apple-icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/167.png">
+  
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-1242-2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-828-1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-1242-2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-750-1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="/icons/apple-splash-640-1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #4f46e5;
+    }
+    
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      max-width: 500px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 8px;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover, .button:active {
+      background-color: #4338ca;
+    }
+    
+    .install-guide {
+      margin-top: 40px;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none;
+    }
+    
+    .standalone-message {
+      display: none;
+      background-color: #d1fae5;
+      color: #065f46;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .browser-instructions {
+      display: none;
+    }
+    
+    .safari-instructions {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="/icons/192.png" alt="MyFC Logo" width="120" height="120">
+    </div>
+    
+    <div id="standalone-message" class="standalone-message">
+      App is running in standalone mode! ✅
+    </div>
+    
+    <h1>Welcome to MyFC</h1>
+    <p>Your all-in-one application for managing your fitness</p>
+    
+    <a href="/dashboard" class="button" id="enter-app">Enter App</a>
+    <a href="#" class="button" id="install-guide" style="background-color: #f59e0b;">How to Install</a>
+    
+    <div class="install-guide" id="install-instructions">
+      <h2>Install MyFC on your device</h2>
+      
+      <div class="safari-instructions" id="safari-instructions">
+        <h3>Safari (iOS)</h3>
+        <ol>
+          <li>Tap the <strong>Share</strong> button at the bottom of the screen <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="currentColor"/></svg></li>
+          <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+          <li>Tap <strong>"Add"</strong> in the top-right corner</li>
+          <li>The app will now be installed on your home screen</li>
+          <li>Launch it from there for the full app experience</li>
+        </ol>
+      </div>
+      
+      <div class="browser-instructions" id="browser-instructions">
+        <h3>Chrome/Edge (Android)</h3>
+        <ol>
+          <li>Tap the menu button <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z" fill="currentColor"/></svg></li>
+          <li>Select <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong></li>
+          <li>Follow the on-screen instructions</li>
+          <li>The app will now be installed on your device</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if running in standalone mode (installed PWA)
+      const isStandalone = window.navigator.standalone || 
+                          window.matchMedia('(display-mode: standalone)').matches;
+      
+      // Save original entry URL if not already in standalone
+      if (!isStandalone && !sessionStorage.getItem('pwaRedirectUrl')) {
+        sessionStorage.setItem('pwaRedirectUrl', '/dashboard');
+      }
+      
+      // Show appropriate message based on standalone status
+      const standaloneMessage = document.getElementById('standalone-message');
+      if (isStandalone) {
+        standaloneMessage.style.display = 'block';
+        
+        // If there's a saved URL, redirect there after a short delay
+        const savedUrl = sessionStorage.getItem('pwaRedirectUrl');
+        if (savedUrl) {
+          sessionStorage.removeItem('pwaRedirectUrl');
+          setTimeout(() => {
+            window.location.href = savedUrl;
+          }, 1000);
+        }
+      }
+      
+      // Detect browser for installation instructions
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      
+      document.getElementById('install-guide').addEventListener('click', function(e) {
+        e.preventDefault();
+        const instructions = document.getElementById('install-instructions');
+        instructions.style.display = instructions.style.display === 'block' ? 'none' : 'block';
+        
+        if (isIOS || isSafari) {
+          document.getElementById('safari-instructions').style.display = 'block';
+          document.getElementById('browser-instructions').style.display = 'none';
+        } else {
+          document.getElementById('safari-instructions').style.display = 'none';
+          document.getElementById('browser-instructions').style.display = 'block';
+        }
+      });
+      
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          // Determine if we're on a subdomain
+          const isSubdomain = window.location.hostname.split('.').length > 2;
+          const swPath = isSubdomain ? '/root-sw.js' : '/sw.js';
+          
+          navigator.serviceWorker.register(swPath, {
+            scope: '/',
+            updateViaCache: 'none'
+          }).then(function(registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+          }).catch(function(err) {
+            console.error('Service Worker registration failed:', err);
+            
+            // Try fallback service worker if main one fails
+            navigator.serviceWorker.register('/fallback-sw.js', {
+              scope: '/'
+            }).catch(e => console.error('Fallback registration also failed:', e));
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html> 

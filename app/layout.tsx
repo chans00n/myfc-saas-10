@@ -107,12 +107,19 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="MyFC" />
+        <meta name="format-detection" content="telephone=no" />
+        
+        <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/180.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/167.png" />
         
         {/* Theme colors */}
         <meta name="theme-color" content="#4f46e5" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
       {/* Required for pricing table */}
       <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
