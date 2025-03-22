@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import LeaderboardTabs from "@/components/leaderboards/LeaderboardTabs"
+import Leaderboards from "@/components/leaderboards/Leaderboards"
 import { getLeaderboardCategories } from "@/utils/supabase/community"
 import { createClient } from "@/utils/supabase/client"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -255,7 +255,7 @@ export default function LeaderboardsPage() {
             See how you rank against other members of the MYFC community!
           </p>
           
-          <LeaderboardTabs categories={categories} userId={userId} />
+          <Leaderboards categories={categories} userId={userId} />
         </div>
       </div>
       <MobileNavigation />
