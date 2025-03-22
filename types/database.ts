@@ -123,8 +123,13 @@ export interface WorkoutComment {
   likes_count: number;
   created_at: string;
   updated_at: string;
-  user?: User; // Populated on query with joins
-  workout?: Workout; // Populated on query with joins
+  user_has_liked?: boolean;
+  user?: {
+    id: string;
+    email?: string;
+    full_name?: string;
+    avatar_url?: string;
+  };
 }
 
 // Comment Likes

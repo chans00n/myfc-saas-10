@@ -1,22 +1,62 @@
-import { Metadata } from "next"
-import { createClient } from "@/utils/supabase/server"
+'use client'
+
+import { useEffect, useState } from "react"
 import LeaderboardTabs from "@/components/leaderboards/LeaderboardTabs"
 import { getLeaderboardCategories } from "@/utils/supabase/community"
+import { createClient } from "@/utils/supabase/client"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export const metadata: Metadata = {
-  title: "MYFC - Community Leaderboards",
-  description: "View the top performers in the MYFC community",
-}
-
-export default async function LeaderboardsPage() {
-  const supabase = createClient()
-  const { data: user } = await supabase.auth.getUser()
+export default function LeaderboardsPage() {
+  const [categories, setCategories] = useState<any[]>([])
+  const [userId, setUserId] = useState<string>('')
+  const [loading, setLoading] = useState(true)
   
-  // Fetch leaderboard categories
-  const categories = await getLeaderboardCategories()
+  useEffect(() => {
+    // Set page title
+    document.title = "MYFC - Community Leaderboards"
+    
+    // Fetch user and categories
+    async function fetchData() {
+      try {
+        setLoading(true)
+        
+        // Get current user
+        const supabase = createClient()
+        const { data: userData } = await supabase.auth.getUser()
+        if (userData?.user?.id) {
+          setUserId(userData.user.id)
+        }
+        
+        // Get leaderboard categories
+        const categoriesData = await getLeaderboardCategories()
+        if (categoriesData) {
+          setCategories(categoriesData)
+        }
+      } catch (error) {
+        console.error("Error loading leaderboard data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchData()
+  }, [])
+  
+  if (loading) {
+    return (
+      <div className="container max-w-6xl mx-auto px-4 py-8">
+        <Skeleton className="h-10 w-64 mb-6" />
+        <Skeleton className="h-6 w-full max-w-lg mb-8" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    )
+  }
   
   // If no categories exist yet or there's an error, show placeholder
-  if (!categories || categories.length === 0) {
+  if (categories.length === 0) {
     return (
       <div className="container max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Community Leaderboards</h1>
@@ -34,7 +74,7 @@ export default async function LeaderboardsPage() {
         See how you rank against other members of the MYFC community!
       </p>
       
-      <LeaderboardTabs categories={categories} userId={user.user?.id} />
+      <LeaderboardTabs categories={categories} userId={userId} />
     </div>
   )
 } 

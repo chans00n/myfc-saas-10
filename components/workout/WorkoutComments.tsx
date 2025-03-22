@@ -41,8 +41,10 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
       setLoading(true)
       try {
         const commentsData = await getWorkoutComments(workoutId, 1)
-        setComments(commentsData || [])
-        setHasMore((commentsData?.length || 0) === 10) // Assuming 10 is the limit per page
+        if (commentsData && commentsData.data) {
+          setComments(commentsData.data)
+          setHasMore(commentsData.data.length === 10) // Assuming 10 is the limit per page
+        }
       } catch (error) {
         console.error("Error loading comments:", error)
         toast.error("Failed to load comments")
@@ -60,10 +62,10 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
       const nextPage = page + 1
       const moreComments = await getWorkoutComments(workoutId, nextPage)
       
-      if (moreComments && moreComments.length > 0) {
-        setComments(prev => [...prev, ...moreComments])
+      if (moreComments && moreComments.data && moreComments.data.length > 0) {
+        setComments(prev => [...prev, ...moreComments.data])
         setPage(nextPage)
-        setHasMore(moreComments.length === 10) // Assuming 10 is the limit per page
+        setHasMore(moreComments.data.length === 10) // Assuming 10 is the limit per page
       } else {
         setHasMore(false)
       }
@@ -105,7 +107,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
             comment.id === commentId 
               ? { 
                   ...comment, 
-                  likes_count: result.likes_count,
+                  likes_count: result.likesCount,
                   user_has_liked: result.liked
                 } 
               : comment

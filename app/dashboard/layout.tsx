@@ -68,18 +68,22 @@ export default async function DashboardLayout({
                  }}>
                 <div className="text-center">
                     <Image 
-                        src={logoSrc}
-                        alt="MYFC Logo" 
-                        width={80} 
-                        height={80} 
-                        className="object-contain h-auto w-auto max-w-[80px] max-h-[80px] dark:hidden"
+                        src="/myfc-logo.png"
+                        alt="My Face Coach"
+                        width={80}
+                        height={80}
+                        className="w-16 h-auto hidden dark:block"
+                        priority
+                        unoptimized
                     />
                     <Image 
-                        src="/logo_white.png"
-                        alt="MYFC Logo" 
-                        width={80} 
-                        height={80} 
-                        className="object-contain h-auto w-auto max-w-[80px] max-h-[80px] hidden dark:block"
+                        src="/myfc-logo-dark.png"
+                        alt="My Face Coach"
+                        width={80}
+                        height={80}
+                        className="w-16 h-auto dark:hidden"
+                        priority
+                        unoptimized
                     />
                 </div>
                 

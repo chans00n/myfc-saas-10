@@ -1,5 +1,4 @@
-// Client-only version to avoid server components import errors
-import { createClient as createBrowserClient } from './client';
+import { createClient } from './server';
 import { 
   WorkoutComment, 
   CommentLike, 
@@ -12,10 +11,10 @@ import {
 // =====================
 
 /**
- * Get comments for a specific workout
+ * Get comments for a specific workout - SERVER VERSION
  */
-export async function getWorkoutComments(workoutId: string, page: number = 1, limit: number = 10) {
-  const supabase = createBrowserClient();
+export async function getServerWorkoutComments(workoutId: string, page: number = 1, limit: number = 10) {
+  const supabase = createClient();
   const startIndex = (page - 1) * limit;
   
   try {
@@ -68,10 +67,10 @@ export async function getWorkoutComments(workoutId: string, page: number = 1, li
 }
 
 /**
- * Add a new comment to a workout
+ * Add a new comment to a workout - SERVER VERSION
  */
-export async function addWorkoutComment(workoutId: string, userId: string, content: string) {
-  const supabase = createBrowserClient();
+export async function addServerWorkoutComment(workoutId: string, userId: string, content: string) {
+  const supabase = createClient();
   
   try {
     const { data, error } = await supabase
@@ -105,10 +104,10 @@ export async function addWorkoutComment(workoutId: string, userId: string, conte
 }
 
 /**
- * Update an existing comment
+ * Update an existing comment - SERVER VERSION
  */
-export async function updateWorkoutComment(commentId: string, userId: string, content: string) {
-  const supabase = createBrowserClient();
+export async function updateServerWorkoutComment(commentId: string, userId: string, content: string) {
+  const supabase = createClient();
   
   try {
     // First check if the user owns this comment
@@ -148,10 +147,10 @@ export async function updateWorkoutComment(commentId: string, userId: string, co
 }
 
 /**
- * Delete a comment
+ * Delete a comment - SERVER VERSION
  */
-export async function deleteWorkoutComment(commentId: string, userId: string) {
-  const supabase = createBrowserClient();
+export async function deleteServerWorkoutComment(commentId: string, userId: string) {
+  const supabase = createClient();
   
   try {
     // First check if the user owns this comment
@@ -185,10 +184,10 @@ export async function deleteWorkoutComment(commentId: string, userId: string) {
 }
 
 /**
- * Like or unlike a comment
+ * Like or unlike a comment - SERVER VERSION
  */
-export async function toggleCommentLike(commentId: string, userId: string) {
-  const supabase = createBrowserClient();
+export async function toggleServerCommentLike(commentId: string, userId: string) {
+  const supabase = createClient();
   
   try {
     // Check if the user has already liked this comment
@@ -258,10 +257,10 @@ export async function toggleCommentLike(commentId: string, userId: string) {
 }
 
 /**
- * Report an inappropriate comment
+ * Report an inappropriate comment - SERVER VERSION
  */
-export async function reportComment(commentId: string, userId: string, reason: string) {
-  const supabase = createBrowserClient();
+export async function reportServerComment(commentId: string, userId: string, reason: string) {
+  const supabase = createClient();
   
   try {
     // Check if this user has already reported this comment
@@ -307,10 +306,10 @@ export async function reportComment(commentId: string, userId: string, reason: s
 // =====================
 
 /**
- * Get all active leaderboard categories
+ * Get all active leaderboard categories - SERVER VERSION
  */
-export async function getLeaderboardCategories() {
-  const supabase = createBrowserClient();
+export async function getServerLeaderboardCategories() {
+  const supabase = createClient();
   
   try {
     const { data, error } = await supabase
@@ -332,10 +331,10 @@ export async function getLeaderboardCategories() {
 }
 
 /**
- * Get leaderboard entries for a specific category
+ * Get leaderboard entries for a specific category - SERVER VERSION
  */
-export async function getLeaderboardEntries(categoryId: string, limit: number = 100) {
-  const supabase = createBrowserClient();
+export async function getServerLeaderboardEntries(categoryId: string, limit: number = 100) {
+  const supabase = createClient();
   
   try {
     const { data, error } = await supabase
@@ -366,10 +365,10 @@ export async function getLeaderboardEntries(categoryId: string, limit: number = 
 }
 
 /**
- * Get a user's rank in a specific leaderboard category
+ * Get a user's rank in a specific leaderboard category - SERVER VERSION
  */
-export async function getUserLeaderboardRank(categoryId: string, userId: string) {
-  const supabase = createBrowserClient();
+export async function getServerUserLeaderboardRank(categoryId: string, userId: string) {
+  const supabase = createClient();
   
   try {
     const { data, error } = await supabase
