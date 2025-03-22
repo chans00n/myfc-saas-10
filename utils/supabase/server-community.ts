@@ -25,7 +25,7 @@ export async function getServerWorkoutComments(workoutId: string, page: number =
         user:user_id (
           id,
           email,
-          full_name,
+          name,
           avatar_url
         )
       `, { count: 'exact' })
@@ -85,7 +85,7 @@ export async function addServerWorkoutComment(workoutId: string, userId: string,
         user:user_id (
           id,
           email,
-          full_name,
+          name,
           avatar_url
         )
       `)
@@ -344,7 +344,7 @@ export async function getServerLeaderboardEntries(categoryId: string, limit: num
         user:user_id (
           id,
           email,
-          full_name,
+          name,
           avatar_url
         )
       `)

@@ -143,13 +143,15 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
   }
 
   // Helper function to get initials from name or email
-  const getInitials = (user: any) => {
-    if (user?.full_name) {
-      return user.full_name
+  const getInitials = (user?: any) => {
+    if (!user) return '';
+    
+    if (user?.name) {
+      return user.name
         .split(' ')
         .map((n: string) => n[0])
         .join('')
-        .toUpperCase()
+        .toUpperCase();
     }
 
     if (user?.email) {
@@ -160,9 +162,11 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
   }
 
   // Helper to get display name
-  const getDisplayName = (user: any) => {
-    if (user?.full_name) {
-      return user.full_name
+  const getDisplayName = (user?: any) => {
+    if (!user) return 'Unknown User';
+    
+    if (user?.name) {
+      return user.name;
     }
 
     if (user?.email) {

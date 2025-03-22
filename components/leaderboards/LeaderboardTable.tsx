@@ -15,7 +15,7 @@ interface LeaderboardTableProps {
     score: number
     user: {
       id: string
-      full_name?: string
+      name?: string
       email?: string
       avatar_url?: string
     }
@@ -26,8 +26,8 @@ interface LeaderboardTableProps {
 export default function LeaderboardTable({ entries }: LeaderboardTableProps) {
   // Helper function to get initials from name or email
   const getInitials = (entry: LeaderboardTableProps['entries'][0]) => {
-    if (entry.user?.full_name) {
-      return entry.user.full_name
+    if (entry.user?.name) {
+      return entry.user.name
         .split(' ')
         .map(n => n[0])
         .join('')
@@ -43,8 +43,8 @@ export default function LeaderboardTable({ entries }: LeaderboardTableProps) {
 
   // Helper to get display name
   const getDisplayName = (entry: LeaderboardTableProps['entries'][0]) => {
-    if (entry.user?.full_name) {
-      return entry.user.full_name
+    if (entry.user?.name) {
+      return entry.user.name
     }
 
     if (entry.user?.email) {

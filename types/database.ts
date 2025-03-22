@@ -127,7 +127,7 @@ export interface WorkoutComment {
   user?: {
     id: string;
     email?: string;
-    full_name?: string;
+    name?: string;
     avatar_url?: string;
   };
 }
