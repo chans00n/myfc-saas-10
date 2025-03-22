@@ -50,18 +50,20 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
 
   return (
     <Tabs defaultValue={categories[0]?.id} className="w-full" onValueChange={handleTabChange}>
-      <div className="mb-6">
-        <TabsList className="inline-flex w-full justify-between">
-          {categories.map((category) => (
-            <TabsTrigger 
-              key={category.id} 
-              value={category.id} 
-              className="flex-1 whitespace-nowrap text-sm px-3 py-2"
-            >
-              {category.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="mb-6 -mx-1 px-1">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 pb-1">
+          <TabsList className="inline-flex min-w-full">
+            {categories.map((category) => (
+              <TabsTrigger 
+                key={category.id} 
+                value={category.id} 
+                className="flex-1 whitespace-nowrap text-sm px-4 py-2 min-w-[130px]"
+              >
+                {category.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </div>
       
       {categories.map((category) => (
