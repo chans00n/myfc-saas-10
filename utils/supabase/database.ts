@@ -562,4 +562,31 @@ export async function getWorkoutMovements(workoutId: string): Promise<any[]> {
     console.error('Unexpected error in getWorkoutMovements:', err);
     return [];
   }
+}
+
+// Get popular workouts for the dashboard carousel
+export async function getPopularWorkouts(limit: number = 5): Promise<Workout[]> {
+  try {
+    const supabase = createClient();
+    
+    // You can customize this query based on your definition of "popular"
+    // Here we're getting the most recently created active workouts
+    // Alternative approach could be to count user_workouts completions
+    const { data, error } = await supabase
+      .from('workouts')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      console.error('Error fetching popular workouts:', error);
+      return [];
+    }
+    
+    return data as Workout[];
+  } catch (err) {
+    console.error('Unexpected error in getPopularWorkouts:', err);
+    return [];
+  }
 } 
