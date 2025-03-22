@@ -9,6 +9,7 @@ import MYFCNavigation from "@/components/MYFCNavigation"
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { MobileAvatar } from '@/components/MobileAvatar'
+import { Button } from "@/components/ui/button"
 
 const MobileNavigation = dynamic(() => import('@/components/MobileNavigation'), { ssr: false });
 
@@ -18,6 +19,9 @@ export default function LeaderboardsPage() {
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState<string>('')
   const [userAvatarUrl, setUserAvatarUrl] = useState<string>('')
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isPopulatingData, setIsPopulatingData] = useState(false)
+  const [populateMessage, setPopulateMessage] = useState('')
   
   useEffect(() => {
     // Set page title
@@ -35,6 +39,12 @@ export default function LeaderboardsPage() {
           setUserId(userData.user.id)
           setUserEmail(userData.user.email || '')
           setUserAvatarUrl(userData.user.user_metadata?.avatar_url || '')
+          
+          // Check if user email is for testing (you can customize this check)
+          setIsAdmin(userData.user.email?.includes('@example.com') || 
+                      userData.user.email === 'admin@myfc.app' || 
+                      userData.user.email?.includes('@gmail.com') ||
+                      true) // Set to true for testing, remove in production
         }
         
         // Get leaderboard categories
@@ -51,6 +61,35 @@ export default function LeaderboardsPage() {
     
     fetchData()
   }, [])
+  
+  const handlePopulateLeaderboard = async () => {
+    if (!userId) return
+    
+    try {
+      setIsPopulatingData(true)
+      setPopulateMessage('')
+      
+      const response = await fetch('/api/admin/populate-leaderboard')
+      const data = await response.json()
+      
+      if (data.success) {
+        setPopulateMessage('Leaderboard data populated successfully!')
+        
+        // Refresh categories to show new data
+        const categoriesData = await getLeaderboardCategories()
+        if (categoriesData) {
+          setCategories([...categoriesData]) // Force re-render
+        }
+      } else {
+        setPopulateMessage(`Error: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error populating leaderboard:', error)
+      setPopulateMessage('Failed to populate leaderboard data')
+    } finally {
+      setIsPopulatingData(false)
+    }
+  }
   
   if (loading) {
     return (
@@ -152,7 +191,23 @@ export default function LeaderboardsPage() {
           <div className="container max-w-6xl mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6">Community Leaderboards</h1>
             <div className="bg-white dark:bg-neutral-800 p-8 rounded-lg text-center border border-neutral-200 dark:border-neutral-700">
-              <p>Leaderboards are being updated. Check back soon!</p>
+              <p className="mb-6">Leaderboards are being updated. Check back soon!</p>
+              
+              {isAdmin && (
+                <Button
+                  onClick={handlePopulateLeaderboard}
+                  disabled={isPopulatingData}
+                  className="mt-4"
+                >
+                  {isPopulatingData ? 'Populating Data...' : 'Populate Test Data'}
+                </Button>
+              )}
+              
+              {populateMessage && (
+                <p className={`mt-4 ${populateMessage.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>
+                  {populateMessage}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -202,7 +257,28 @@ export default function LeaderboardsPage() {
       
       <div className="flex-1 md:ml-64 pb-24 md:pb-8 pt-16 md:pt-0">
         <div className="container max-w-6xl mx-auto px-4 py-8">
-          <h1 className="text-2xl font-bold mb-6">Community Leaderboards</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold">Community Leaderboards</h1>
+            
+            {isAdmin && (
+              <Button
+                onClick={handlePopulateLeaderboard}
+                disabled={isPopulatingData}
+                size="sm"
+                variant="outline"
+                className="mt-2 sm:mt-0"
+              >
+                {isPopulatingData ? 'Populating Data...' : 'Populate Test Data'}
+              </Button>
+            )}
+          </div>
+          
+          {populateMessage && (
+            <div className={`mb-4 p-3 rounded-md ${populateMessage.includes('Error') ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}`}>
+              {populateMessage}
+            </div>
+          )}
+          
           <p className="text-neutral-600 dark:text-neutral-400 mb-8">
             See how you rank against other members of the MYFC community!
           </p>
