@@ -137,6 +137,7 @@ CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_user_id ON leaderboard_entrie
 -- Set up appropriate RLS (Row Level Security) policies
 ALTER TABLE workout_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comment_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comment_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE leaderboard_entries ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Anyone can view non-hidden comments
@@ -147,21 +148,25 @@ CREATE POLICY view_non_hidden_comments ON workout_comments
 -- Policy: Users can only edit their own comments
 CREATE POLICY edit_own_comments ON workout_comments
   FOR UPDATE
-  USING (user_id = auth.uid());
+  USING (user_id = auth.uid()::TEXT);
 
 -- Policy: Users can only delete their own comments
 CREATE POLICY delete_own_comments ON workout_comments
   FOR DELETE
-  USING (user_id = auth.uid());
+  USING (user_id = auth.uid()::TEXT);
 
 -- Policy: Users can insert their own comments
 CREATE POLICY insert_own_comments ON workout_comments
   FOR INSERT
-  WITH CHECK (user_id = auth.uid());
+  WITH CHECK (user_id = auth.uid()::TEXT);
 
 -- Policy: Users can only like/unlike comments themselves
 CREATE POLICY manage_own_likes ON comment_likes
-  USING (user_id = auth.uid());
+  USING (user_id = auth.uid()::TEXT);
+
+-- Policy: Users can only report comments themselves
+CREATE POLICY manage_own_reports ON comment_reports
+  USING (reporter_user_id = auth.uid()::TEXT);
 
 -- Policy: Everyone can view leaderboard entries
 CREATE POLICY view_leaderboard ON leaderboard_entries

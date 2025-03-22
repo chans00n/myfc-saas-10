@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Workout, UserWorkout } from '@/types/database';
 import CoachImage from '@/app/components/CoachImage';
+import WorkoutComments from '@/components/workout/WorkoutComments';
 
 // Extend the Workout type to include exercises
 interface WorkoutWithExercises extends Workout {
@@ -261,6 +262,11 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
             </Link>
           </section>
         )}
+        
+        {/* Workout comments section */}
+        <section className="mb-10">
+          <WorkoutComments workoutId={params.id} userId={data.user.id} />
+        </section>
       </div>
       
       {/* Fixed bottom buttons */}
