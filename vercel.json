@@ -1,0 +1,6 @@
+{
+  "crons": [{
+    "path": "/api/cron/update-leaderboards?secret=${CRON_SECRET}",
+    "schedule": "0 0 * * *"
+  }]
+} 
