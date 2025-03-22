@@ -51,12 +51,12 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
   return (
     <Tabs defaultValue={categories[0]?.id} className="w-full" onValueChange={handleTabChange}>
       <div className="mb-6">
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-1 w-full">
+        <TabsList className="inline-flex w-full justify-between">
           {categories.map((category) => (
             <TabsTrigger 
               key={category.id} 
               value={category.id} 
-              className="whitespace-nowrap text-sm px-3 py-2"
+              className="flex-1 whitespace-nowrap text-sm px-3 py-2"
             >
               {category.name}
             </TabsTrigger>
