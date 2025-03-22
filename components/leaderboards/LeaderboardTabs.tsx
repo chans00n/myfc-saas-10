@@ -57,7 +57,7 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
               <TabsTrigger 
                 key={category.id} 
                 value={category.id} 
-                className="flex-1 whitespace-nowrap text-sm px-4 py-2 min-w-[130px]"
+                className="flex-1 whitespace-nowrap text-sm px-4 py-2 min-w-[130px] mx-1.5"
               >
                 {category.name}
               </TabsTrigger>
