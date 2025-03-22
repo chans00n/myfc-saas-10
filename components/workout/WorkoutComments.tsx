@@ -188,8 +188,13 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
           placeholder="Share your thoughts, tips, or encouragement..."
           className="min-h-24"
         />
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting} variant="secondary" className="bg-neutral-600 hover:bg-neutral-700 text-white dark:bg-neutral-500 dark:hover:bg-neutral-400">
+        <div className="flex flex-col sm:flex-row sm:justify-end">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting} 
+            variant="secondary" 
+            className="w-full sm:w-auto bg-neutral-600 hover:bg-neutral-700 text-white dark:bg-neutral-500 dark:hover:bg-neutral-400"
+          >
             {isSubmitting ? "Posting..." : "Post Comment"}
           </Button>
         </div>
@@ -217,7 +222,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
         ) : comments.length > 0 ? (
           <>
             {comments.map(comment => (
-              <div key={comment.id} className="bg-card rounded-lg p-4 border shadow-sm">
+              <div key={comment.id} className="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-4 border shadow-sm">
                 <div className="flex justify-between">
                   <div className="flex items-center gap-2 mb-3">
                     <Avatar className="h-8 w-8">
@@ -238,7 +243,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
                   {comment.user?.id === userId && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-neutral-200 dark:hover:bg-neutral-800">
                           <MoreHorizontal size={16} />
                           <span className="sr-only">Comment actions</span>
                         </Button>
@@ -267,7 +272,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
                     onClick={() => handleLike(comment.id)}
                     disabled={loadingAction[`like-${comment.id}`]}
                   >
-                    <Heart className={`h-4 w-4 ${comment.user_has_liked ? "fill-current" : ""}`} />
+                    <Heart className={`h-4 w-4 ${comment.user_has_liked ? "fill-neutral-700 dark:fill-neutral-300" : ""}`} />
                     {comment.likes_count}
                   </Button>
                 </div>
