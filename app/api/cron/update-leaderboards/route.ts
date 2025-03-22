@@ -84,7 +84,7 @@ async function updateLeaderboardForCategory(supabase: any, category: any) {
       case 'total_workouts':
         // Raw SQL query for total workouts leaderboard
         const { data: allTimeData, error: allTimeError } = await supabase.rpc('calculate_total_workouts_leaderboard', {
-          category_id: category.id
+          input_category_id: category.id
         })
         
         if (allTimeError) {
@@ -104,7 +104,7 @@ async function updateLeaderboardForCategory(supabase: any, category: any) {
       case 'weekly_workouts':
         // Use a stored procedure for weekly workouts
         const { data: weeklyData, error: weeklyError } = await supabase.rpc('calculate_weekly_workouts_leaderboard', {
-          category_id: category.id
+          input_category_id: category.id
         })
         
         if (weeklyError) {
@@ -124,7 +124,7 @@ async function updateLeaderboardForCategory(supabase: any, category: any) {
       case 'monthly_completion_rate':
         // Use a stored procedure for monthly workouts
         const { data: monthlyData, error: monthlyError } = await supabase.rpc('calculate_monthly_workouts_leaderboard', {
-          category_id: category.id
+          input_category_id: category.id
         })
         
         if (monthlyError) {
