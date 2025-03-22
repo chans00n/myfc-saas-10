@@ -189,7 +189,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
           className="min-h-24"
         />
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} variant="secondary" className="bg-neutral-600 hover:bg-neutral-700 text-white dark:bg-neutral-500 dark:hover:bg-neutral-400">
             {isSubmitting ? "Posting..." : "Post Comment"}
           </Button>
         </div>
@@ -261,9 +261,9 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
                 
                 <div className="flex items-center gap-4">
                   <Button
-                    variant={comment.user_has_liked ? "default" : "outline"}
+                    variant={comment.user_has_liked ? "secondary" : "outline"}
                     size="sm"
-                    className="gap-1"
+                    className={`gap-1 ${comment.user_has_liked ? "bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600" : ""}`}
                     onClick={() => handleLike(comment.id)}
                     disabled={loadingAction[`like-${comment.id}`]}
                   >
@@ -276,7 +276,7 @@ export default function WorkoutComments({ workoutId, userId }: WorkoutCommentsPr
             
             {hasMore && (
               <div className="flex justify-center pt-4">
-                <Button variant="outline" onClick={loadMoreComments}>
+                <Button variant="outline" onClick={loadMoreComments} className="border-neutral-400 hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-800">
                   Load More Comments
                 </Button>
               </div>

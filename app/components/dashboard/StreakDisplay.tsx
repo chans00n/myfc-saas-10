@@ -11,7 +11,7 @@ export default function StreakDisplay({ streak }: StreakDisplayProps) {
     <div className="mb-8">
       <div className="mb-5">
         <h2 className="text-xl font-normal text-neutral-800 dark:text-neutral-200">
-          You have a <span className="font-bold border-b-2 border-indigo-500 dark:border-indigo-400">{currentStreak} day streak</span> today
+          You have a <span className="font-bold border-b-2 border-neutral-600 dark:border-neutral-400">{currentStreak} day streak</span> today
         </h2>
       </div>
       
@@ -28,8 +28,8 @@ export default function StreakDisplay({ streak }: StreakDisplayProps) {
               className={`flex-1 h-full rounded-sm ${
                 i < currentStreak 
                   ? i % 5 === 0 
-                      ? 'bg-indigo-600 dark:bg-indigo-500' 
-                      : 'bg-indigo-500 dark:bg-indigo-400'
+                      ? 'bg-neutral-600 dark:bg-neutral-500' 
+                      : 'bg-neutral-500 dark:bg-neutral-400'
                   : 'bg-neutral-200 dark:bg-neutral-700'
               } ${i === currentStreak - 1 ? 'animate-pulse' : ''}`}
             ></div>
@@ -38,7 +38,7 @@ export default function StreakDisplay({ streak }: StreakDisplayProps) {
         
         {currentStreak >= 5 && (
           <div className="mt-2 text-center">
-            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
               {currentStreak >= 30 
                 ? "Amazing! You've completed a full month streak! 🎉" 
                 : `Keep going! ${30 - currentStreak} more days for a full month streak`}

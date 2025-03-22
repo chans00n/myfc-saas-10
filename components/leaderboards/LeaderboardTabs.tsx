@@ -77,11 +77,11 @@ export default function LeaderboardTabs({ categories, userId }: LeaderboardTabsP
             ) : (
               <>
                 {userId && userRank && (
-                  <div className="bg-primary-foreground p-4 rounded-lg mb-4 border">
+                  <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg mb-4 border">
                     <p className="font-medium">Your Ranking</p>
                     <div className="flex justify-between items-center mt-2">
                       <div className="flex items-center gap-2">
-                        <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                        <div className="bg-neutral-600 dark:bg-neutral-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                           {userRank.rank}
                         </div>
                         <span className="font-medium">You</span>
