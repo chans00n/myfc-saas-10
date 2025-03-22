@@ -286,7 +286,7 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
             console.error('Error completing workout:', err);
           }
         }} className="flex-1">
-          <button type="submit" className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 rounded-lg transition duration-300">
+          <button type="submit" className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition duration-300">
             Mark as Completed
           </button>
         </form>

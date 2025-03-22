@@ -68,7 +68,7 @@ export default async function DashboardLayout({
                  }}>
                 <div className="text-center">
                     <Image 
-                        src="/myfc-logo.png"
+                        src="/logo_white.png"
                         alt="My Face Coach"
                         width={80}
                         height={80}
@@ -77,7 +77,7 @@ export default async function DashboardLayout({
                         unoptimized
                     />
                     <Image 
-                        src="/myfc-logo-dark.png"
+                        src="/logo.png"
                         alt="My Face Coach"
                         width={80}
                         height={80}

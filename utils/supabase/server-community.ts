@@ -48,7 +48,7 @@ export async function getServerWorkoutComments(workoutId: string, page: number =
         .from('comment_likes')
         .select('comment_id')
         .eq('user_id', user.user.id)
-        .in('comment_id', comments.map(c => c.id));
+        .in('comment_id', comments?.map(c => c.id) || []);
         
       // Add the user_has_liked property to each comment
       const commentsWithLikeStatus = comments.map(comment => ({
