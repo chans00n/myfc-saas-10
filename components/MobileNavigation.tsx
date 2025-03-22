@@ -2,47 +2,46 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Camera, Dumbbell, BarChart3, Trophy } from 'lucide-react';
 
 export default function MobileNavigation() {
   const pathname = usePathname();
   
-  // Define our navigation items
+  // Define our navigation items - reduced to 4 most important ones
   const navItems = [
-    {
-      name: 'Home',
-      href: '/dashboard',
-      icon: (active: boolean) => (
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      )
-    },
     {
       name: 'Lifts',
       href: '/dashboard/library',
       icon: (active: boolean) => (
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
+        <Dumbbell className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
       )
     },
     {
       name: 'Moves',
       href: '/dashboard/movements',
       icon: (active: boolean) => (
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <BarChart3 className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
+      )
+    },
+    // Face is the 3rd item (will be center in a 5-item layout)
+    {
+      name: 'Capture',
+      href: '/dashboard/facial-progress',
+      isSpecial: true,
+      icon: (active: boolean) => (
+        <div className="relative">
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full bg-neutral-800 dark:bg-neutral-100 flex items-center justify-center">
+            <Camera className="h-7 w-7 text-white dark:text-neutral-800" />
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xs">+</span>
+          </div>
+        </div>
       )
     },
     {
       name: 'Leaders',
       href: '/leaderboards',
       icon: (active: boolean) => (
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
+        <Trophy className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
       )
     },
     {
@@ -57,7 +56,6 @@ export default function MobileNavigation() {
   ];
   
   // Helper function to check if a path matches the current route
-  // This allows for sub-paths like /dashboard/library/123 to still highlight the library tab
   const isActive = (path: string) => {
     if (path === '/dashboard') {
       return pathname === '/dashboard';
@@ -79,9 +77,17 @@ export default function MobileNavigation() {
           <Link 
             key={item.name}
             href={item.href} 
-            className={`flex flex-col items-center justify-center w-full py-2 ${active ? 'bg-neutral-100 dark:bg-neutral-700/50 rounded-md' : ''}`}>
+            className={`flex flex-col items-center justify-center w-full py-2 ${
+              active && !item.isSpecial ? 'bg-neutral-100 dark:bg-neutral-700/50 rounded-md' : ''
+            } ${
+              item.isSpecial ? 'mt-3' : ''
+            }`}>
             {item.icon(active)}
-            <span className={`text-xs mt-1 ${active ? 'font-medium text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`}>
+            <span className={`text-xs mt-1 ${
+              active ? 'font-medium text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'
+            } ${
+              item.isSpecial ? 'mt-7' : ''
+            }`}>
               {item.name}
             </span>
           </Link>

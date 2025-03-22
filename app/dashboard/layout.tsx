@@ -66,7 +66,7 @@ export default async function DashboardLayout({
                      paddingLeft: 'max(16px, env(safe-area-inset-left))',
                      paddingRight: 'max(16px, env(safe-area-inset-right))'
                  }}>
-                <div className="text-center">
+                <Link href="/dashboard" className="text-center">
                     <Image 
                         src="/logo_white.png"
                         alt="My Face Coach"
@@ -85,7 +85,7 @@ export default async function DashboardLayout({
                         priority
                         unoptimized
                     />
-                </div>
+                </Link>
                 
                 <div className="flex items-center">
                     <MobileAvatar userEmail={userEmail} userAvatarUrl={avatarUrl} />
