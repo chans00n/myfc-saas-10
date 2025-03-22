@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>MYFC PWA Status</title>
+  <link rel="manifest" href="./manifest.json" crossorigin="use-credentials">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -160,7 +161,15 @@
       logEntry.className = 'log-entry ' + type;
       logEntry.textContent = msg;
       $('console-log').appendChild(logEntry);
-      console[type](msg);
+      
+      // Use safer console logging
+      if (type === 'error' && console.error) {
+        console.error(msg);
+      } else if (type === 'warning' && console.warn) {
+        console.warn(msg);
+      } else {
+        console.log(msg);
+      }
     }
     
     // Display environment info

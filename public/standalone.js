@@ -166,94 +166,102 @@
   };
 })();
 
-// MYFC PWA Standalone Mode Helper
+/***********************************************
+ * MYFC PWA Standalone Mode Enhancement
+ * This script enhances the iOS standalone mode experience
+ ***********************************************/
 
-// Detect if running on the members subdomain
+// Utility functions
 function isMembersSubdomain() {
   return window.location.hostname === 'members.myfc.app';
 }
 
-// Detect iOS standalone mode (added to home screen)
 function isIOSStandalone() {
   return window.navigator.standalone === true;
 }
 
-// Detect Android standalone mode (added to home screen)
 function isAndroidStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches;
 }
 
-// Combined standalone detection
 function isStandalone() {
   return isIOSStandalone() || isAndroidStandalone();
 }
 
-// Log current environment details
-console.log('[MYFC] Environment info:');
-console.log('- URL:', window.location.href);
-console.log('- Hostname:', window.location.hostname);
-console.log('- Is members subdomain:', isMembersSubdomain());
-console.log('- Is iOS standalone:', isIOSStandalone());
-console.log('- Is Android standalone:', isAndroidStandalone());
-console.log('- Is standalone:', isStandalone());
+// Log environment details
+console.log('[Standalone.js] Current URL:', window.location.href);
+console.log('[Standalone.js] Hostname:', window.location.hostname);
+console.log('[Standalone.js] Is members subdomain:', isMembersSubdomain());
+console.log('[Standalone.js] iOS standalone:', isIOSStandalone());
+console.log('[Standalone.js] Android standalone:', isAndroidStandalone());
 
-// Store standalone status in localStorage for other scripts to use
+// Store standalone status in localStorage for other scripts
 if (isStandalone()) {
+  console.log('[Standalone.js] Running in standalone mode');
   localStorage.setItem('pwaStandalone', 'true');
   
-  // If on root path, redirect to dashboard (using relative path for subdomain compatibility)
-  if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-    console.log('[MYFC] Redirecting from root to dashboard in standalone mode');
+  // Redirect to dashboard if on root path
+  if (window.location.pathname === '/' || window.location.pathname.includes('index')) {
+    console.log('[Standalone.js] Redirecting to dashboard from root'); 
     window.location.replace('./dashboard');
   }
 }
 
 // Handle external links in standalone mode
 document.addEventListener('click', function(event) {
-  // Only handle clicks in standalone mode
+  // Only process in standalone mode
   if (!isStandalone()) return;
   
   let target = event.target;
   
-  // Find the closest anchor tag
+  // Find closest anchor if clicked on a child element
   while (target && target.tagName !== 'A') {
     target = target.parentElement;
+    if (!target) return;
   }
   
-  // If we found an anchor tag
   if (target && target.tagName === 'A') {
     const href = target.getAttribute('href');
-    const target_type = target.getAttribute('target');
+    if (!href) return;
     
-    // Skip if no href or it's a hash link
-    if (!href || href.startsWith('#')) return;
-    
-    // Handle external links
-    if (
-      href.startsWith('http') && 
-      !href.includes(window.location.hostname)
-    ) {
-      console.log('[MYFC] Opening external link in system browser:', href);
-      window.open(href, '_system');
-      event.preventDefault();
-    }
-    // Handle target="_blank" links
-    else if (target_type === '_blank') {
-      console.log('[MYFC] Opening _blank link in system browser:', href);
-      window.open(href, '_system');
-      event.preventDefault();
+    try {
+      const url = new URL(href, window.location.href);
+      
+      // If it's an external link or has target="_blank"
+      if (url.hostname !== window.location.hostname || target.getAttribute('target') === '_blank') {
+        console.log('[Standalone.js] Opening external link in system browser:', url.href);
+        
+        // Open in system browser
+        window.open(url.href, '_system');
+        
+        // Prevent default navigation
+        event.preventDefault();
+      }
+    } catch (e) {
+      console.error('[Standalone.js] Error processing link:', e);
     }
   }
 });
 
-// Register the service worker if not already registered
+// Register service worker if not already registered
 if ('serviceWorker' in navigator) {
-  const swPath = './sw.js';
-  navigator.serviceWorker.register(swPath, { scope: './' })
-    .then(registration => {
-      console.log('[MYFC] Service worker registered with scope:', registration.scope);
-    })
-    .catch(error => {
-      console.error('[MYFC] Service worker registration failed:', error);
+  // Check if we're on the members.myfc.app subdomain
+  const hostname = window.location.hostname;
+  const isMembersSubdomain = hostname === 'members.myfc.app';
+  
+  // Choose appropriate service worker path and scope
+  const swPath = isMembersSubdomain ? './sw.js' : '/sw.js';
+  const swScope = isMembersSubdomain ? './' : '/';
+  
+  console.log(`[Standalone.js] Will register service worker from ${swPath} with scope ${swScope}`);
+  
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register(swPath, {
+      scope: swScope
+    }).then(function(registration) {
+      console.log('[Standalone.js] Service worker registered successfully:', registration.scope);
+    }).catch(function(error) {
+      console.error('[Standalone.js] Service worker registration failed:', error);
     });
+  });
 } 

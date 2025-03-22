@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "MYFC - My Face Coach",
   description: "Daily facial exercises and tracking",
-  manifest: "./manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
