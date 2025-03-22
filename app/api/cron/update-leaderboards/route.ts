@@ -16,39 +16,30 @@ export async function GET(request: Request) {
     
     const supabase = createClient()
     
-    // Get all active leaderboard categories
-    const { data: categories, error: catError } = await supabase
-      .from('leaderboard_categories')
-      .select('*')
-      .eq('is_active', true)
-    
-    if (catError) {
-      throw new Error(`Error fetching categories: ${catError.message}`)
-    }
-    
-    if (!categories || categories.length === 0) {
-      return NextResponse.json({ message: 'No active leaderboard categories found' })
-    }
+    // Define our categories directly since we're facing database issues
+    const categories = [
+      { name: 'Longest Streak', sort_field: 'current_streak' },
+      { name: 'All-Time Workouts', sort_field: 'total_workouts' },
+      { name: 'Weekly Champions', sort_field: 'weekly_workouts' },
+      { name: 'Monthly Dedication', sort_field: 'monthly_completion_rate' }
+    ]
     
     // Track stats for response
     const results = []
     
-    // Process each category
-    for (const category of categories) {
-      // Call the database function to update leaderboards
-      if (category.sort_field === 'current_streak') {
-        const { data, error } = await supabase.rpc('update_streak_leaderboard')
-        
-        results.push({
-          category: category.name,
-          status: error ? 'error' : 'success',
-          message: error ? error.message : 'Updated successfully'
-        })
-      } else {
-        // For other leaderboard types, call the appropriate function or update directly
-        const result = await updateLeaderboardForCategory(supabase, category)
-        results.push(result)
-      }
+    // Process Longest Streak category first using direct SQL
+    const { error: streakError } = await supabase.rpc('update_streak_leaderboard')
+    
+    results.push({
+      category: 'Longest Streak',
+      status: streakError ? 'error' : 'success',
+      message: streakError ? streakError.message : 'Updated successfully'
+    })
+    
+    // Process other categories
+    for (const category of categories.slice(1)) {
+      const result = await updateLeaderboardForCategory(supabase, category)
+      results.push(result)
     }
     
     // Revalidate the leaderboards page
@@ -67,35 +58,60 @@ export async function GET(request: Request) {
 }
 
 async function updateLeaderboardForCategory(supabase: any, category: any) {
-  const categoryId = category.id
-  const sortField = category.sort_field
-  
   try {
-    let query;
     let entries = [];
     
     // Logic for different category types
-    switch (sortField) {
+    switch (category.sort_field) {
       case 'total_workouts':
-        // Count completed workouts per user
+        // Count completed workouts per user using direct SQL query
         const { data: totalWorkouts, error: totalError } = await supabase
-          .from('user_workouts')
-          .select('user_id, count(*)')
-          .eq('completed', true)
-          .group('user_id')
-          .order('count', { ascending: false })
+          .from('workouts_completed')
+          .select('user_id, count')
+          .select(`
+            user_id,
+            count(*) as workout_count,
+            users!workouts_completed_user_id_fkey (display_name, email)
+          `)
+          .group('user_id, users.display_name, users.email')
+          .order('workout_count', { ascending: false })
           .limit(100)
         
         if (totalError) throw new Error(`Error counting workouts: ${totalError.message}`)
         
         if (totalWorkouts && totalWorkouts.length > 0) {
-          entries = totalWorkouts.map((item: any, index: number) => ({
-            category_id: categoryId,
+          // Clear existing entries
+          await supabase
+            .from('leaderboard_entries')
+            .delete()
+            .eq('category', 'All-Time Workouts')
+            
+          // Insert new entries
+          const allTimeEntries = totalWorkouts.map((item: any, index: number) => ({
             user_id: item.user_id,
+            username: item.users?.display_name || item.users?.email || 'Unknown User',
             rank: index + 1,
-            score: parseInt(item.count, 10),
-            last_updated: new Date().toISOString()
+            score: parseInt(item.workout_count, 10),
+            category: 'All-Time Workouts'
           }))
+          
+          const { error: insertError } = await supabase
+            .from('leaderboard_entries')
+            .insert(allTimeEntries)
+            
+          if (insertError) throw new Error(`Error inserting entries: ${insertError.message}`)
+          
+          return {
+            category: 'All-Time Workouts',
+            status: 'success',
+            entries: allTimeEntries.length
+          }
+        } else {
+          return {
+            category: 'All-Time Workouts',
+            status: 'skipped',
+            message: 'No workout data found'
+          }
         }
         break
         
@@ -106,26 +122,54 @@ async function updateLeaderboardForCategory(supabase: any, category: any) {
         startOfWeek.setDate(now.getDate() - now.getDay())
         startOfWeek.setHours(0, 0, 0, 0)
         
-        // Count completed workouts per user for the current week
-        const { data: weeklyWorkouts, error: weeklyError } = await supabase
-          .from('user_workouts')
-          .select('user_id, count(*)')
-          .eq('completed', true)
-          .gte('completed_at', startOfWeek.toISOString())
-          .group('user_id')
-          .order('count', { ascending: false })
+        // Use raw SQL for this complex query since the ORM syntax is causing errors
+        const { data: weeklyData, error: weeklyError } = await supabase
+          .from('workouts_completed')
+          .select(`
+            user_id,
+            count(*) as workout_count,
+            users!workouts_completed_user_id_fkey (display_name, email)
+          `)
+          .gte('created_at', startOfWeek.toISOString())
+          .group('user_id, users.display_name, users.email')
+          .order('workout_count', { ascending: false })
           .limit(100)
         
         if (weeklyError) throw new Error(`Error counting weekly workouts: ${weeklyError.message}`)
         
-        if (weeklyWorkouts && weeklyWorkouts.length > 0) {
-          entries = weeklyWorkouts.map((item: any, index: number) => ({
-            category_id: categoryId,
+        if (weeklyData && weeklyData.length > 0) {
+          // Clear existing entries
+          await supabase
+            .from('leaderboard_entries')
+            .delete()
+            .eq('category', 'Weekly Champions')
+            
+          // Insert new entries
+          const weeklyEntries = weeklyData.map((item: any, index: number) => ({
             user_id: item.user_id,
+            username: item.users?.display_name || item.users?.email || 'Unknown User',
             rank: index + 1,
-            score: parseInt(item.count, 10),
-            last_updated: new Date().toISOString()
+            score: parseInt(item.workout_count, 10),
+            category: 'Weekly Champions'
           }))
+          
+          const { error: insertWeeklyError } = await supabase
+            .from('leaderboard_entries')
+            .insert(weeklyEntries)
+            
+          if (insertWeeklyError) throw new Error(`Error inserting weekly entries: ${insertWeeklyError.message}`)
+          
+          return {
+            category: 'Weekly Champions',
+            status: 'success',
+            entries: weeklyEntries.length
+          }
+        } else {
+          return {
+            category: 'Weekly Champions',
+            status: 'skipped',
+            message: 'No weekly workout data found'
+          }
         }
         break
         
@@ -133,63 +177,67 @@ async function updateLeaderboardForCategory(supabase: any, category: any) {
         // Get the start of the current month
         const currentDate = new Date()
         const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-        
-        // Count completed workouts per user for the current month
-        const { data: monthlyWorkouts, error: monthlyError } = await supabase
-          .from('user_workouts')
-          .select('user_id, count(*)')
-          .eq('completed', true)
-          .gte('completed_at', startOfMonth.toISOString())
-          .group('user_id')
-          .order('count', { ascending: false })
+
+        // Use raw SQL for this complex query
+        const { data: monthlyData, error: monthlyError } = await supabase
+          .from('workouts_completed')
+          .select(`
+            user_id,
+            count(*) as workout_count,
+            users!workouts_completed_user_id_fkey (display_name, email)
+          `)
+          .gte('created_at', startOfMonth.toISOString())
+          .group('user_id, users.display_name, users.email')
+          .order('workout_count', { ascending: false })
           .limit(100)
         
         if (monthlyError) throw new Error(`Error counting monthly workouts: ${monthlyError.message}`)
         
-        if (monthlyWorkouts && monthlyWorkouts.length > 0) {
-          entries = monthlyWorkouts.map((item: any, index: number) => ({
-            category_id: categoryId,
+        if (monthlyData && monthlyData.length > 0) {
+          // Clear existing entries
+          await supabase
+            .from('leaderboard_entries')
+            .delete()
+            .eq('category', 'Monthly Dedication')
+            
+          // Insert new entries
+          const monthlyEntries = monthlyData.map((item: any, index: number) => ({
             user_id: item.user_id,
+            username: item.users?.display_name || item.users?.email || 'Unknown User',
             rank: index + 1,
-            score: parseInt(item.count, 10),
-            last_updated: new Date().toISOString()
+            score: parseInt(item.workout_count, 10),
+            category: 'Monthly Dedication'
           }))
+          
+          const { error: insertMonthlyError } = await supabase
+            .from('leaderboard_entries')
+            .insert(monthlyEntries)
+            
+          if (insertMonthlyError) throw new Error(`Error inserting monthly entries: ${insertMonthlyError.message}`)
+          
+          return {
+            category: 'Monthly Dedication',
+            status: 'success',
+            entries: monthlyEntries.length
+          }
+        } else {
+          return {
+            category: 'Monthly Dedication',
+            status: 'skipped',
+            message: 'No monthly workout data found'
+          }
         }
         break
     }
     
-    // Skip update if no entries were found
-    if (entries.length === 0) {
-      return {
-        category: category.name,
-        status: 'skipped',
-        message: 'No data found for this category'
-      }
-    }
-    
-    // Clear existing entries for this category
-    await supabase
-      .from('leaderboard_entries')
-      .delete()
-      .eq('category_id', categoryId)
-    
-    // Insert new entries
-    const { error: insertError } = await supabase
-      .from('leaderboard_entries')
-      .insert(entries)
-    
-    if (insertError) {
-      throw new Error(`Error inserting leaderboard entries: ${insertError.message}`)
-    }
-    
     return {
       category: category.name,
-      status: 'success',
-      entries: entries.length
+      status: 'error',
+      message: 'Unknown category type'
     }
   } catch (error: any) {
     return {
-      category: category.name,
+      category: category.name || 'Unknown',
       status: 'error',
       message: error.message
     }
