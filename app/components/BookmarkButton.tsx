@@ -2,6 +2,7 @@
 
 import { useWorkoutBookmark } from '@/hooks/useWorkoutBookmark';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 interface BookmarkButtonProps {
   workoutId: string | number;
@@ -9,21 +10,46 @@ interface BookmarkButtonProps {
 }
 
 export default function BookmarkButton({ workoutId, className }: BookmarkButtonProps) {
-  const workoutIdNumber = typeof workoutId === 'string' ? parseInt(workoutId, 10) : workoutId;
-  const { isBookmarked, isLoading, toggleBookmark } = useWorkoutBookmark(workoutIdNumber);
+  console.log(`[DETAIL_BOOKMARK] Rendering BookmarkButton for workout ${workoutId}, type: ${typeof workoutId}`);
+  
+  // Use the original workoutId without parsing
+  const { isBookmarked, isLoading, toggleBookmark } = useWorkoutBookmark(workoutId);
+  
+  useEffect(() => {
+    console.log(`[DETAIL_BOOKMARK] Effect: workout ${workoutId} isBookmarked=${isBookmarked}, isLoading=${isLoading}`);
+  }, [workoutId, isBookmarked, isLoading]);
+
+  const handleToggleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Add more explicit debugging
+    console.log(`[DETAIL_BOOKMARK] Button clicked for workout ${workoutId}, current status: ${isBookmarked}`);
+    console.log(`[DETAIL_BOOKMARK] Button state: isLoading=${isLoading}, disabled=${isLoading}`);
+    
+    // Only proceed if not already loading
+    if (isLoading) {
+      console.log(`[DETAIL_BOOKMARK] Ignoring click because button is in loading state`);
+      return;
+    }
+    
+    // Make the API call
+    toggleBookmark().then(newStatus => {
+      console.log(`[DETAIL_BOOKMARK] Toggle result for workout ${workoutId}: ${newStatus}`);
+    }).catch(err => {
+      console.error(`[DETAIL_BOOKMARK] Error toggling bookmark for workout ${workoutId}:`, err);
+    });
+  };
 
   return (
     <button
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleBookmark();
-      }}
+      onClick={handleToggleBookmark}
       className={clsx(
         'text-white hover:text-indigo-200 transition',
         className
       )}
       aria-label={isBookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
+      disabled={isLoading}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
