@@ -75,7 +75,7 @@ export function MobileAvatar({ userEmail, userAvatarUrl }: MobileAvatarProps) {
             />
           </div>
         ) : (
-          <div className="h-9 w-9 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600">
+          <div className="h-9 w-9 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm">
               {getInitials(userEmail || '')}
             </span>
@@ -88,7 +88,7 @@ export function MobileAvatar({ userEmail, userAvatarUrl }: MobileAvatarProps) {
         onClose={() => setIsSheetOpen(false)}
       >
         {/* Enhanced profile header with avatar and name */}
-        <div className="pb-6">
+        <div className="pt-safe-top pb-6">
           <div className="flex items-center mb-4">
             <div className="mr-4">
               {userAvatarUrl ? (

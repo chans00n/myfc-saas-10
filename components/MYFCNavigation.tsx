@@ -85,7 +85,7 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
         onClose={() => setIsSheetOpen(false)}
       >
         {/* Enhanced profile header with avatar and name */}
-        <div className="pb-6">
+        <div className="pt-safe-top pb-6">
           <div className="flex items-center mb-4">
             <div className="mr-4">
               {userAvatarUrl ? (

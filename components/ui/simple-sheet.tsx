@@ -78,21 +78,29 @@ export function SimpleSheet({
       {/* Sheet */}
       <div 
         ref={sheetRef}
-        className={`fixed bg-white dark:bg-neutral-800 shadow-lg z-50 w-[280px] p-6 ${positionClasses} ${className}`}
+        className={`
+          fixed bg-white dark:bg-neutral-800 shadow-lg z-50 w-[280px] 
+          ${positionClasses} ${className}
+          pt-safe-top pb-safe-bottom pr-safe-right pl-safe-left
+          flex flex-col
+        `}
       >
-        {/* Close button */}
-        <button 
-          onClick={onClose} 
-          className="absolute top-4 right-4 p-1 rounded-sm text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-          aria-label="Close"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18"></path>
-            <path d="M6 6l12 12"></path>
-          </svg>
-        </button>
-        
-        {children}
+        {/* Content wrapper with proper padding accounting for safe areas */}
+        <div className="p-6 relative flex-1 overflow-y-auto">
+          {/* Close button */}
+          <button 
+            onClick={onClose} 
+            className="absolute top-4 right-4 p-1 rounded-sm text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+            aria-label="Close"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18"></path>
+              <path d="M6 6l12 12"></path>
+            </svg>
+          </button>
+          
+          {children}
+        </div>
       </div>
     </>
   );

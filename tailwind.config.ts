@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss"
+import defaultTheme from "tailwindcss/defaultTheme"
+import tailwindcssAnimate from "tailwindcss-animate"
 
 const config: Config = {
   darkMode: ["class"],
@@ -20,7 +22,7 @@ const config: Config = {
   		fontFamily: {
   			sans: [
   				'Inter',
-  				'sans-serif'
+  				...defaultTheme.fontFamily.sans
   			]
   		},
   		colors: {
@@ -38,8 +40,8 @@ const config: Config = {
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
+  				DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+  				foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)'
   			},
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',
@@ -72,6 +74,7 @@ const config: Config = {
   			}
   		},
   		borderRadius: {
+  			xl: 'calc(var(--radius) + 4px)',
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
@@ -98,6 +101,18 @@ const config: Config = {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		},
+  		padding: {
+  			'safe-top': 'env(safe-area-inset-top)',
+  			'safe-right': 'env(safe-area-inset-right)',
+  			'safe-bottom': 'env(safe-area-inset-bottom)',
+  			'safe-left': 'env(safe-area-inset-left)'
+  		},
+  		margin: {
+  			'safe-top': 'env(safe-area-inset-top)',
+  			'safe-right': 'env(safe-area-inset-right)',
+  			'safe-bottom': 'env(safe-area-inset-bottom)',
+  			'safe-left': 'env(safe-area-inset-left)'
+  		},
   		screens: {
   			xs: '375px',
   			sm: '640px',
@@ -108,7 +123,7 @@ const config: Config = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config
 
 export default config
