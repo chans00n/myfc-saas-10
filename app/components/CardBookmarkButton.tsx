@@ -2,6 +2,7 @@
 
 import { useWorkoutBookmark } from '@/hooks/useWorkoutBookmark';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 interface CardBookmarkButtonProps {
   workoutId: string | number;
@@ -17,15 +18,29 @@ export default function CardBookmarkButton({
   lightMode = false
 }: CardBookmarkButtonProps) {
   const workoutIdNumber = typeof workoutId === 'string' ? parseInt(workoutId, 10) : workoutId;
+  
+  console.log(`[BOOKMARK_BUTTON] Rendering CardBookmarkButton for workout ${workoutIdNumber}`);
+  
   const { isBookmarked, isLoading, toggleBookmark } = useWorkoutBookmark(workoutIdNumber);
+  
+  useEffect(() => {
+    console.log(`[BOOKMARK_BUTTON] Effect: workout ${workoutIdNumber} isBookmarked=${isBookmarked}, isLoading=${isLoading}`);
+  }, [workoutIdNumber, isBookmarked, isLoading]);
+
+  const handleToggleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`[BOOKMARK_BUTTON] Button clicked for workout ${workoutIdNumber}, current status: ${isBookmarked}`);
+    toggleBookmark().then(newStatus => {
+      console.log(`[BOOKMARK_BUTTON] Toggle result for workout ${workoutIdNumber}: ${newStatus}`);
+    }).catch(err => {
+      console.error(`[BOOKMARK_BUTTON] Error toggling bookmark for workout ${workoutIdNumber}:`, err);
+    });
+  };
 
   return (
     <button
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleBookmark();
-      }}
+      onClick={handleToggleBookmark}
       className={clsx(
         'transition rounded-full flex items-center justify-center',
         lightMode 

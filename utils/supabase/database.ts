@@ -594,6 +594,7 @@ export async function getPopularWorkouts(limit: number = 5): Promise<Workout[]> 
 // Get user's bookmarked workouts
 export async function getUserBookmarks(userId: string): Promise<WorkoutBookmark[]> {
   try {
+    console.log(`[DATABASE] Fetching bookmarks for user ${userId}`);
     const supabase = createClient();
     
     const { data, error } = await supabase
@@ -603,13 +604,18 @@ export async function getUserBookmarks(userId: string): Promise<WorkoutBookmark[
       .order('created_at', { ascending: false });
     
     if (error) {
-      console.error('Error fetching user bookmarks:', error);
+      console.error('[DATABASE] Error fetching user bookmarks:', error);
       return [];
+    }
+    
+    console.log(`[DATABASE] Found ${data?.length || 0} bookmarks for user ${userId}`);
+    if (data && data.length > 0) {
+      console.log('[DATABASE] First few bookmarks:', data.slice(0, 3));
     }
     
     return data as WorkoutBookmark[];
   } catch (err) {
-    console.error('Unexpected error in getUserBookmarks:', err);
+    console.error('[DATABASE] Unexpected error in getUserBookmarks:', err);
     return [];
   }
 }
@@ -617,6 +623,7 @@ export async function getUserBookmarks(userId: string): Promise<WorkoutBookmark[
 // Check if a workout is bookmarked by a user
 export async function isWorkoutBookmarked(userId: string, workoutId: string): Promise<boolean> {
   try {
+    console.log(`[DATABASE] Checking if workout ${workoutId} is bookmarked by user ${userId}`);
     const supabase = createClient();
     
     const { data, error } = await supabase
@@ -629,15 +636,17 @@ export async function isWorkoutBookmarked(userId: string, workoutId: string): Pr
     if (error) {
       // If no record found, just return false
       if (error.code === 'PGRST116') {
+        console.log(`[DATABASE] Workout ${workoutId} is NOT bookmarked by user ${userId}`);
         return false;
       }
-      console.error('Error checking if workout is bookmarked:', error);
+      console.error('[DATABASE] Error checking if workout is bookmarked:', error);
       return false;
     }
     
+    console.log(`[DATABASE] Workout ${workoutId} IS bookmarked by user ${userId}`);
     return !!data;
   } catch (err) {
-    console.error('Unexpected error in isWorkoutBookmarked:', err);
+    console.error('[DATABASE] Unexpected error in isWorkoutBookmarked:', err);
     return false;
   }
 }
@@ -645,13 +654,16 @@ export async function isWorkoutBookmarked(userId: string, workoutId: string): Pr
 // Toggle bookmark status (add or remove)
 export async function toggleWorkoutBookmark(userId: string, workoutId: string): Promise<boolean> {
   try {
+    console.log(`[DATABASE] Toggling bookmark for workout ${workoutId} by user ${userId}`);
     const supabase = createClient();
     
     // First, check if the bookmark already exists
     const isBookmarked = await isWorkoutBookmarked(userId, workoutId);
+    console.log(`[DATABASE] Current bookmark status: ${isBookmarked}`);
     
     if (isBookmarked) {
       // Remove the bookmark
+      console.log(`[DATABASE] Removing bookmark for workout ${workoutId}`);
       const { error } = await supabase
         .from('workout_bookmarks')
         .delete()
@@ -659,13 +671,15 @@ export async function toggleWorkoutBookmark(userId: string, workoutId: string): 
         .eq('workout_id', workoutId);
       
       if (error) {
-        console.error('Error removing bookmark:', error);
+        console.error('[DATABASE] Error removing bookmark:', error);
         return false;
       }
       
+      console.log(`[DATABASE] Successfully removed bookmark for workout ${workoutId}`);
       return false; // Indicates bookmark was removed
     } else {
       // Add the bookmark
+      console.log(`[DATABASE] Adding bookmark for workout ${workoutId}`);
       const { error } = await supabase
         .from('workout_bookmarks')
         .insert({
@@ -674,14 +688,15 @@ export async function toggleWorkoutBookmark(userId: string, workoutId: string): 
         });
       
       if (error) {
-        console.error('Error adding bookmark:', error);
+        console.error('[DATABASE] Error adding bookmark:', error);
         return false;
       }
       
+      console.log(`[DATABASE] Successfully added bookmark for workout ${workoutId}`);
       return true; // Indicates bookmark was added
     }
   } catch (err) {
-    console.error('Unexpected error in toggleWorkoutBookmark:', err);
+    console.error('[DATABASE] Unexpected error in toggleWorkoutBookmark:', err);
     return false;
   }
 } 
