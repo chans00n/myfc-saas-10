@@ -14,13 +14,13 @@ let lastFetched = 0;
 // Replace these with the actual price IDs of the plans you want to keep
 const ALLOWED_PLAN_IDS: string[] = [
   // List your two price IDs here, e.g.:
-  // "price_1AbCdEfGhIjKlMnOpQrStUvW",
-  // "price_2XyZaBcDeFgHiJkLmNoPqRsT"
+  "price_1R2C2uAGGp9MhWwYJm24DRNO",
+  "price_1R2C2uAGGp9MhWwY1993ULoV"
 ];
 
 // Check if we should show all plans or filter them
 // Set to false to only show plans with IDs in ALLOWED_PLAN_IDS
-const SHOW_ALL_PLANS = true; // Change to false to enable filtering
+const SHOW_ALL_PLANS = false; // Changed to false to enable filtering
 
 export async function GET() {
   try {
@@ -122,6 +122,10 @@ export async function POST(request: Request) {
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
       automatic_tax: { enabled: true },
+      customer_update: {
+        address: 'auto',
+        shipping: 'auto'
+      },
     });
     
     return NextResponse.json({ sessionId: session.id, url: session.url });
