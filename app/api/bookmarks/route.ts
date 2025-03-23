@@ -15,7 +15,19 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const { workoutId } = await request.json();
+    // First try to get workoutId from URL params (for backward compatibility)
+    const url = new URL(request.url);
+    let workoutId = url.searchParams.get('workoutId');
+    
+    // If not in URL params, try to get from request body
+    if (!workoutId) {
+      try {
+        const body = await request.json();
+        workoutId = body.workoutId;
+      } catch (e) {
+        console.error('Error parsing request body:', e);
+      }
+    }
     
     if (!workoutId) {
       return NextResponse.json(
@@ -24,7 +36,10 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const isBookmarked = await toggleWorkoutBookmark(user.id, workoutId);
+    // Ensure workoutId is a string
+    const workoutIdString = String(workoutId);
+    
+    const isBookmarked = await toggleWorkoutBookmark(user.id, workoutIdString);
     
     return NextResponse.json({ isBookmarked });
   } catch (error) {
@@ -59,7 +74,10 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    const isBookmarked = await isWorkoutBookmarked(user.id, workoutId);
+    // Ensure workoutId is a string for database operations
+    const workoutIdString = String(workoutId);
+    
+    const isBookmarked = await isWorkoutBookmarked(user.id, workoutIdString);
     
     return NextResponse.json({ isBookmarked });
   } catch (error) {

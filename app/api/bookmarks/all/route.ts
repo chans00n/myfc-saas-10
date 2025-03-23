@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { getUserBookmarks } from '@/utils/supabase/database';
 
+// Define the type for WorkoutBookmark for better type safety
+interface WorkoutBookmark {
+  workout_id: string;
+  [key: string]: any; // For other properties
+}
+
 /**
  * GET /api/bookmarks/all - Fetches all bookmarks for the current user
  */
@@ -22,8 +28,11 @@ export async function GET() {
     // Get all bookmarks for the user
     const bookmarks = await getUserBookmarks(user.id);
     
-    // Extract just the workout IDs
-    const bookmarkedWorkoutIds = bookmarks.map(bookmark => bookmark.workout_id);
+    // Extract workout IDs and convert to numbers for the frontend
+    const bookmarkedWorkoutIds = bookmarks.map(bookmark => {
+      const workoutId = (bookmark as WorkoutBookmark).workout_id;
+      return typeof workoutId === 'string' ? parseInt(workoutId, 10) : workoutId;
+    }).filter(id => !isNaN(id)); // Filter out any NaN values
     
     return NextResponse.json({
       bookmarkedWorkoutIds

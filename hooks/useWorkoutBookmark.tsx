@@ -65,8 +65,12 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   // Toggle bookmark status
   const toggleBookmark = async (workoutId: number): Promise<boolean> => {
     try {
-      const response = await fetch(`/api/bookmarks?workoutId=${workoutId}`, {
+      const response = await fetch('/api/bookmarks', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ workoutId: String(workoutId) }),
       });
 
       if (!response.ok) {
