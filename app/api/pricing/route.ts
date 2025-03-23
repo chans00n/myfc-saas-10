@@ -10,6 +10,18 @@ const CACHE_DURATION = 60 * 60 * 1000;
 let cachedPrices: any[] = [];
 let lastFetched = 0;
 
+// IDs of the only plans we want to show
+// Replace these with the actual price IDs of the plans you want to keep
+const ALLOWED_PLAN_IDS: string[] = [
+  // List your two price IDs here, e.g.:
+  // "price_1AbCdEfGhIjKlMnOpQrStUvW",
+  // "price_2XyZaBcDeFgHiJkLmNoPqRsT"
+];
+
+// Check if we should show all plans or filter them
+// Set to false to only show plans with IDs in ALLOWED_PLAN_IDS
+const SHOW_ALL_PLANS = true; // Change to false to enable filtering
+
 export async function GET() {
   try {
     // Check if we need to refresh the cache
@@ -46,7 +58,12 @@ export async function GET() {
       console.log('Using cached pricing data');
     }
 
-    return NextResponse.json(cachedPrices);
+    // Apply plan filtering if enabled
+    const filteredPrices = SHOW_ALL_PLANS 
+      ? cachedPrices 
+      : cachedPrices.filter(plan => ALLOWED_PLAN_IDS.includes(plan.id));
+
+    return NextResponse.json(filteredPrices);
   } catch (error: any) {
     console.error('Error fetching pricing:', error);
     return NextResponse.json(
