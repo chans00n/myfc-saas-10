@@ -13,6 +13,36 @@ import FeaturedWorkoutCard from '@/app/components/dashboard/FeaturedWorkoutCard'
 import StreakDisplay from '@/app/components/dashboard/StreakDisplay';
 import QuickLinks from '@/app/components/dashboard/QuickLinks';
 
+/**
+ * Returns a random encouraging message for the user
+ */
+function getRandomGreeting(): string {
+    const greetings = [
+        "Ready to shine today",
+        "Looking good",
+        "Time to glow up",
+        "Awesome to see you",
+        "You've got this",
+        "Let's crush today",
+        "Hello gorgeous",
+        "Great to see you",
+        "Another day, another slay",
+        "Hey fitness star",
+        "Welcome to your day",
+        "You're doing amazing",
+        "Ready for greatness",
+        "Looking fabulous",
+        "Keep up the momentum",
+        "Your commitment shows",
+        "Consistency is key",
+        "Your future self thanks you",
+        "Making progress every day",
+        "Champion in progress"
+    ];
+    
+    return greetings[Math.floor(Math.random() * greetings.length)];
+}
+
 export default async function Dashboard() {
     const supabase = createClient()
 
@@ -34,6 +64,9 @@ export default async function Dashboard() {
     let userStreak = null;
     let popularWorkouts: Workout[] = [];
     const userName = data.user.email?.split('@')[0] || 'there';
+    
+    // Get a random greeting
+    const greeting = getRandomGreeting();
     
     try {
         todaysWorkout = await getTodaysWorkout();
@@ -61,7 +94,7 @@ export default async function Dashboard() {
             {/* Welcome Section */}
             <div className="mt-8 mb-6 flex justify-between items-center">
                 <div>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Welcome back</p>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">{greeting}</p>
                     <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">{userName}</h1>
                 </div>
                 {/* Avatar handled by the navigation component */}
@@ -69,7 +102,6 @@ export default async function Dashboard() {
 
             {/* Today's Workout */}
             <div className="mb-8">
-                <h2 className="text-xl font-bold mb-4">Today's Workout</h2>
                 {todaysWorkout ? (
                     <FeaturedWorkoutCard workout={todaysWorkout} />
                 ) : (
