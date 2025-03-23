@@ -21,6 +21,27 @@ const FacialTrackingCapture = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Cleanup function to stop camera tracks
+  const stopCamera = () => {
+    if (streamRef.current) {
+      console.log('Stopping camera tracks');
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    
+    // Clear video srcObject to fully release camera
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
   // Initialize camera when component mounts or when camera is switched
   useEffect(() => {
     // Initialize camera for steps 1 and 2
@@ -31,7 +52,7 @@ const FacialTrackingCapture = () => {
     return () => {
       // Only stop camera when moving away from steps that need it
       if (step > 2 && streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        stopCamera();
       }
     };
   }, [isFrontCamera]);
@@ -48,8 +69,7 @@ const FacialTrackingCapture = () => {
     
     // If moving away from camera steps, stop the stream
     if (step > 2 && streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+      stopCamera();
     }
   }, [step]);
 
@@ -59,7 +79,7 @@ const FacialTrackingCapture = () => {
       
       // Only stop the current stream if switching cameras
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        stopCamera();
       }
       
       const constraints = {
@@ -177,7 +197,7 @@ const FacialTrackingCapture = () => {
   const renderStepIndicator = () => (
     <div className="flex justify-center mb-6">
       <div className="flex items-center">
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-neutral-200 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
           1
         </div>
         <div className="w-16 h-1 bg-muted">
