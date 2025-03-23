@@ -4,6 +4,27 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useFormState, useFormStatus } from 'react-dom'
 import { signup } from '@/app/auth/actions'
+import { toast } from "sonner"
+import { useEffect } from "react"
+import { Loader2 } from "lucide-react"
+
+// Submit button with loading state
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    
+    return (
+        <Button className="w-full mt-4" type="submit" disabled={pending}>
+            {pending ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                </>
+            ) : (
+                "Sign Up"
+            )}
+        </Button>
+    )
+}
 
 export default function SignupForm() {
     const initialState = {
@@ -11,7 +32,13 @@ export default function SignupForm() {
     }
 
     const [formState, formAction] = useFormState(signup, initialState)
-    const { pending } = useFormStatus()
+    
+    // Show toast notifications based on form state
+    useEffect(() => {
+        if (formState?.message) {
+            toast.error(formState.message)
+        }
+    }, [formState])
 
     return (
         <form action={formAction}>
@@ -44,9 +71,10 @@ export default function SignupForm() {
                     required
                 />
             </div>
-            <Button className="w-full mt-4" type="submit" aria-disabled={pending}>  {pending ? 'Submitting...' : 'Sign up'}</Button>
+            <SubmitButton />
+            {/* We'll still keep this for accessibility, but visual feedback will be via toast */}
             {formState?.message && (
-                <p className="text-sm text-red-500 text-center py-2">{formState.message}</p>
+                <p className="sr-only">{formState.message}</p>
             )}
         </form>
     )

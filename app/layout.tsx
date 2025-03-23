@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProviderServer } from "@/components/ThemeProviderServer";
 import Script from "next/script";
 import { ServiceWorkerRegistry } from "@/components/ServiceWorkerRegistry";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -172,6 +173,7 @@ export default function RootLayout({
         <ThemeProviderServer>
           <ServiceWorkerRegistry />
           {children}
+          <Toaster position="bottom-right" closeButton richColors />
         </ThemeProviderServer>
       </body>
     </html>
