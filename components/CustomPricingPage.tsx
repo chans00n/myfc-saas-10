@@ -368,6 +368,21 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1" className="border-b border-gray-200 dark:border-gray-800">
             <AccordionTrigger className="hover:no-underline py-4 text-left">
+              What is MYFC?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
+              At MYFC, we believe facial fitness should be as normalized as body exercise. Our approach combines proven fitness principles with innovative facial techniques to create a comprehensive program that's:
+            <ul>
+                <li>Accessible to everyone</li>
+                <li>Science-based and effective</li>
+                <li>Easy to integrate into daily life</li>
+                <li>Sustainable for long-term results</li>
+                <li>Natural and non-invasive</li>
+            </ul>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-4" className="border-b border-gray-200 dark:border-gray-800">
+            <AccordionTrigger className="hover:no-underline py-4 text-left">
               Can I cancel my subscription anytime?
             </AccordionTrigger>
             <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
