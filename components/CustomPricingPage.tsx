@@ -15,6 +15,7 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
   const [isLoading, setIsLoading] = useState(true)
   const [plans, setPlans] = useState<PricingPlan[]>([])
   const [error, setError] = useState("")
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
   
   useEffect(() => {
     const fetchPlans = async () => {
@@ -93,6 +94,34 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
     }
   }
   
+  // Sort plans - monthly first, then annual
+  const sortedPlans = [...plans].sort((a, b) => {
+    if (a.name.toLowerCase().includes('monthly')) return -1;
+    if (b.name.toLowerCase().includes('monthly')) return 1;
+    return 0;
+  });
+  
+  const monthlyPlan = sortedPlans.find(p => p.name.toLowerCase().includes('monthly'));
+  const annualPlan = sortedPlans.find(p => p.name.toLowerCase().includes('annual'));
+  
+  // Set monthly as default selected plan when plans are loaded
+  useEffect(() => {
+    if (monthlyPlan && !selectedPlanId) {
+      setSelectedPlanId(monthlyPlan.id);
+    }
+  }, [monthlyPlan, selectedPlanId]);
+  
+  // Calculate savings percentage for annual plan
+  let savingsPercent = 0;
+  let monthlyEquivalent = 0;
+  
+  if (monthlyPlan && annualPlan) {
+    const annualMonthly = annualPlan.price / 12; // Annual price divided by 12 months
+    const monthlyCost = monthlyPlan.price;
+    savingsPercent = Math.round((1 - (annualMonthly / monthlyCost)) * 100);
+    monthlyEquivalent = annualMonthly / 100; // Convert to dollars
+  }
+  
   if (isLoading) {
     return (
       <div className="container max-w-3xl mx-auto px-4">
@@ -131,33 +160,12 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
     )
   }
   
-  // Sort plans - monthly first, then annual
-  const sortedPlans = [...plans].sort((a, b) => {
-    if (a.name.toLowerCase().includes('monthly')) return -1;
-    if (b.name.toLowerCase().includes('monthly')) return 1;
-    return 0;
-  });
-  
-  const monthlyPlan = sortedPlans.find(p => p.name.toLowerCase().includes('monthly'));
-  const annualPlan = sortedPlans.find(p => p.name.toLowerCase().includes('annual'));
-  
-  // Calculate savings percentage for annual plan
-  let savingsPercent = 0;
-  let monthlyEquivalent = 0;
-  
-  if (monthlyPlan && annualPlan) {
-    const annualMonthly = annualPlan.price / 12; // Annual price divided by 12 months
-    const monthlyCost = monthlyPlan.price;
-    savingsPercent = Math.round((1 - (annualMonthly / monthlyCost)) * 100);
-    monthlyEquivalent = annualMonthly / 100; // Convert to dollars
-  }
-  
   return (
     <div className="container max-w-3xl mx-auto px-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 pb-0">
-          <h3 className="text-xl font-semibold mb-2">Start your free 14-day Pro trial</h3>
-          <div className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+          <h3 className="text-xl font-semibold mb-2">Start Your FREE 7-Day Trial</h3>
+          <div className="text-neutral-500 dark:text-gray-400 mb-4 text-sm">
             Choose a plan:
           </div>
         </div>
@@ -167,10 +175,15 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Monthly Plan */}
             {monthlyPlan && (
-              <div className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors">
+              <div 
+                className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                onClick={() => setSelectedPlanId(monthlyPlan.id)}
+              >
                 <div className="flex items-start">
                   <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-blue-500 flex-shrink-0 mr-3">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                    {selectedPlanId === monthlyPlan.id && (
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                    )}
                   </div>
                   <div className="flex-grow">
                     <div className="font-medium">Monthly</div>
@@ -188,12 +201,19 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
             
             {/* Annual Plan */}
             {annualPlan && (
-              <div className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors">
+              <div 
+                className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                onClick={() => setSelectedPlanId(annualPlan.id)}
+              >
                 <div className="absolute -right-1 -top-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
                   {savingsPercent}% OFF
                 </div>
                 <div className="flex items-start">
-                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-gray-300 flex-shrink-0 mr-3"></div>
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-blue-500 flex-shrink-0 mr-3">
+                    {selectedPlanId === annualPlan.id && (
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                    )}
+                  </div>
                   <div className="flex-grow">
                     <div className="font-medium">Yearly</div>
                     <div className="flex items-end">
@@ -216,13 +236,13 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
           <div className="space-y-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-neutral-600 dark:text-blue-400" />
                 </div>
               </div>
               <div className="ml-4">
                 <div className="font-medium">Today</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   All Pro features immediately unlocked. Things just leveled up!
                 </div>
               </div>
@@ -230,13 +250,13 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
             
             <div className="flex">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-neutral-600 dark:text-blue-400" />
                 </div>
               </div>
               <div className="ml-4">
                 <div className="font-medium">January 09, 2025</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   You'll get a reminder 7 days before the trial is up.
                 </div>
               </div>
@@ -244,13 +264,13 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
             
             <div className="flex">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-neutral-600 dark:text-blue-400" />
                 </div>
               </div>
               <div className="ml-4">
                 <div className="font-medium">January 16, 2025</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   Your Pro subscription starts! Unless you cancel before.
                 </div>
               </div>
@@ -263,7 +283,10 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
           <Button
             size="lg"
             className="w-full py-6"
-            onClick={() => monthlyPlan && handleSelectPlan(monthlyPlan.id)}
+            onClick={() => {
+              const planId = selectedPlanId || (monthlyPlan ? monthlyPlan.id : null);
+              if (planId) handleSelectPlan(planId);
+            }}
           >
             Start your free trial
           </Button>
