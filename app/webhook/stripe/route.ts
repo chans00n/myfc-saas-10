@@ -60,6 +60,15 @@ export async function POST(request: Request) {
                 
             case 'customer.subscription.deleted':
                 // Handle subscription deletion if needed
+                const deletedSubscription = event.data.object;
+                console.log('Subscription deleted:', JSON.stringify(deletedSubscription, null, 2));
+                await handleSubscriptionCancellation(deletedSubscription);
+                break;
+                
+            case 'invoice.payment_failed':
+                const failedInvoice = event.data.object;
+                console.log('Payment failed:', JSON.stringify(failedInvoice, null, 2));
+                await handlePaymentFailure(failedInvoice);
                 break;
                 
             default:
@@ -197,6 +206,130 @@ async function handleSubscriptionChange(subscription: any) {
         }
     } catch (error: any) {
         console.error('Error handling subscription change:', error.message);
+        console.error('Error stack:', error.stack);
+    }
+}
+
+async function handleSubscriptionCancellation(subscription: any) {
+    try {
+        const customerId = subscription.customer;
+        const subscriptionId = subscription.id;
+        
+        console.log(`Handling subscription cancellation for subscription ${subscriptionId}, customer ${customerId}`);
+        
+        if (customerId) {
+            try {
+                // Lookup user to verify they exist in the database
+                console.log(`Looking up user with stripe_id: ${customerId}`);
+                const existingUsers = await db.select().from(usersTable).where(eq(usersTable.stripe_id, customerId));
+                console.log(`Found ${existingUsers.length} user(s) with matching stripe_id`);
+                
+                if (existingUsers.length === 0) {
+                    console.error(`No user found with stripe_id: ${customerId}`);
+                    return;
+                }
+                
+                const user = existingUsers[0];
+                console.log(`User found: ${user.email} (${user.id})`);
+                
+                // Only reset if this is the subscription that was active
+                if (user.plan === subscriptionId) {
+                    // Update user record to remove subscription access
+                    console.log('Removing subscription access from user record...');
+                    await db.update(usersTable)
+                        .set({ 
+                            plan: 'none',
+                            plan_name: ''
+                        })
+                        .where(eq(usersTable.stripe_id, customerId));
+                    
+                    // Verify update succeeded
+                    const updatedUser = await db.select().from(usersTable).where(eq(usersTable.stripe_id, customerId));
+                    
+                    if (updatedUser.length > 0 && updatedUser[0].plan === 'none') {
+                        console.log('Database update for cancellation confirmed successful!');
+                    } else {
+                        console.error('Database update for cancellation may have failed');
+                    }
+                } else {
+                    console.log(`Cancelled subscription ${subscriptionId} is not the current active subscription ${user.plan}, no action needed`);
+                }
+            } catch (dbError: any) {
+                console.error('Database operation failed during subscription cancellation:', dbError.message);
+                throw dbError;
+            }
+        } else {
+            console.warn('Missing customer ID in subscription cancellation event');
+        }
+    } catch (error: any) {
+        console.error('Error handling subscription cancellation:', error.message);
+        console.error('Error stack:', error.stack);
+    }
+}
+
+async function handlePaymentFailure(invoice: any) {
+    try {
+        const customerId = invoice.customer;
+        const subscriptionId = invoice.subscription;
+        
+        console.log(`Handling payment failure for invoice ${invoice.id}, customer ${customerId}, subscription ${subscriptionId}`);
+        
+        if (!customerId || !subscriptionId) {
+            console.warn('Missing customer ID or subscription ID in failed invoice');
+            return;
+        }
+        
+        // Get subscription details to check status
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        console.log(`Subscription status: ${subscription.status}`);
+        
+        // Only modify user access if subscription is past_due or canceled
+        if (['past_due', 'canceled', 'unpaid'].includes(subscription.status)) {
+            try {
+                // Lookup user to verify they exist in the database
+                console.log(`Looking up user with stripe_id: ${customerId}`);
+                const existingUsers = await db.select().from(usersTable).where(eq(usersTable.stripe_id, customerId));
+                console.log(`Found ${existingUsers.length} user(s) with matching stripe_id`);
+                
+                if (existingUsers.length === 0) {
+                    console.error(`No user found with stripe_id: ${customerId}`);
+                    return;
+                }
+                
+                const user = existingUsers[0];
+                console.log(`User found: ${user.email} (${user.id})`);
+                
+                // Only reset if this is the subscription that was active
+                if (user.plan === subscriptionId) {
+                    // Update user record to remove subscription access
+                    console.log(`Removing subscription access due to payment failure (status: ${subscription.status})...`);
+                    await db.update(usersTable)
+                        .set({ 
+                            plan: 'none',
+                            plan_name: ''
+                        })
+                        .where(eq(usersTable.stripe_id, customerId));
+                    
+                    // Verify update succeeded
+                    const updatedUser = await db.select().from(usersTable).where(eq(usersTable.stripe_id, customerId));
+                    
+                    if (updatedUser.length > 0 && updatedUser[0].plan === 'none') {
+                        console.log('Database update for payment failure confirmed successful!');
+                    } else {
+                        console.error('Database update for payment failure may have failed');
+                    }
+                } else {
+                    console.log(`Failed payment for subscription ${subscriptionId} is not the current active subscription ${user.plan}, no action needed`);
+                }
+            } catch (dbError: any) {
+                console.error('Database operation failed during payment failure handling:', dbError.message);
+                throw dbError;
+            }
+        } else {
+            console.log(`Subscription is in status ${subscription.status}, not removing access yet`);
+        }
+    } catch (error: any) {
+        console.error('Error handling payment failure:', error.message);
         console.error('Error stack:', error.stack);
     }
 }

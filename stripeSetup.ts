@@ -136,7 +136,9 @@ async function setupWebhook(): Promise<void> {
             enabled_events: [
                 'customer.subscription.created',
                 'customer.subscription.deleted',
-                'customer.subscription.updated'
+                'customer.subscription.updated',
+                'invoice.payment_failed',
+                'invoice.payment_succeeded'
             ],
             url: webhookUrl,
         });
