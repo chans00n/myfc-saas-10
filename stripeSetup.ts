@@ -35,33 +35,27 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 // Product Plans
 const plans: Plan[] = [
     {
-        name: IS_PRODUCTION ? 'Basic' : 'Basic-Test',
-        price: 1000, // price in cents
-        description: 'Perfect for small teams and individuals',
+        name: IS_PRODUCTION ? 'Basic Monthly' : 'Basic-Monthly-Test',
+        price: 1997, // price in cents ($19.97/month)
+        description: 'Monthly membership with 7-day free trial',
         features: [
-            'Up to 10 users',
-            'Up to 1000 records',
-            'Up to 1000 API calls'
+            'Personalized workout plans',
+            'Progress tracking',
+            'Nutritional guidance',
+            'Community support',
+            '7-day free trial'
         ]
     },
     {
-        name: IS_PRODUCTION ? 'Pro' : 'Pro-Test',
-        price: 2000,
-        description: 'Great for growing teams',
+        name: IS_PRODUCTION ? 'Basic Annual' : 'Basic-Annual-Test',
+        price: 17970, // price in cents ($179.70/year, 25% discount from monthly)
+        description: 'Best value: Save 25% with annual plan',
         features: [
-            'Up to 100 users',
-            'Up to 10000 records',
-            'Up to 10000 API calls'
-        ]
-    },
-    {
-        name: IS_PRODUCTION ? 'Enterprise' : 'Enterprise-Test',
-        price: 5000,
-        description: 'For large organizations',
-        features: [
-            'Unlimited users',
-            'Unlimited records',
-            'Unlimited API calls'
+            'Everything in Monthly plan',
+            'Advanced analytics',
+            'Priority support',
+            '25% savings compared to monthly plan',
+            'Instant access'
         ]
     }
 ];

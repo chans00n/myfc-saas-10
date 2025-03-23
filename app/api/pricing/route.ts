@@ -20,7 +20,7 @@ const ALLOWED_PLAN_IDS: string[] = [
 
 // Check if we should show all plans or filter them
 // Set to false to only show plans with IDs in ALLOWED_PLAN_IDS
-const SHOW_ALL_PLANS = false; // Changed to false to enable filtering
+const SHOW_ALL_PLANS = true; // Changed to true to show all plans
 
 export async function GET() {
   try {
@@ -106,6 +106,20 @@ export async function POST(request: Request) {
     
     const stripeCustomerId = userRecord[0].stripe_id;
     
+    // Get price details to check if it's a monthly plan (to add trial)
+    const price = await stripe.prices.retrieve(priceId, {
+      expand: ['product']
+    });
+    
+    // Safely check if it's a monthly plan by examining the product name
+    let isMonthlyPlan = false;
+    if (price.product && typeof price.product !== 'string') {
+      const product = price.product as any; // Cast to any to avoid type issues
+      if (product.name && typeof product.name === 'string') {
+        isMonthlyPlan = product.name.toLowerCase().includes('monthly');
+      }
+    }
+    
     // Create a checkout session with the selected price
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
@@ -117,6 +131,9 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'subscription',
+      subscription_data: isMonthlyPlan ? {
+        trial_period_days: 7
+      } : undefined,
       success_url: `${process.env.NODE_ENV === 'production' ? 'https://members.myfc.app' : process.env.NEXT_PUBLIC_WEBSITE_URL}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NODE_ENV === 'production' ? 'https://members.myfc.app' : process.env.NEXT_PUBLIC_WEBSITE_URL}/subscribe`,
       allow_promotion_codes: true,
