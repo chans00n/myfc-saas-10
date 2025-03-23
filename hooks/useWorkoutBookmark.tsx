@@ -71,8 +71,10 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
 
   // Check if a workout is bookmarked
   const isBookmarked = (workoutId: number): boolean => {
-    const result = bookmarkedWorkouts.includes(workoutId);
-    console.log(`[BOOKMARK] Checking if workout ${workoutId} is bookmarked:`, result);
+    // Convert both to strings for comparison to avoid type mismatches
+    const workoutIdStr = String(workoutId);
+    const result = bookmarkedWorkouts.some(id => String(id) === workoutIdStr);
+    console.log(`[BOOKMARK] Checking if workout ${workoutId} is bookmarked:`, result, 'Current bookmarks:', bookmarkedWorkouts);
     return result;
   };
 

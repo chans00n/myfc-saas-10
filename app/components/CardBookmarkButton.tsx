@@ -30,7 +30,18 @@ export default function CardBookmarkButton({
   const handleToggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Add more explicit debugging
     console.log(`[BOOKMARK_BUTTON] Button clicked for workout ${workoutIdNumber}, current status: ${isBookmarked}`);
+    console.log(`[BOOKMARK_BUTTON] Button state: isLoading=${isLoading}, disabled=${isLoading}`);
+    
+    // Only proceed if not already loading
+    if (isLoading) {
+      console.log(`[BOOKMARK_BUTTON] Ignoring click because button is in loading state`);
+      return;
+    }
+    
+    // Make the API call
     toggleBookmark().then(newStatus => {
       console.log(`[BOOKMARK_BUTTON] Toggle result for workout ${workoutIdNumber}: ${newStatus}`);
     }).catch(err => {
