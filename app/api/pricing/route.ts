@@ -14,8 +14,8 @@ let lastFetched = 0;
 // Replace these with the actual price IDs of the plans you want to keep
 const ALLOWED_PLAN_IDS: string[] = [
   // List your two price IDs here, e.g.:
-  "price_1R2C2uAGGp9MhWwYJm24DRNO",
-  "price_1R2C2uAGGp9MhWwY1993ULoV"
+  "price_1QxzMRAGGp9MhWwYzY4MgIEt",
+  "price_1QxzLdAGGp9MhWwYuM49Lyif"
 ];
 
 // Check if we should show all plans or filter them
