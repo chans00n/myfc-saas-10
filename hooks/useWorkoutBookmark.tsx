@@ -2,13 +2,16 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useMemo } from 'react';
 
+// Type for workout ID (can be string or number)
+type WorkoutId = string | number;
+
 // Type for the bookmark context
 type BookmarkContextType = {
-  bookmarkedWorkouts: number[];
+  bookmarkedWorkouts: WorkoutId[];
   isLoading: boolean;
   refreshBookmarks: () => Promise<void>;
-  isBookmarked: (workoutId: number) => boolean;
-  toggleBookmark: (workoutId: number) => Promise<boolean>;
+  isBookmarked: (workoutId: WorkoutId) => boolean;
+  toggleBookmark: (workoutId: WorkoutId) => Promise<boolean>;
 };
 
 // Type for the single workout bookmark return type
@@ -29,7 +32,7 @@ const BookmarkContext = createContext<BookmarkContextType>({
 
 // Provider component
 export function BookmarkProvider({ children }: { children: ReactNode }) {
-  const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState<number[]>([]);
+  const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState<WorkoutId[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch all bookmarks once on mount
@@ -70,7 +73,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Check if a workout is bookmarked
-  const isBookmarked = (workoutId: number): boolean => {
+  const isBookmarked = (workoutId: WorkoutId): boolean => {
     // Convert both to strings for comparison to avoid type mismatches
     const workoutIdStr = String(workoutId);
     const result = bookmarkedWorkouts.some(id => String(id) === workoutIdStr);
@@ -79,7 +82,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   };
 
   // Toggle bookmark status
-  const toggleBookmark = async (workoutId: number): Promise<boolean> => {
+  const toggleBookmark = async (workoutId: WorkoutId): Promise<boolean> => {
     console.log(`[BOOKMARK] Toggling bookmark for workout ${workoutId}`);
     try {
       const timestamp = Date.now(); // Add cache-busting parameter
@@ -117,7 +120,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
       } else {
         console.log(`[BOOKMARK] Removing workout ${workoutId} from bookmarks`);
         setBookmarkedWorkouts(prev => {
-          const newState = prev.filter(id => id !== workoutId);
+          const newState = prev.filter(id => String(id) !== String(workoutId));
           console.log('[BOOKMARK] New bookmarked workouts state:', newState);
           return newState;
         });
@@ -154,8 +157,8 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
 
 // Hook for components to consume the bookmark context
 export function useWorkoutBookmark(): BookmarkContextType;
-export function useWorkoutBookmark(workoutId: number): SingleWorkoutBookmarkType;
-export function useWorkoutBookmark(workoutId?: number): BookmarkContextType | SingleWorkoutBookmarkType {
+export function useWorkoutBookmark(workoutId: WorkoutId): SingleWorkoutBookmarkType;
+export function useWorkoutBookmark(workoutId?: WorkoutId): BookmarkContextType | SingleWorkoutBookmarkType {
   const context = useContext(BookmarkContext);
   
   if (!context) {

@@ -33,13 +33,12 @@ export async function GET() {
     const bookmarks = await getUserBookmarks(user.id);
     console.log(`[API] Retrieved ${bookmarks.length} bookmarks from database`);
     
-    // Extract workout IDs and convert to numbers for the frontend
+    // Extract workout IDs but preserve them as strings to avoid type issues
     const bookmarkedWorkoutIds = bookmarks.map(bookmark => {
       const workoutId = (bookmark as WorkoutBookmark).workout_id;
-      const parsedId = typeof workoutId === 'string' ? parseInt(workoutId, 10) : workoutId;
-      console.log(`[API] Converting bookmark ID from ${workoutId} to ${parsedId}`);
-      return parsedId;
-    }).filter(id => !isNaN(id)); // Filter out any NaN values
+      console.log(`[API] Processing bookmark ID: ${workoutId}, type: ${typeof workoutId}`);
+      return workoutId; // Keep original ID format
+    });
     
     console.log(`[API] Returning ${bookmarkedWorkoutIds.length} bookmark IDs to client:`, bookmarkedWorkoutIds);
     
