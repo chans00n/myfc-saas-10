@@ -177,25 +177,25 @@ const FacialTrackingCapture = () => {
   const renderStepIndicator = () => (
     <div className="flex justify-center mb-6">
       <div className="flex items-center">
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-neutral-800 text-neutral-100' : 'bg-neutral-200 text-neutral-600'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
           1
         </div>
-        <div className="w-16 h-1 bg-neutral-200">
-          <div className={`h-full bg-neutral-800 ${step > 1 ? 'w-full' : 'w-0'}`}></div>
+        <div className="w-16 h-1 bg-muted">
+          <div className={`h-full bg-primary ${step > 1 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-neutral-800 text-neutral-100' : step > 2 ? 'bg-emerald-500 text-white' : 'bg-neutral-200 text-neutral-600'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-primary text-primary-foreground' : step > 2 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
           2
         </div>
-        <div className="w-16 h-1 bg-neutral-200">
-          <div className={`h-full bg-neutral-800 ${step > 2 ? 'w-full' : 'w-0'}`}></div>
+        <div className="w-16 h-1 bg-muted">
+          <div className={`h-full bg-primary ${step > 2 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 3 ? 'bg-neutral-800 text-neutral-100' : step > 3 ? 'bg-emerald-500 text-white' : 'bg-neutral-200 text-neutral-600'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 3 ? 'bg-primary text-primary-foreground' : step > 3 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
           3
         </div>
-        <div className="w-16 h-1 bg-neutral-200">
-          <div className={`h-full bg-neutral-800 ${step > 3 ? 'w-full' : 'w-0'}`}></div>
+        <div className="w-16 h-1 bg-muted">
+          <div className={`h-full bg-primary ${step > 3 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 4 ? 'bg-neutral-800 text-neutral-100' : 'bg-neutral-200 text-neutral-600'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 4 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
           4
         </div>
       </div>
@@ -203,7 +203,7 @@ const FacialTrackingCapture = () => {
   );
 
   const renderStepLabel = () => (
-    <div className="flex justify-center mb-4 text-sm text-neutral-600">
+    <div className="flex justify-center mb-4 text-sm text-muted-foreground">
       <div className="flex w-full max-w-md justify-between px-4">
         <div className="text-center">Set up</div>
         <div className="text-center">Align</div>
@@ -216,29 +216,12 @@ const FacialTrackingCapture = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-center text-2xl text-neutral-900">Facial Fitness Photo Capture</CardTitle>
+        <CardTitle className="text-center text-2xl">Facial Fitness Photo Capture</CardTitle>
         <CardDescription className="text-center">
           Create consistent, high-quality photos to track your progress
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-          <Button 
-            className="w-full py-4 text-lg"
-            onClick={step === 1 ? proceedToAlignment : 
-                     step === 2 ? capturePhoto : 
-                     step === 3 ? savePhoto : 
-                     startNewCapture}
-            disabled={isUploading || (step === 3 && !capturedPhoto)}
-          >
-            {isUploading ? 'Uploading...' : 
-             step === 1 ? "Capture Your Progress Photo" : 
-             step === 2 ? "Capture Photo" : 
-             step === 3 ? "Save Photo" : 
-             "Start New Capture"}
-          </Button>
-        </div>
-
         {renderStepIndicator()}
         {renderStepLabel()}
 
@@ -260,7 +243,7 @@ const FacialTrackingCapture = () => {
 
         {step === 1 && (
           <div className="text-center">
-            <p className="mb-4 text-neutral-600">
+            <p className="mb-4 text-muted-foreground">
               Please allow camera access to capture your progress photos.
             </p>
             <div className="aspect-[3/4] bg-black rounded-lg overflow-hidden relative mb-4">
@@ -272,6 +255,13 @@ const FacialTrackingCapture = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+            
+            <Button 
+              className="w-full py-4 text-lg mb-4"
+              onClick={proceedToAlignment}
+            >
+              Continue to Alignment
+            </Button>
           </div>
         )}
 
@@ -294,7 +284,7 @@ const FacialTrackingCapture = () => {
               {/* Lighting indicator */}
               <div className="absolute top-3 right-3 flex items-center bg-black/70 rounded-full px-2 py-1">
                 <SunMedium className="h-4 w-4 text-yellow-400 mr-1" />
-                <div className="w-16 h-2 bg-neutral-200 rounded-full">
+                <div className="w-16 h-2 bg-muted rounded-full">
                   <div 
                     className={`h-full rounded-full ${
                       lightingScore < 70 ? 'bg-destructive' : 
@@ -306,11 +296,21 @@ const FacialTrackingCapture = () => {
               </div>
             </div>
 
-            <div className="flex space-x-4 mb-4">
+            <div className="flex flex-col items-center space-y-4 mb-4">
+              {/* Circular capture button for more intuitive experience */}
+              <Button 
+                onClick={capturePhoto}
+                className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center"
+                aria-label="Capture photo"
+              >
+                <Camera className="h-8 w-8" />
+              </Button>
+              
               <Button 
                 variant="outline" 
                 onClick={switchCamera} 
-                className="flex-1"
+                className="w-full"
+                size="sm"
               >
                 <Camera className="mr-2 h-4 w-4" /> Switch Camera
               </Button>
@@ -324,7 +324,7 @@ const FacialTrackingCapture = () => {
               {capturedPhoto && <img src={capturedPhoto} alt="Captured facial progress" className="w-full h-full object-cover" />}
             </div>
 
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-4">
               <Button 
                 variant="outline" 
                 onClick={retakePhoto} 
@@ -332,6 +332,18 @@ const FacialTrackingCapture = () => {
                 disabled={isUploading}
               >
                 Retake
+              </Button>
+              
+              <Button 
+                className="flex-1"
+                onClick={savePhoto}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <span className="flex items-center">
+                    <span className="animate-spin mr-2">⏳</span> Uploading...
+                  </span>
+                ) : "Save Photo"}
               </Button>
             </div>
           </div>
@@ -345,7 +357,14 @@ const FacialTrackingCapture = () => {
               </div>
             </div>
             <h3 className="text-xl font-semibold mb-2">Photo Saved Successfully!</h3>
-            <p className="text-neutral-600 mb-6">Your progress photo has been saved to your gallery.</p>
+            <p className="text-muted-foreground mb-6">Your progress photo has been saved to your gallery.</p>
+            
+            <Button 
+              className="w-full"
+              onClick={startNewCapture}
+            >
+              Take Another Photo
+            </Button>
           </div>
         )}
 
@@ -353,30 +372,30 @@ const FacialTrackingCapture = () => {
         <canvas ref={canvasRef} className="hidden"></canvas>
 
         {step === 1 && (
-          <div className="mt-6 bg-neutral-100 p-4 rounded-lg">
-            <h3 className="text-neutral-900 font-medium mb-2 flex items-center">
+          <div className="mt-6 bg-muted/50 p-4 rounded-lg">
+            <h3 className="font-medium mb-2 flex items-center">
               <AlertCircle className="h-4 w-4 mr-2" />
               Tips for perfect progress photos
             </h3>
-            <ul className="text-neutral-600 text-sm space-y-2">
+            <ul className="text-muted-foreground text-sm space-y-2">
               <li className="flex">
-                <span className="mr-2 text-neutral-800">•</span>
+                <span className="mr-2 text-primary">•</span>
                 <span>Use natural light if possible, facing a window for even lighting</span>
               </li>
               <li className="flex">
-                <span className="mr-2 text-neutral-800">•</span>
+                <span className="mr-2 text-primary">•</span>
                 <span>Keep a neutral facial expression (no smiling or frowning)</span>
               </li>
               <li className="flex">
-                <span className="mr-2 text-neutral-800">•</span>
+                <span className="mr-2 text-primary">•</span>
                 <span>Position your face in the oval outline with eyes at the horizontal line</span>
               </li>
               <li className="flex">
-                <span className="mr-2 text-neutral-800">•</span>
+                <span className="mr-2 text-primary">•</span>
                 <span>Remove glasses, hats, or anything covering your face</span>
               </li>
               <li className="flex">
-                <span className="mr-2 text-neutral-800">•</span>
+                <span className="mr-2 text-primary">•</span>
                 <span>Take photos at the same time of day for consistency</span>
               </li>
             </ul>
