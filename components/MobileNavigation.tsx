@@ -2,25 +2,25 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Camera, Dumbbell, BarChart3, Trophy } from 'lucide-react';
+import { Camera, Dumbbell, Smile, BarChart3, Trophy, Move } from 'lucide-react';
 
 export default function MobileNavigation() {
   const pathname = usePathname();
   
-  // Define our navigation items - reduced to 4 most important ones
+  // Define our navigation items - reduced to 5 most important ones
   const navItems = [
     {
       name: 'Lifts',
       href: '/dashboard/library',
       icon: (active: boolean) => (
-        <Dumbbell className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
+        <Smile className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
       )
     },
     {
       name: 'Moves',
       href: '/dashboard/movements',
       icon: (active: boolean) => (
-        <BarChart3 className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
+        <Move className={`h-6 w-6 ${active ? 'text-neutral-800 dark:text-neutral-200' : 'text-neutral-600 dark:text-neutral-400'}`} />
       )
     },
     // Face is the 3rd item (will be center in a 5-item layout)

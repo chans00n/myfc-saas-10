@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MobileAvatar } from '@/components/MobileAvatar';
 import dynamic from 'next/dynamic';
+import { BookmarkProvider } from '@/hooks/useWorkoutBookmark';
 
 const InstallPWA = dynamic(() => import('@/components/InstallPWA'), { ssr: false });
 const MobileNavigation = dynamic(() => import('@/components/MobileNavigation'), { ssr: false });
@@ -54,56 +55,56 @@ export default async function DashboardLayout({
 
     return (
         <div className="flex flex-col min-h-screen bg-neutral-50 dark:bg-neutral-900">
-            {/* Only render side navigation on desktop */}
-            <div className="hidden md:block">
-                <MYFCNavigation />
-            </div>
-            
-            {/* Mobile-only top avatar bar with safe area insets */}
-            <div className="md:hidden flex justify-between items-center p-4 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" 
-                 style={{
-                     paddingTop: 'max(16px, env(safe-area-inset-top))',
-                     paddingLeft: 'max(16px, env(safe-area-inset-left))',
-                     paddingRight: 'max(16px, env(safe-area-inset-right))'
-                 }}>
-                <Link href="/dashboard" className="text-center">
-                    <Image 
-                        src="/logo_white.png"
-                        alt="My Face Coach"
-                        width={80}
-                        height={80}
-                        className="w-16 h-auto hidden dark:block"
-                        priority
-                        unoptimized
-                    />
-                    <Image 
-                        src="/logo.png"
-                        alt="My Face Coach"
-                        width={80}
-                        height={80}
-                        className="w-16 h-auto dark:hidden"
-                        priority
-                        unoptimized
-                    />
-                </Link>
-                
-                <div className="flex items-center">
-                    <MobileAvatar userEmail={userEmail} userAvatarUrl={avatarUrl} />
+            <BookmarkProvider>
+                <div className="hidden md:block">
+                    <MYFCNavigation />
                 </div>
-            </div>
-            
-            <div className="flex-1 md:ml-64 pb-24 md:pb-8"
-                 style={{
-                     paddingBottom: 'max(96px, calc(64px + env(safe-area-inset-bottom)))'
-                 }}>
-                {children}
-            </div>
-            
-            {/* PWA Install Prompt */}
-            <InstallPWA />
-            
-            {/* Mobile Navigation with safe area insets */}
-            <MobileNavigation />
+                
+                <div className="md:hidden flex justify-between items-center p-4 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" 
+                     style={{
+                         paddingTop: 'max(16px, env(safe-area-inset-top))',
+                         paddingLeft: 'max(16px, env(safe-area-inset-left))',
+                         paddingRight: 'max(16px, env(safe-area-inset-right))'
+                     }}>
+                    <Link href="/dashboard" className="text-center">
+                        <Image 
+                            src="/logo_white.png"
+                            alt="My Face Coach"
+                            width={80}
+                            height={80}
+                            className="w-16 h-auto hidden dark:block"
+                            priority
+                            unoptimized
+                        />
+                        <Image 
+                            src="/logo.png"
+                            alt="My Face Coach"
+                            width={80}
+                            height={80}
+                            className="w-16 h-auto dark:hidden"
+                            priority
+                            unoptimized
+                        />
+                    </Link>
+                    
+                    <div className="flex items-center">
+                        <MobileAvatar userEmail={userEmail} userAvatarUrl={avatarUrl} />
+                    </div>
+                </div>
+                
+                <div className="flex-1 md:ml-64 pb-24 md:pb-8"
+                     style={{
+                         paddingBottom: 'max(96px, calc(64px + env(safe-area-inset-bottom)))'
+                     }}>
+                    {children}
+                </div>
+                
+                {/* PWA Install Prompt */}
+                <InstallPWA />
+                
+                {/* Mobile Navigation with safe area insets */}
+                <MobileNavigation />
+            </BookmarkProvider>
         </div>
     );
 }

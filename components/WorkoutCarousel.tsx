@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Workout } from '@/types/database';
+import CardBookmarkButton from '@/app/components/CardBookmarkButton';
 
 interface WorkoutCarouselProps {
   workouts: Workout[];
@@ -103,6 +104,11 @@ export default function WorkoutCarousel({ workouts, title = "Popular Workouts" }
                         <span className="text-white text-2xl font-bold">MYFC</span>
                       </div>
                     )}
+                    
+                    {/* Bookmark button */}
+                    <div className="absolute top-3 right-3 z-10" onClick={(e) => e.preventDefault()}>
+                      <CardBookmarkButton workoutId={workout.id} />
+                    </div>
                     
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>

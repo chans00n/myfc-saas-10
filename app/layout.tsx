@@ -11,6 +11,36 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "MYFC - My Face Coach",
   description: "Daily facial exercises and tracking",
+  keywords: [
+    'Fitness',
+    'Gym',
+    'Workout',
+    'Progress',
+    'Fitness tracking',
+    'Exercise',
+  ],
+  authors: [
+    {
+      name: 'chriss',
+      url: 'https://chriss.com',
+    },
+  ],
+  creator: 'chriss',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://myfc.com',
+    title: 'MYFC - My Face Coach',
+    description: 'Daily facial exercises and tracking',
+    siteName: 'MYFC - My Face Coach',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MYFC - My Face Coach',
+    description: 'Daily facial exercises and tracking',
+    images: [`https://myfc.com/og.jpg`],
+    creator: '@chriss',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -63,21 +93,13 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    apple: [
-      { url: '/apple-icon.png' },
-      { url: '/apple-touch-icon.png' },
-      { url: '/apple-touch-icon-precomposed.png' },
-      { url: '/icons/180.png', sizes: '180x180', type: 'image/png' },
-      { url: '/icons/152.png', sizes: '152x152', type: 'image/png' },
-      { url: '/icons/120.png', sizes: '120x120', type: 'image/png' }
-    ],
-    icon: [
-      { url: '/favicon.ico', sizes: '16x16' },
-      { url: '/icons/16.png', sizes: '16x16' },
-      { url: '/icons/32.png', sizes: '32x32' },
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    other: [
       { url: '/icons/192.png', sizes: '192x192' },
       { url: '/icons/512.png', sizes: '512x512' },
-    ]
+    ],
   },
   other: {
     "mobile-web-app-capable": "yes",

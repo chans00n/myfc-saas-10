@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Workout, UserWorkout } from '@/types/database';
 import CoachImage from '@/app/components/CoachImage';
 import WorkoutComments from '@/components/workout/WorkoutComments';
+import BookmarkButton from '@/app/components/BookmarkButton';
 
 // Extend the Workout type to include exercises
 interface WorkoutWithExercises extends Workout {
@@ -85,11 +86,7 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
         {/* Top navigation */}
         <div className="relative z-10 flex justify-between items-start p-6 pt-12 md:pt-6 safe-top">
           {/* Bookmark button */}
-          <button className="text-white hover:text-indigo-200 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-          </button>
+          <BookmarkButton workoutId={params.id} />
           
           {/* Close button */}
           <Link href="/dashboard" className="text-white hover:text-indigo-200 transition">

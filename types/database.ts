@@ -108,6 +108,15 @@ export interface UserStreak {
   last_workout_date: string | null;
 }
 
+// Workout Bookmarks
+export interface WorkoutBookmark {
+  id: string;
+  user_id: string;
+  workout_id: string;
+  created_at: string;
+  workouts?: Workout;
+}
+
 // =====================
 // COMMUNITY FEATURES
 // =====================

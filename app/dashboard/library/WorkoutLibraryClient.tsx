@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FocusArea, Workout } from '@/types/database';
 import { getImageSizes, getPlaceholderImage } from '@/utils/image-sizes';
+import CardBookmarkButton from '@/app/components/CardBookmarkButton';
 
 interface WorkoutLibraryClientProps {
   initialWorkouts: any[];
@@ -321,6 +322,9 @@ export default function WorkoutLibraryClient({
                         <span className="text-white text-2xl font-bold">MYFC</span>
                       </div>
                     )}
+                    <div className="absolute top-2 right-2 z-10">
+                      <CardBookmarkButton workoutId={workout.id} size="sm" />
+                    </div>
                   </div>
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
@@ -538,4 +542,4 @@ function getWorkoutsForDate(workouts: any[], date: Date) {
     if (!workout.scheduled_dates) return false;
     return workout.scheduled_dates.includes(dateStr);
   });
-} 
+}

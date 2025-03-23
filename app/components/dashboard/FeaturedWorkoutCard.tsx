@@ -1,69 +1,91 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Workout } from '@/types/database';
+import CardBookmarkButton from '@/app/components/CardBookmarkButton';
+import { getImageSizes, getPlaceholderImage } from '@/utils/image-helpers';
 
 interface FeaturedWorkoutCardProps {
   workout: Workout;
   label?: string;
 }
 
-export default function FeaturedWorkoutCard({ 
-  workout, 
-  label = "TODAY'S LIFT" 
-}: FeaturedWorkoutCardProps) {
+export default function FeaturedWorkoutCard({ workout, label }: FeaturedWorkoutCardProps) {
   return (
-    <div className="relative rounded-xl overflow-hidden mb-8 shadow-sm bg-white dark:bg-neutral-800">
-      <div className="relative">
-        <div className="relative h-56 w-full">
-          {workout.thumbnail_url ? (
-            <Image 
-              src={workout.thumbnail_url} 
-              alt={workout.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white text-3xl font-bold">MYFC</span>
-            </div>
-          )}
-          
-          {/* Gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-          
-          {/* Title overlay */}
-          <div className="absolute bottom-0 left-0 p-6 w-full">
-            <p className="uppercase tracking-wide text-xs font-medium text-white/80 mb-2">{label}</p>
-            <h2 className="text-2xl font-bold text-white mb-2">{workout.title}</h2>
-            
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <Link
+      href={`/workout/${workout.id}`}
+      className="flex flex-col h-full relative rounded-xl overflow-hidden group shadow-sm hover:shadow-md transition-all"
+    >
+      <div className="relative w-full h-52 sm:h-72">
+        {workout.thumbnail_url ? (
+          <Image
+            src={workout.thumbnail_url}
+            alt={workout.title}
+            fill
+            sizes={getImageSizes('hero')}
+            placeholder="blur"
+            blurDataURL={getPlaceholderImage('indigo')}
+            className="object-cover"
+            quality={75}
+            priority
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center">
+            <span className="text-white text-2xl font-bold">MYFC</span>
+          </div>
+        )}
+        
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
+        
+        {/* Add bookmark button in top right corner */}
+        <div className="absolute top-3 right-3 z-10">
+          <CardBookmarkButton workoutId={workout.id} size="md" />
+        </div>
+        
+        {label && (
+          <div className="absolute top-3 left-3 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+            {label}
+          </div>
+        )}
+        
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+          <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-200 transition-colors">
+            {workout.title}
+          </h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
-                <span className="text-sm text-white/90">{workout.duration_minutes} min</span>
-              </div>
+                {workout.duration_minutes} min
+              </span>
               
-              <span className={`text-xs px-3 py-1 rounded-full font-medium 
-                ${workout.intensity === 'beginner' 
-                  ? 'bg-green-500/20 text-green-100' 
-                  : workout.intensity === 'intermediate' 
-                    ? 'bg-amber-500/20 text-amber-100' 
-                    : 'bg-rose-500/20 text-rose-100'
-                }`}>
+              <span className="flex items-center bg-white/20 px-2 py-1 rounded text-xs">
                 {workout.intensity.charAt(0).toUpperCase() + workout.intensity.slice(1)}
               </span>
             </div>
             
-            <Link href={`/workout/${workout.id}`} className="block">
-              <button className="w-full bg-white hover:bg-white/90 text-neutral-900 font-medium py-3 rounded-lg transition duration-300">
-                Start Workout
-              </button>
-            </Link>
+            <button
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1 rounded-full transition"
+              aria-label="Start workout"
+            >
+              Start
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 } 

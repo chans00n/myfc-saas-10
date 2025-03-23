@@ -1,5 +1,5 @@
 import { createClient } from './server';
-import type { User, Workout, UserWorkout, DailyWorkout, Achievement, UserAchievement, UserStreak, Movement, FocusArea } from '../../types/database';
+import type { User, Workout, UserWorkout, DailyWorkout, Achievement, UserAchievement, UserStreak, Movement, FocusArea, WorkoutBookmark } from '../../types/database';
 
 // Helper function to get the authenticated user from the session
 export async function getCurrentUser(): Promise<User | null> {
@@ -588,5 +588,100 @@ export async function getPopularWorkouts(limit: number = 5): Promise<Workout[]> 
   } catch (err) {
     console.error('Unexpected error in getPopularWorkouts:', err);
     return [];
+  }
+}
+
+// Get user's bookmarked workouts
+export async function getUserBookmarks(userId: string): Promise<WorkoutBookmark[]> {
+  try {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('workout_bookmarks')
+      .select('*, workouts(*)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching user bookmarks:', error);
+      return [];
+    }
+    
+    return data as WorkoutBookmark[];
+  } catch (err) {
+    console.error('Unexpected error in getUserBookmarks:', err);
+    return [];
+  }
+}
+
+// Check if a workout is bookmarked by a user
+export async function isWorkoutBookmarked(userId: string, workoutId: string): Promise<boolean> {
+  try {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('workout_bookmarks')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('workout_id', workoutId)
+      .single();
+    
+    if (error) {
+      // If no record found, just return false
+      if (error.code === 'PGRST116') {
+        return false;
+      }
+      console.error('Error checking if workout is bookmarked:', error);
+      return false;
+    }
+    
+    return !!data;
+  } catch (err) {
+    console.error('Unexpected error in isWorkoutBookmarked:', err);
+    return false;
+  }
+}
+
+// Toggle bookmark status (add or remove)
+export async function toggleWorkoutBookmark(userId: string, workoutId: string): Promise<boolean> {
+  try {
+    const supabase = createClient();
+    
+    // First, check if the bookmark already exists
+    const isBookmarked = await isWorkoutBookmarked(userId, workoutId);
+    
+    if (isBookmarked) {
+      // Remove the bookmark
+      const { error } = await supabase
+        .from('workout_bookmarks')
+        .delete()
+        .eq('user_id', userId)
+        .eq('workout_id', workoutId);
+      
+      if (error) {
+        console.error('Error removing bookmark:', error);
+        return false;
+      }
+      
+      return false; // Indicates bookmark was removed
+    } else {
+      // Add the bookmark
+      const { error } = await supabase
+        .from('workout_bookmarks')
+        .insert({
+          user_id: userId,
+          workout_id: workoutId
+        });
+      
+      if (error) {
+        console.error('Error adding bookmark:', error);
+        return false;
+      }
+      
+      return true; // Indicates bookmark was added
+    }
+  } catch (err) {
+    console.error('Unexpected error in toggleWorkoutBookmark:', err);
+    return false;
   }
 } 

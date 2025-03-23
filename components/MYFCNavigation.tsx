@@ -18,6 +18,14 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
     return namePart.charAt(0).toUpperCase();
   };
   
+  // Get user's first name from email
+  const getUserFirstName = (email: string) => {
+    if (!email) return 'User';
+    const namePart = email.split('@')[0];
+    // Convert username to Title Case (first letter uppercase)
+    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+  };
+  
   // Get billing portal URL when sheet is opened
   useEffect(() => {
     if (isSheetOpen) {
@@ -76,16 +84,45 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
         isOpen={isSheetOpen} 
         onClose={() => setIsSheetOpen(false)}
       >
-        <div className="pb-4">
-          <SimpleSheetTitle>Your Profile</SimpleSheetTitle>
-          <SimpleSheetDescription>{userEmail}</SimpleSheetDescription>
+        {/* Enhanced profile header with avatar and name */}
+        <div className="pb-6">
+          <div className="flex items-center mb-4">
+            <div className="mr-4">
+              {userAvatarUrl ? (
+                <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-neutral-200 dark:border-neutral-600">
+                  <img 
+                    src={userAvatarUrl}
+                    alt={userEmail || 'User'}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                  />
+                </div>
+              ) : (
+                <div className="h-14 w-14 rounded-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 border-2 border-neutral-200 dark:border-neutral-600">
+                  <span className="text-indigo-600 dark:text-indigo-300 font-bold text-lg">
+                    {getInitials(userEmail || '')}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                {getUserFirstName(userEmail || '')}
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 break-all max-w-[200px]">{userEmail}</p>
+            </div>
+          </div>
+          <div className="h-1 w-1/3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
         </div>
         
-        <div className="py-4">
-          <div className="space-y-4">
+        <div className="py-2">
+          <div className="space-y-1">
+            <h4 className="text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 px-1 mb-2">Account</h4>
+            
             <Link 
               href="/dashboard/profile" 
-              className="flex items-center py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100"
+              className="flex items-center py-2.5 px-1 text-sm text-neutral-800 dark:text-neutral-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-md"
               onClick={() => setIsSheetOpen(false)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,8 +132,19 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
             </Link>
             
             <Link 
+              href="/dashboard/bookmarks" 
+              className="flex items-center py-2.5 px-1 text-sm text-neutral-800 dark:text-neutral-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-md"
+              onClick={() => setIsSheetOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              Bookmarks
+            </Link>
+            
+            <Link 
               href={billingUrl} 
-              className="flex items-center py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100"
+              className="flex items-center py-2.5 px-1 text-sm text-neutral-800 dark:text-neutral-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-md"
               onClick={() => setIsSheetOpen(false)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +155,7 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
             
             <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-4">
               <form action="/auth/auth/logout" method="post">
-                <button type="submit" className="flex items-center py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100 w-full">
+                <button type="submit" className="flex items-center py-2.5 px-1 text-sm text-neutral-800 dark:text-neutral-200 hover:text-rose-600 dark:hover:text-rose-400 transition-colors w-full rounded-md">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
@@ -198,7 +246,7 @@ export default function MYFCNavigation() {
               className="mr-2 h-auto w-auto hidden dark:block"
             />
           </div>
-          {userData.email && <p className="text-sm text-neutral-500 dark:text-neutral-400 truncate mt-2">{userData.email}</p>}
+          {userData.email && <p className="text-sm text-neutral-500 dark:text-neutral-400 break-all mt-2">{userData.email}</p>}
         </div>
         <nav className="flex-1 py-6">
           <ul className="space-y-2">
@@ -233,6 +281,17 @@ export default function MYFCNavigation() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 History
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/dashboard/bookmarks" 
+                className="flex items-center px-6 py-3 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-l-2 border-transparent hover:border-neutral-800 dark:hover:border-neutral-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                Bookmarks
               </Link>
             </li>
             <li>
