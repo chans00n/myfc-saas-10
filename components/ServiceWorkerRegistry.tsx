@@ -2,20 +2,43 @@
 
 import { useEffect } from 'react';
 
+// Temporary flag to completely disable service worker while fixing issues
+const DISABLE_SERVICE_WORKER = true;
+
 export function ServiceWorkerRegistry() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      // If service worker is disabled, unregister any existing ones
+      if (DISABLE_SERVICE_WORKER) {
+        console.log('[PWA] Service worker disabled for debugging. Unregistering existing workers.');
+        
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let registration of registrations) {
+            registration.unregister().then(() => {
+              console.log('[PWA] Service worker unregistered successfully');
+            }).catch(error => {
+              console.error('[PWA] Error unregistering service worker:', error);
+            });
+          }
+        });
+        
+        return; // Don't proceed with registration
+      }
+      
       const registerServiceWorker = async () => {
         try {
           // Check if we're on the members.myfc.app subdomain
           const hostname = window.location.hostname;
           const isMembersSubdomain = hostname === 'members.myfc.app';
+          const pathname = window.location.pathname;
+          const isInSubfolder = pathname.startsWith('/dashboard/') || pathname === '/dashboard';
           
-          console.log(`[PWA] Running on ${hostname}, subdomain: ${isMembersSubdomain ? 'members.myfc.app' : 'no'}`);
+          console.log(`[PWA] Running on ${hostname}, subdomain: ${isMembersSubdomain ? 'members.myfc.app' : 'no'}, path: ${pathname}`);
           
           // Choose appropriate service worker path and scope
-          const swPath = isMembersSubdomain ? './sw.js' : '/sw.js';
-          const swScope = isMembersSubdomain ? './' : '/';
+          // Always use absolute paths for service workers to avoid 404s in subfolders
+          const swPath = '/sw.js';
+          const swScope = '/';
           
           console.log(`[PWA] Registering service worker from ${swPath} with scope ${swScope}`);
           
@@ -34,10 +57,9 @@ export function ServiceWorkerRegistry() {
           
           // Try fallback service worker as a last resort
           try {
-            const hostname = window.location.hostname;
-            const isMembersSubdomain = hostname === 'members.myfc.app';
-            const fallbackPath = isMembersSubdomain ? './fallback-sw.js' : '/fallback-sw.js';
-            const fallbackScope = isMembersSubdomain ? './' : '/';
+            // Always use absolute paths for fallback as well
+            const fallbackPath = '/fallback-sw.js';
+            const fallbackScope = '/';
             
             console.log(`[PWA] Trying fallback service worker from ${fallbackPath}`);
             const fallbackReg = await navigator.serviceWorker.register(fallbackPath, {
