@@ -3,7 +3,12 @@ import { db } from '../db/db';
 import { usersTable } from '../db/schema';
 import { eq } from "drizzle-orm";
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-const PUBLIC_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ? process.env.NEXT_PUBLIC_WEBSITE_URL : "http://localhost:3000"
+
+// Update the PUBLIC_URL to include the production URL
+const PUBLIC_URL = process.env.NODE_ENV === 'production' 
+  ? "https://members.myfc.app" 
+  : (process.env.NEXT_PUBLIC_WEBSITE_URL || "http://localhost:3000");
+
 export async function getStripePlan(email: string) {
 
     const user = await db.select().from(usersTable).where(eq(usersTable.email, email))
@@ -44,7 +49,7 @@ export async function generateStripeBillingPortalLink(email: string) {
     const user = await db.select().from(usersTable).where(eq(usersTable.email, email))
     const portalSession = await stripe.billingPortal.sessions.create({
         customer: user[0].stripe_id,
-        return_url: `${PUBLIC_URL}/dashboard`,
+        return_url: `${PUBLIC_URL}/dashboard/profile`,
     });
     return portalSession.url
 }
