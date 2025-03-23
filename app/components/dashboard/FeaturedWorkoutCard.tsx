@@ -10,16 +10,25 @@ interface FeaturedWorkoutCardProps {
 }
 
 export default function FeaturedWorkoutCard({ workout, label }: FeaturedWorkoutCardProps) {
+  // Format today's date: Month, date, year
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   return (
     <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg overflow-hidden border border-neutral-200 dark:border-neutral-700 mb-8 transform transition-all duration-300 hover:shadow-xl">
       {/* Header with Today's Workout Label */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-700 dark:to-indigo-900 px-6 py-3">
+      <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-700 dark:to-indigo-900 px-6 py-3 flex justify-between items-center">
         <h2 className="text-white font-medium tracking-wide text-sm uppercase flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           Today's Workout
         </h2>
+        <span className="text-white text-sm font-medium">{formattedDate}</span>
       </div>
 
       {/* Main Content */}
