@@ -36,7 +36,13 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   const fetchAllBookmarks = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/bookmarks/all');
+      const timestamp = Date.now(); // Add cache-busting parameter
+      const response = await fetch(`/api/bookmarks/all?_t=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store',
+          'Pragma': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
         console.error('Failed to fetch bookmarks');
@@ -65,12 +71,18 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   // Toggle bookmark status
   const toggleBookmark = async (workoutId: number): Promise<boolean> => {
     try {
+      const timestamp = Date.now(); // Add cache-busting parameter
       const response = await fetch('/api/bookmarks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store',
+          'Pragma': 'no-cache'
         },
-        body: JSON.stringify({ workoutId: String(workoutId) }),
+        body: JSON.stringify({ 
+          workoutId: String(workoutId),
+          _t: timestamp // Add timestamp to prevent caching
+        }),
       });
 
       if (!response.ok) {

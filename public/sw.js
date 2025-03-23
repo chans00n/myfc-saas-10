@@ -109,6 +109,17 @@ function getCacheStrategy(url) {
       };
     }
     
+    // Skip bookmark API calls - always use network
+    if (
+      pathname.includes('/api/bookmarks') || 
+      pathname.includes('/api/bookmarks/all')
+    ) {
+      return {
+        strategy: 'network-only',
+        cache: null
+      };
+    }
+    
     // API responses - stale-while-revalidate with short TTL
     if (pathname.includes('/api/')) {
       return {
@@ -209,8 +220,23 @@ self.addEventListener('fetch', (event) => {
     // Skip Stripe-related URLs
     if (url.hostname.includes('stripe.com')) return;
     
+    // Skip bookmark API endpoints for POST requests
+    if (event.request.method === 'POST' && 
+       (url.pathname.includes('/api/bookmarks') || 
+        url.pathname.includes('/api/bookmarks/all'))) {
+      console.log('[SW] Skipping interception for bookmark API POST:', event.request.url);
+      return; // Don't intercept, let browser handle natively
+    }
+    
     // Get appropriate caching strategy
     const { strategy, cache: cacheName, expiration } = getCacheStrategy(event.request.url);
+    
+    // Skip handling if strategy is network-only
+    if (strategy === 'network-only') {
+      console.log('[SW] Using network-only for:', event.request.url);
+      return; // Don't intercept
+    }
+    
     console.log(`[SW] Handling ${strategy} for ${event.request.url}`);
     
     // Implement cache strategies
