@@ -20,7 +20,7 @@ const ALLOWED_PLAN_IDS: string[] = [
 
 // Check if we should show all plans or filter them
 // Set to false to only show plans with IDs in ALLOWED_PLAN_IDS
-const SHOW_ALL_PLANS = true; // Changed to true to show all plans
+const SHOW_ALL_PLANS = false; // Changed to false to enable filtering
 
 export async function GET() {
   try {

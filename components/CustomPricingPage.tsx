@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import PricingCard, { PricingFeature, PricingPlan } from "./PricingCard"
 import { Card } from "./ui/card"
+import { Check, Clock, ShieldCheck } from "lucide-react"
+import { Button } from "./ui/button"
 
 interface CustomPricingPageProps {
   userId: string
@@ -93,12 +95,8 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
   
   if (isLoading) {
     return (
-      <div className="container max-w-6xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[1, 2].map(i => (
-            <Card key={i} className="opacity-40 animate-pulse h-[450px]"></Card>
-          ))}
-        </div>
+      <div className="container max-w-3xl mx-auto px-4">
+        <div className="animate-pulse bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full h-[380px]"></div>
       </div>
     )
   }
@@ -133,54 +131,182 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
     )
   }
   
+  // Sort plans - monthly first, then annual
+  const sortedPlans = [...plans].sort((a, b) => {
+    if (a.name.toLowerCase().includes('monthly')) return -1;
+    if (b.name.toLowerCase().includes('monthly')) return 1;
+    return 0;
+  });
+  
+  const monthlyPlan = sortedPlans.find(p => p.name.toLowerCase().includes('monthly'));
+  const annualPlan = sortedPlans.find(p => p.name.toLowerCase().includes('annual'));
+  
+  // Calculate savings percentage for annual plan
+  let savingsPercent = 0;
+  let monthlyEquivalent = 0;
+  
+  if (monthlyPlan && annualPlan) {
+    const annualMonthly = annualPlan.price / 12; // Annual price divided by 12 months
+    const monthlyCost = monthlyPlan.price;
+    savingsPercent = Math.round((1 - (annualMonthly / monthlyCost)) * 100);
+    monthlyEquivalent = annualMonthly / 100; // Convert to dollars
+  }
+  
   return (
-    <div className="container max-w-6xl mx-auto px-4">
-      {/* Benefits section */}
-      <div className="mb-12 text-center max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Transform Your Fitness Journey Today</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-          Join thousands of members who have already transformed their lives with our personalized fitness programs.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-            <div className="text-blue-600 dark:text-blue-300 font-medium mb-2">Personalized Plans</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Custom workouts designed for your goals and fitness level</p>
+    <div className="container max-w-3xl mx-auto px-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 pb-0">
+          <h3 className="text-xl font-semibold mb-2">Start your free 14-day Pro trial</h3>
+          <div className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+            Choose a plan:
           </div>
-          <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800">
-            <div className="text-green-600 dark:text-green-300 font-medium mb-2">Expert Support</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Guidance from certified fitness professionals</p>
+        </div>
+        
+        {/* Plan Selection Cards */}
+        <div className="px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Monthly Plan */}
+            {monthlyPlan && (
+              <div className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors">
+                <div className="flex items-start">
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-blue-500 flex-shrink-0 mr-3">
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                  </div>
+                  <div className="flex-grow">
+                    <div className="font-medium">Monthly</div>
+                    <div className="flex items-end">
+                      <span className="text-2xl font-bold">${(monthlyPlan.price / 100).toFixed(2)}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1 mb-0.5">/month</span>
+                    </div>
+                    <div className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                      Includes 7-day free trial
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Annual Plan */}
+            {annualPlan && (
+              <div className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors">
+                <div className="absolute -right-1 -top-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                  {savingsPercent}% OFF
+                </div>
+                <div className="flex items-start">
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-gray-300 flex-shrink-0 mr-3"></div>
+                  <div className="flex-grow">
+                    <div className="font-medium">Yearly</div>
+                    <div className="flex items-end">
+                      <span className="text-2xl font-bold">${monthlyEquivalent.toFixed(2)}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1 mb-0.5">/month</span>
+                    </div>
+                    <div className="mt-2 text-sm text-gray-500">
+                      Billed ${(annualPlan.price / 100).toFixed(2)} annually
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800">
-            <div className="text-purple-600 dark:text-purple-300 font-medium mb-2">Progress Tracking</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track your improvements with detailed analytics</p>
+        </div>
+        
+        {/* Timeline */}
+        <div className="p-6">
+          <h4 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">How it works</h4>
+          <div className="space-y-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <div className="font-medium">Today</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  All Pro features immediately unlocked. Things just leveled up!
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <div className="font-medium">January 09, 2025</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  You'll get a reminder 7 days before the trial is up.
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <div className="font-medium">January 16, 2025</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Your Pro subscription starts! Unless you cancel before.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* CTA */}
+        <div className="p-6 pt-2 flex flex-col gap-4">
+          <Button
+            size="lg"
+            className="w-full py-6"
+            onClick={() => monthlyPlan && handleSelectPlan(monthlyPlan.id)}
+          >
+            Start your free trial
+          </Button>
+          
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <ShieldCheck className="w-4 h-4" />
+            <span>No strings attached, cancel anytime</span>
           </div>
         </div>
       </div>
       
-      {/* Plan selection section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {plans.map(plan => (
-          <PricingCard 
-            key={plan.id} 
-            plan={plan} 
-            onSelect={handleSelectPlan}
-          />
-        ))}
-      </div>
-      
-      {/* Testimonials section */}
-      <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
-        <h3 className="text-xl font-semibold text-center mb-8">What Our Members Say</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="italic text-gray-600 dark:text-gray-300 mb-4">"I've tried many fitness programs, but this one actually works. The personalized plans make all the difference!"</p>
-            <div className="font-medium">Sarah K.</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Member since 2022</div>
+      {/* Benefits section below the plans */}
+      <div className="mt-16 max-w-2xl mx-auto text-center">
+        <h2 className="text-2xl font-bold mb-2">Transform Your Fitness Journey Today</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-8">
+          Join thousands of members who have already transformed their lives with our personalized fitness programs.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 text-left">
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Membership includes:</h3>
+            <ul className="space-y-3">
+              {plans[0]?.features.map((feature, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <span>{feature.name}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="italic text-gray-600 dark:text-gray-300 mb-4">"The annual plan was a no-brainer for me. Great value and the results speak for themselves."</p>
-            <div className="font-medium">Mike T.</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Lost 30lbs in 6 months</div>
+          
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Why members love us:</h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <p className="italic text-sm text-gray-600 dark:text-gray-300">"The personalized plans and support have transformed my fitness journey. Best investment I've made in myself!"</p>
+                <div className="font-medium mt-2">- Sarah K.</div>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <p className="italic text-sm text-gray-600 dark:text-gray-300">"I tried the free trial and was hooked. The annual plan is a great value, and I've seen amazing results."</p>
+                <div className="font-medium mt-2">- Mike T.</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -191,7 +317,7 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
         <div className="space-y-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <h4 className="font-medium mb-2">Can I cancel my subscription anytime?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Yes, you can cancel your subscription at any time. For monthly plans, you'll maintain access until the end of your current billing period. Annual plans can also be canceled, but are non-refundable.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Yes, you can cancel your subscription at any time. For monthly plans, you'll maintain access until the end of your current billing period.</p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <h4 className="font-medium mb-2">How does the 7-day free trial work?</h4>
@@ -199,7 +325,7 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <h4 className="font-medium mb-2">What's included in my membership?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Your membership includes access to personalized workout plans, nutritional guidance, progress tracking, and our community support. Annual members also receive premium features and priority support.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Your membership includes access to personalized workout plans, nutritional guidance, progress tracking, and our community support. Annual members also receive priority support.</p>
           </div>
         </div>
       </div>
