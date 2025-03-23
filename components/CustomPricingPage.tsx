@@ -5,6 +5,12 @@ import PricingCard, { PricingFeature, PricingPlan } from "./PricingCard"
 import { Card } from "./ui/card"
 import { Check, Clock, ShieldCheck } from "lucide-react"
 import { Button } from "./ui/button"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion"
 
 interface CustomPricingPageProps {
   userId: string
@@ -16,6 +22,22 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
   const [plans, setPlans] = useState<PricingPlan[]>([])
   const [error, setError] = useState("")
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
+  
+  // Calculate dates for timeline
+  const today = new Date();
+  const reminderDate = new Date(today);
+  reminderDate.setDate(today.getDate() + 6); // 6 days from now for reminder (1 day before trial ends)
+  
+  const subscriptionDate = new Date(today);
+  subscriptionDate.setDate(today.getDate() + 7); // 7 days from now for subscription start
+  
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
   
   useEffect(() => {
     const fetchPlans = async () => {
@@ -176,13 +198,13 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
             {/* Monthly Plan */}
             {monthlyPlan && (
               <div 
-                className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                className={`relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors ${selectedPlanId === monthlyPlan.id ? 'border-blue-500' : 'border-gray-200 dark:border-gray-700'}`}
                 onClick={() => setSelectedPlanId(monthlyPlan.id)}
               >
                 <div className="flex items-start">
-                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-blue-500 flex-shrink-0 mr-3">
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center border-blue-500 flex-shrink-0 mr-3">
                     {selectedPlanId === monthlyPlan.id && (
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
                     )}
                   </div>
                   <div className="flex-grow">
@@ -202,16 +224,16 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
             {/* Annual Plan */}
             {annualPlan && (
               <div 
-                className="relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                className={`relative border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors ${selectedPlanId === annualPlan.id ? 'border-blue-500' : 'border-gray-200 dark:border-gray-700'}`}
                 onClick={() => setSelectedPlanId(annualPlan.id)}
               >
                 <div className="absolute -right-1 -top-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
                   {savingsPercent}% OFF
                 </div>
                 <div className="flex items-start">
-                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 border-blue-500 flex-shrink-0 mr-3">
+                  <div className="w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center border-blue-500 flex-shrink-0 mr-3">
                     {selectedPlanId === annualPlan.id && (
-                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full m-0.5"></div>
+                      <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
                     )}
                   </div>
                   <div className="flex-grow">
@@ -255,9 +277,9 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
                 </div>
               </div>
               <div className="ml-4">
-                <div className="font-medium">January 09, 2025</div>
+                <div className="font-medium">{formatDate(reminderDate)}</div>
                 <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                  You'll get a reminder 7 days before the trial is up.
+                  You'll get a reminder 1 day before the trial is up.
                 </div>
               </div>
             </div>
@@ -269,7 +291,7 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
                 </div>
               </div>
               <div className="ml-4">
-                <div className="font-medium">January 16, 2025</div>
+                <div className="font-medium">{formatDate(subscriptionDate)}</div>
                 <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   Your Pro subscription starts! Unless you cancel before.
                 </div>
@@ -337,20 +359,32 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
       {/* FAQ section */}
       <div className="mt-16 mb-8">
         <h3 className="text-xl font-semibold text-center mb-8">Frequently Asked Questions</h3>
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h4 className="font-medium mb-2">Can I cancel my subscription anytime?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Yes, you can cancel your subscription at any time. For monthly plans, you'll maintain access until the end of your current billing period.</p>
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h4 className="font-medium mb-2">How does the 7-day free trial work?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">The monthly plan includes a 7-day free trial. You won't be charged until the trial period ends, and you're free to cancel anytime during the trial.</p>
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h4 className="font-medium mb-2">What's included in my membership?</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Your membership includes access to personalized workout plans, nutritional guidance, progress tracking, and our community support. Annual members also receive priority support.</p>
-          </div>
-        </div>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="item-1" className="border-b border-gray-200 dark:border-gray-800">
+            <AccordionTrigger className="hover:no-underline py-4 text-left">
+              Can I cancel my subscription anytime?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
+              Yes, you can cancel your subscription at any time. For monthly plans, you'll maintain access until the end of your current billing period.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2" className="border-b border-gray-200 dark:border-gray-800">
+            <AccordionTrigger className="hover:no-underline py-4 text-left">
+              How does the 7-day free trial work?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
+              The monthly plan includes a 7-day free trial. You won't be charged until the trial period ends, and you're free to cancel anytime during the trial.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3" className="border-b border-gray-200 dark:border-gray-800">
+            <AccordionTrigger className="hover:no-underline py-4 text-left">
+              What's included in my membership?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
+              Your membership includes access to personalized workout plans, nutritional guidance, progress tracking, and our community support. Annual members also receive priority support.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   )
