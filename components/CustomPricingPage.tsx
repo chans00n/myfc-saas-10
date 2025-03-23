@@ -331,12 +331,18 @@ export default function CustomPricingPage({ userId, userEmail }: CustomPricingPa
           <div>
             <h3 className="font-semibold text-lg mb-4">Membership includes:</h3>
             <ul className="space-y-3">
-              {plans[0]?.features.map((feature, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
-                  <span>{feature.name}</span>
-                </li>
-              ))}
+              {(() => {
+                const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
+                const annualPlan = plans.find(p => p.name.toLowerCase().includes('annual'));
+                const featuresToShow = selectedPlan?.features || annualPlan?.features || plans[0]?.features || [];
+                
+                return featuresToShow.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                    <span>{feature.name}</span>
+                  </li>
+                ));
+              })()}
             </ul>
           </div>
           
