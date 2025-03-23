@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext, ReactNode, useMemo } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
 
 // Type for workout ID (can be string or number)
 type WorkoutId = string | number;
@@ -74,10 +74,30 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
 
   // Check if a workout is bookmarked
   const isBookmarked = (workoutId: WorkoutId): boolean => {
-    // Convert both to strings for comparison to avoid type mismatches
-    const workoutIdStr = String(workoutId);
-    const result = bookmarkedWorkouts.some(id => String(id) === workoutIdStr);
-    console.log(`[BOOKMARK] Checking if workout ${workoutId} is bookmarked:`, result, 'Current bookmarks:', bookmarkedWorkouts);
+    // Normalize the target workout ID
+    const workoutIdStr = String(workoutId).trim();
+    
+    // Additional debugging
+    console.log(`[BOOKMARK] isBookmarked check for: "${workoutIdStr}" (${typeof workoutId})`);
+    console.log(`[BOOKMARK] Current bookmarks array length: ${bookmarkedWorkouts.length}`);
+    
+    // For debugging, log each bookmark and comparison result
+    if (bookmarkedWorkouts.length > 0) {
+      console.log(`[BOOKMARK] Detailed comparison for ${workoutIdStr}:`);
+      bookmarkedWorkouts.forEach((id, index) => {
+        const idStr = String(id).trim();
+        const matches = idStr === workoutIdStr;
+        console.log(`[BOOKMARK] - Compare [${index}]: "${idStr}" === "${workoutIdStr}" => ${matches}`);
+      });
+    }
+    
+    // Check if any bookmark matches the ID
+    const result = bookmarkedWorkouts.some(id => {
+      const idStr = String(id).trim();
+      return idStr === workoutIdStr;
+    });
+    
+    console.log(`[BOOKMARK] Final isBookmarked result for ${workoutIdStr}: ${result}`);
     return result;
   };
 
@@ -155,28 +175,50 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook for components to consume the bookmark context
-export function useWorkoutBookmark(): BookmarkContextType;
-export function useWorkoutBookmark(workoutId: WorkoutId): SingleWorkoutBookmarkType;
-export function useWorkoutBookmark(workoutId?: WorkoutId): BookmarkContextType | SingleWorkoutBookmarkType {
+// Hook to use in components
+export function useWorkoutBookmark(workoutId?: WorkoutId) {
   const context = useContext(BookmarkContext);
+  const [loading, setLoading] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
   
   if (!context) {
     throw new Error('useWorkoutBookmark must be used within a BookmarkProvider');
   }
+  
+  // Get the current state from context
+  const { bookmarkedWorkouts, isLoading: contextLoading, isBookmarked, toggleBookmark: contextToggle } = context;
 
-  // For backward compatibility with existing components
-  if (workoutId !== undefined) {
-    const { isLoading, isBookmarked, toggleBookmark } = context;
-    console.log(`[BOOKMARK] Hook for workout ${workoutId} initialized. Is bookmarked:`, isBookmarked(workoutId));
+  // Check if this specific workout is bookmarked - runs when workoutId or bookmarkedWorkouts changes
+  useEffect(() => {
+    if (workoutId !== undefined) {
+      console.log(`[BOOKMARK] Hook for workout ${workoutId} initialized. Is bookmarked:`, isBookmarked(workoutId));
+      setBookmarked(isBookmarked(workoutId));
+    }
+  }, [workoutId, bookmarkedWorkouts]); // Depend on bookmarkedWorkouts to update when they change
+
+  // Wrapper for toggle function that sets local loading state
+  const toggleBookmark = useCallback(async () => {
+    if (workoutId === undefined) {
+      console.warn('[BOOKMARK] Cannot toggle bookmark: workoutId is undefined');
+      return false;
+    }
     
-    return {
-      isLoading,
-      isBookmarked: isBookmarked(workoutId),
-      toggleBookmark: () => toggleBookmark(workoutId),
-    };
-  }
+    try {
+      setLoading(true);
+      const result = await contextToggle(workoutId);
+      setBookmarked(result);
+      return result;
+    } catch (error) {
+      console.error('[BOOKMARK] Error in toggleBookmark:', error);
+      return bookmarked; // Return current state if error
+    } finally {
+      setLoading(false);
+    }
+  }, [workoutId, contextToggle, bookmarked]);
 
-  // Return the full context for components that need access to all bookmarks
-  return context;
+  return {
+    isBookmarked: bookmarked,
+    isLoading: loading || contextLoading,
+    toggleBookmark
+  };
 } 
