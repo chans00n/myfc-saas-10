@@ -22,6 +22,23 @@ const ALLOWED_PLAN_IDS: string[] = [
 // Set to false to only show plans with IDs in ALLOWED_PLAN_IDS
 const SHOW_ALL_PLANS = false; // Changed to false to enable filtering
 
+// Add default features for plans based on their type
+const DEFAULT_MONTHLY_FEATURES = [
+  "Personalized workout plans",
+  "Progress tracking",
+  "Nutritional guidance",
+  "Community support",
+  "7-day free trial"
+];
+
+const DEFAULT_ANNUAL_FEATURES = [
+  "Everything in Monthly plan",
+  "Advanced analytics",
+  "Priority support",
+  "25% savings compared to monthly plan",
+  "Instant access"
+];
+
 export async function GET() {
   try {
     // Check if we need to refresh the cache
@@ -39,6 +56,26 @@ export async function GET() {
         .filter(product => product.default_price)
         .map(product => {
           const price = product.default_price as any;
+          
+          // Get features from metadata or fallback to default features based on plan type
+          let features: string[] = [];
+          if (product.metadata?.features) {
+            try {
+              features = JSON.parse(product.metadata.features);
+            } catch (error) {
+              console.warn(`Failed to parse features for ${product.name}:`, error);
+            }
+          }
+          
+          // If features are empty, assign default features based on product name
+          if (features.length === 0) {
+            if (product.name.toLowerCase().includes('monthly')) {
+              features = DEFAULT_MONTHLY_FEATURES;
+            } else if (product.name.toLowerCase().includes('annual')) {
+              features = DEFAULT_ANNUAL_FEATURES;
+            }
+          }
+          
           return {
             id: price.id,
             productId: product.id,
@@ -47,7 +84,7 @@ export async function GET() {
             price: price.unit_amount,
             currency: price.currency,
             interval: price.recurring?.interval || 'month',
-            features: product.metadata?.features ? JSON.parse(product.metadata.features) : [],
+            features,
             popular: product.metadata?.popular === 'true',
           };
         })
