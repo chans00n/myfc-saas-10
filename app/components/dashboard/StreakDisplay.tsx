@@ -8,7 +8,7 @@ export default function StreakDisplay({ streak }: StreakDisplayProps) {
   const currentStreak = streak?.current_streak || 0;
   
   return (
-    <div className="mb-8">
+    <div className="mb-8 mt-8">
       <div className="mb-5">
         <h2 className="text-xl font-normal text-neutral-800 dark:text-neutral-200">
           You have a <span className="font-bold border-b-2 border-neutral-600 dark:border-neutral-400">{currentStreak} day streak</span> today
