@@ -57,7 +57,7 @@ export default async function Dashboard() {
     }
 
     return (
-        <main className="max-w-md mx-auto px-4 pb-24">
+        <main className="max-w-4xl mx-auto px-4 pb-24">
             {/* Welcome Section */}
             <div className="mt-8 mb-6 flex justify-between items-center">
                 <div>
@@ -68,40 +68,63 @@ export default async function Dashboard() {
             </div>
 
             {/* Today's Workout */}
-            {todaysWorkout ? (
-                <FeaturedWorkoutCard workout={todaysWorkout} />
-            ) : (
-                <div className="rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700 overflow-hidden mb-8 bg-white dark:bg-neutral-800">
-                    <div className="relative">
-                        <div className="relative h-48 w-full bg-gradient-to-br from-neutral-400 to-neutral-600 dark:from-neutral-700 dark:to-neutral-900 flex items-center justify-center">
-                            <span className="text-white text-4xl font-bold">MYFC</span>
-                        </div>
-                        
-                        <div className="p-6">
-                            <p className="uppercase text-xs tracking-wide text-neutral-500 dark:text-neutral-400 mb-2">TODAY'S LIFT</p>
-                            <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">No workout scheduled</h2>
-                            <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-6">Check back tomorrow for a new exercise routine</p>
-                            
-                            <Link href="/dashboard/library" className="block w-full">
-                                <button className="w-full bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-100 font-medium py-3 rounded-lg transition duration-300">
-                                    Browse Workout Library
-                                </button>
-                            </Link>
+            <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4">Today's Workout</h2>
+                {todaysWorkout ? (
+                    <FeaturedWorkoutCard workout={todaysWorkout} />
+                ) : (
+                    <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg p-6 border border-neutral-200 dark:border-neutral-700">
+                        <div className="text-center py-8">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-12 w-12 mx-auto text-neutral-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                            </svg>
+                            <h3 className="mt-4 text-xl font-medium text-neutral-900 dark:text-neutral-100">
+                                No workout scheduled for today
+                            </h3>
+                            <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+                                Check back later or explore our workout library to find something for today.
+                            </p>
+                            <div className="mt-6">
+                                <Link
+                                    href="/dashboard/library"
+                                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                                >
+                                    Browse Workouts
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
             
             {/* Streak Display */}
             <StreakDisplay streak={userStreak} />
             
             {/* Popular Workouts Carousel */}
-            {popularWorkouts.length > 0 && (
-                <WorkoutCarousel 
-                    workouts={popularWorkouts} 
-                    title="Recommended for You" 
-                />
-            )}
+            <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4">Recommended For You</h2>
+                {popularWorkouts.length > 0 ? (
+                    <WorkoutCarousel 
+                        workouts={popularWorkouts} 
+                        title="Recommended for You" 
+                    />
+                ) : (
+                    <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg p-6 border border-neutral-200 dark:border-neutral-700">
+                        <p className="text-neutral-600 dark:text-neutral-400">No recommended workouts found.</p>
+                    </div>
+                )}
+            </div>
             
             {/* Quick Links */}
             <QuickLinks />
