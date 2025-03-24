@@ -1,502 +1,93 @@
-// MYFC Service Worker - Optimized for PWA Performance
-const CACHE_VERSION = 'v3';
-const STATIC_CACHE = 'myfc-static-' + CACHE_VERSION;
-const DYNAMIC_CACHE = 'myfc-dynamic-' + CACHE_VERSION;
-const API_CACHE = 'myfc-api-' + CACHE_VERSION;
-const IMAGE_CACHE = 'myfc-images-' + CACHE_VERSION;
-const OFFLINE_URL = './offline.html';
+/**
+ * Copyright 2018 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-// Make sure we have the scope
-const SCOPE = self.registration ? self.registration.scope : self.location.origin;
-const IS_SUBDOMAIN = new URL(SCOPE).hostname === 'members.myfc.app';
+// If the loader is already loaded, just stop.
+if (!self.define) {
+  let registry = {};
 
-console.log('[Service Worker] Initializing with scope:', SCOPE);
-console.log('[Service Worker] Is subdomain:', IS_SUBDOMAIN);
+  // Used for `eval` and `importScripts` where we can't get script URL by other means.
+  // In both cases, it's safe to use a global var because those functions are synchronous.
+  let nextDefineUri;
 
-// Assets to cache immediately - critical files
-const STATIC_ASSETS = [
-  './',
-  './dashboard',
-  './manifest.json',
-  './offline.html',
-  './pwa-status.html',
-  './apple-touch-icon.png',
-  './icons/512.png',
-  './icons/192.png',
-  './icons/180.png',
-  './icons/152.png',
-  './icons/120.png',
-  './logo.png',
-  './logo_white.png',
-  './standalone.js'
-];
-
-// Install event - cache critical assets
-self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing optimized service worker with scope:', SCOPE);
-  
-  // Skip waiting to become active immediately
-  self.skipWaiting();
-  
-  event.waitUntil(
-    Promise.all([
-      // Cache static assets
-      caches.open(STATIC_CACHE).then(cache => {
-        console.log('[Service Worker] Caching critical assets:', STATIC_ASSETS);
-        return cache.addAll(STATIC_ASSETS)
-          .then(() => console.log('[Service Worker] Successfully cached assets'))
-          .catch(err => {
-            console.error('[Service Worker] Failed to cache assets:', err);
-            // Try caching assets one by one to identify problematic ones
-            return Promise.allSettled(
-              STATIC_ASSETS.map(asset => 
-                cache.add(asset)
-                  .then(() => console.log('[SW] Cached:', asset))
-                  .catch(e => console.error('[SW] Failed to cache:', asset, e))
-              )
-            );
-          });
-      }),
-      // Create other caches
-      caches.open(DYNAMIC_CACHE),
-      caches.open(API_CACHE),
-      caches.open(IMAGE_CACHE)
-    ])
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating optimized service worker with scope:', SCOPE);
-  
-  // Claim clients immediately
-  event.waitUntil(
-    caches.keys()
-      .then(keyList => {
-        return Promise.all(keyList.map(key => {
-          if (
-            !key.endsWith(CACHE_VERSION) && 
-            (key.startsWith('myfc-static-') || 
-             key.startsWith('myfc-dynamic-') || 
-             key.startsWith('myfc-api-') ||
-             key.startsWith('myfc-images-'))
-          ) {
-            console.log('[Service Worker] Removing old cache', key);
-            return caches.delete(key);
+  const singleRequire = (uri, parentUri) => {
+    uri = new URL(uri + ".js", parentUri).href;
+    return registry[uri] || (
+      
+        new Promise(resolve => {
+          if ("document" in self) {
+            const script = document.createElement("script");
+            script.src = uri;
+            script.onload = resolve;
+            document.head.appendChild(script);
+          } else {
+            nextDefineUri = uri;
+            importScripts(uri);
+            resolve();
           }
-        }));
-      })
+        })
+      
       .then(() => {
-        console.log('[Service Worker] Claiming clients');
-        return self.clients.claim();
+        let promise = registry[uri];
+        if (!promise) {
+          throw new Error(`Module ${uri} didn’t register its module`);
+        }
+        return promise;
       })
-      .catch(err => console.error('[Service Worker] Activate error:', err))
-  );
-});
+    );
+  };
 
-// Add this detection before the existing cache strategy function
-function correctIconUrl(url) {
-  // Check if the URL is an external URL to myfc.app
-  if (url.includes('members.myfc.app') && (url.includes('/icons/') || url.includes('/screenshots/'))) {
-    // Extract the path part (after the domain)
-    const pathMatch = url.match(/https:\/\/members\.myfc\.app(\/.*)/);
-    if (pathMatch && pathMatch[1]) {
-      // Convert to a relative path
-      return pathMatch[1];
-    }
-  }
-  return url;
-}
-
-// Helper function to determine caching strategy by URL
-function getCacheStrategy(url) {
-  try {
-    // Ensure we're working with a URL object
-    const parsedUrl = typeof url === 'string' ? new URL(url, SCOPE) : url;
-    // If the URL is an object but not a proper URL instance, try to create one
-    if (!(parsedUrl instanceof URL)) {
-      const urlString = parsedUrl.toString ? parsedUrl.toString() : String(parsedUrl);
-      parsedUrl = new URL(urlString, SCOPE);
-    }
-    
-    const { pathname } = parsedUrl;
-    
-    // Special handling for diagnostic page
-    if (pathname && pathname.endsWith('/pwa-status.html')) {
-      return {
-        strategy: 'network-first',
-        cache: DYNAMIC_CACHE
-      };
-    }
-    
-    // Skip bookmark API calls - always use network
-    if (
-      pathname && (
-      pathname.includes('/api/bookmarks') || 
-      pathname.includes('/api/bookmarks/all'))
-    ) {
-      return {
-        strategy: 'network-only',
-        cache: null
-      };
-    }
-    
-    // API responses - stale-while-revalidate with short TTL
-    if (pathname && pathname.includes('/api/')) {
-      return {
-        strategy: 'stale-while-revalidate',
-        cache: API_CACHE,
-        expiration: 5 * 60 * 1000 // 5 minutes
-      };
-    }
-    
-    // Images - cache-first with longer TTL
-    if (
-      pathname && (
-      pathname.match(/\.(jpg|jpeg|png|gif|svg|webp|avif)$/) ||
-      pathname.includes('/icons/') ||
-      pathname.startsWith('/apple-touch-icon'))
-    ) {
-      return {
-        strategy: 'cache-first',
-        cache: IMAGE_CACHE,
-        expiration: 7 * 24 * 60 * 60 * 1000 // 1 week
-      };
-    }
-    
-    // Static assets - cache-first
-    if (
-      pathname && (
-      pathname.match(/\.(js|css|woff|woff2|ttf|eot)$/) ||
-      pathname.includes('/_next/static/'))
-    ) {
-      return {
-        strategy: 'cache-first',
-        cache: STATIC_CACHE
-      };
-    }
-    
-    // HTML pages - network-first
-    return {
-      strategy: 'network-first',
-      cache: DYNAMIC_CACHE
-    };
-  } catch (e) {
-    console.error('[SW] Error parsing URL:', url, e);
-    return { strategy: 'network-first', cache: DYNAMIC_CACHE };
-  }
-}
-
-// Check if a cached response has expired
-function hasExpired(response, expirationTime) {
-  if (!expirationTime) return false;
-  
-  const cachedTime = response.headers.get('sw-cached-on');
-  if (!cachedTime) return false;
-  
-  return (Date.now() - parseInt(cachedTime, 10)) > expirationTime;
-}
-
-// Cache a response with a timestamp
-async function cacheWithTimestamp(cache, request, response, cloneResponse = true) {
-  if (!response || !response.ok) return response;
-  
-  try {
-    const resClone = cloneResponse ? response.clone() : response;
-    const headers = new Headers(resClone.headers);
-    headers.append('sw-cached-on', Date.now().toString());
-    
-    const init = {
-      status: resClone.status,
-      statusText: resClone.statusText,
-      headers
-    };
-    
-    const body = await resClone.blob();
-    const timestampedResponse = new Response(body, init);
-    await cache.put(request, timestampedResponse);
-    console.log('[SW] Cached response for:', request.url);
-  } catch (err) {
-    console.error('[Service Worker] Cache write error:', err, 'for URL:', request.url);
-  }
-  
-  return response;
-}
-
-// Fetch event - intercept network requests
-self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
-  
-  // Get the URL from the request
-  const url = event.request.url;
-  
-  // Correct any icon URLs that might be using absolute paths
-  const correctedUrl = correctIconUrl(url);
-  
-  // If URL was corrected, create a new request with the corrected URL
-  const request = correctedUrl !== url 
-    ? new Request(correctedUrl, event.request) 
-    : event.request;
-  
-  // Choose caching strategy based on the request URL
-  const { strategy, cache, expiration } = getCacheStrategy(request.url);
-  
-  try {
-    // Handle diagnostic page specially
-    if (url.pathname.endsWith('/pwa-status.html')) {
-      event.respondWith(fetch(event.request));
+  self.define = (depsNames, factory) => {
+    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
+    if (registry[uri]) {
+      // Module is already loading or loaded.
       return;
     }
-    
-    // Skip cross-origin requests
-    if (url.origin !== self.location.origin) return;
-    
-    // Skip Stripe-related URLs
-    if (url.hostname.includes('stripe.com')) return;
-    
-    // Skip bookmark API endpoints for POST requests
-    if (event.request.method === 'POST' && 
-       (url.pathname.includes('/api/bookmarks') || 
-        url.pathname.includes('/api/bookmarks/all'))) {
-      console.log('[SW] Skipping interception for bookmark API POST:', event.request.url);
-      return; // Don't intercept, let browser handle natively
-    }
-    
-    // Skip handling if strategy is network-only
-    if (strategy === 'network-only') {
-      console.log('[SW] Using network-only for:', event.request.url);
-      return; // Don't intercept
-    }
-    
-    console.log(`[SW] Handling ${strategy} for ${event.request.url}`);
-    
-    // Implement cache strategies
-    if (strategy === 'cache-first') {
-      // Cache First for static assets and images
-      event.respondWith(
-        caches.open(cache)
-          .then(cache => {
-            return cache.match(event.request)
-              .then(cachedResponse => {
-                // If in cache and not expired, use it
-                if (cachedResponse && !hasExpired(cachedResponse, expiration)) {
-                  console.log('[SW] Serving from cache:', event.request.url);
-                  return cachedResponse;
-                }
-                
-                // Otherwise fetch from network
-                console.log('[SW] Not in cache, fetching:', event.request.url);
-                return fetch(event.request)
-                  .then(networkResponse => {
-                    return cacheWithTimestamp(cache, event.request, networkResponse);
-                  })
-                  .catch(error => {
-                    console.error('[Service Worker] Fetch error:', error, 'for URL:', event.request.url);
-                    
-                    // If it's an image, try to return a fallback
-                    if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|webp|avif)$/)) {
-                      return caches.match('./icons/192.png');
-                    }
-                    
-                    throw error;
-                  });
-              });
-          })
-          .catch(err => {
-            console.error('[SW] Cache-first strategy error:', err, 'for URL:', event.request.url);
-            return fetch(event.request);
-          })
-      );
-    } else if (strategy === 'stale-while-revalidate') {
-      // Stale-while-revalidate for API responses
-      event.respondWith(
-        caches.open(cache)
-          .then(cache => {
-            return cache.match(event.request)
-              .then(cachedResponse => {
-                const fetchPromise = fetch(event.request)
-                  .then(networkResponse => {
-                    return cacheWithTimestamp(cache, event.request, networkResponse);
-                  })
-                  .catch((err) => {
-                    console.log('[Service Worker] Failed to update API cache:', err);
-                    // If fetch fails, we still have the cached version
-                  });
-                
-                // Return the cached response immediately, but update cache in background
-                if (cachedResponse && !hasExpired(cachedResponse, expiration)) {
-                  console.log('[SW] Serving stale response while revalidating:', event.request.url);
-                  fetchPromise.catch(() => console.log('Background fetch failed'));
-                  return cachedResponse;
-                }
-                
-                // No valid cache, wait for the network response
-                console.log('[SW] No cache, waiting for network:', event.request.url);
-                return fetchPromise;
-              });
-          })
-          .catch((err) => {
-            console.error('[SW] Stale-while-revalidate error:', err, 'for URL:', event.request.url);
-            
-            // Last resort - if all caching mechanisms fail
-            if (event.request.mode === 'navigate') {
-              return caches.match(OFFLINE_URL);
-            }
-            return fetch(event.request);
-          })
-      );
-    } else {
-      // Network First for HTML and other resources
-      event.respondWith(
-        fetch(event.request)
-          .then(networkResponse => {
-            console.log('[SW] Network-first success for:', event.request.url);
-            // Also cache the successful response
-            caches.open(cache).then(cache => {
-              cacheWithTimestamp(cache, event.request, networkResponse.clone(), false);
-            });
-            return networkResponse;
-          })
-          .catch((err) => {
-            console.log('[SW] Network failed, trying cache:', event.request.url, err);
-            // If network fails, try the cache
-            return caches.match(event.request)
-              .then(cachedResponse => {
-                if (cachedResponse) {
-                  console.log('[SW] Serving from cache after network failure:', event.request.url);
-                  return cachedResponse;
-                }
-                
-                console.log('[SW] No cache entry after network failure, serving offline page');
-                // Return offline page for navigation requests
-                if (event.request.mode === 'navigate') {
-                  return caches.match(OFFLINE_URL)
-                    .then(offlineResponse => {
-                      if (offlineResponse) {
-                        return offlineResponse;
-                      }
-                      console.error('[SW] Even offline page not found!');
-                      return new Response('Network error and offline page not found', { 
-                        status: 503,
-                        headers: { 'Content-Type': 'text/plain' }
-                      });
-                    });
-                }
-                
-                return null;
-              });
-          })
-      );
-    }
-  } catch (err) {
-    console.error('[SW] Fatal error in fetch handler:', err);
-    // Don't break the fetch
-    return;
-  }
-});
-
-// Handle messages from clients
-self.addEventListener('message', (event) => {
-  console.log('[SW] Received message:', event.data);
-  
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHES') {
-    event.waitUntil(
-      caches.keys().then(cacheNames => {
-        console.log('[SW] Clearing all caches:', cacheNames);
-        return Promise.all(
-          cacheNames.map(cacheName => {
-            if (cacheName.startsWith('myfc-')) {
-              return caches.delete(cacheName)
-                .then(() => console.log('[SW] Successfully deleted cache:', cacheName))
-                .catch(err => console.error('[SW] Failed to delete cache:', cacheName, err));
-            }
-          })
-        );
-      })
-    );
-  }
-  
-  if (event.data && event.data.type === 'ONLINE_STATUS') {
-    console.log('[SW] Online status changed to:', event.data.status);
-  }
-});
-
-// Push event handler
-self.addEventListener('push', (event) => {
-  console.log('[Service Worker] Push received');
-  
-  let notificationData = {};
-  
-  try {
-    if (event.data) {
-      try {
-        notificationData = event.data.json();
-        console.log('[Service Worker] Push notification data:', notificationData);
-      } catch (e) {
-        console.error('[Service Worker] Error parsing push data as JSON:', e);
-        notificationData = {
-          title: 'New Notification',
-          body: event.data ? event.data.text() : 'No payload',
-          icon: '/icons/192.png'
-        };
-      }
-    } else {
-      console.warn('[Service Worker] Push event received without data');
-      notificationData = {
-        title: 'New Notification',
-        body: 'No content available',
-        icon: '/icons/192.png'
-      };
-    }
-    
-    const title = notificationData.title || 'New Notification';
-    const options = {
-      body: notificationData.body || '',
-      icon: notificationData.icon || '/icons/192.png',
-      badge: '/icons/120.png',
-      data: notificationData.data || {},
-      tag: notificationData.tag || 'default'
+    let exports = {};
+    const require = depUri => singleRequire(depUri, uri);
+    const specialDeps = {
+      module: { uri },
+      exports,
+      require
     };
-    
-    event.waitUntil(
-      self.registration.showNotification(title, options)
-        .then(() => {
-          console.log('[Service Worker] Notification shown successfully');
-        })
-        .catch(err => {
-          console.error('[Service Worker] Error showing notification:', err);
-        })
-    );
-  } catch (err) {
-    console.error('[Service Worker] Error handling push event:', err);
-  }
-});
+    registry[uri] = Promise.all(depsNames.map(
+      depName => specialDeps[depName] || require(depName)
+    )).then(deps => {
+      factory(...deps);
+      return exports;
+    });
+  };
+}
+define(['./workbox-631a4576'], (function (workbox) { 'use strict';
 
-// Notification click event
-self.addEventListener('notificationclick', (event) => {
-  console.log('[Service Worker] Notification click received');
-  
-  event.notification.close();
-  
-  // Navigate to appropriate URL based on notification data
-  const urlToOpen = event.notification.data?.url || '/dashboard';
-  
-  event.waitUntil(
-    clients.matchAll({type: 'window'}).then(windowClients => {
-      // Check if there is already a window open
-      const matchingClient = windowClients.find(client => 
-        client.url.includes(urlToOpen) && 'focus' in client);
-        
-      if (matchingClient) {
-        return matchingClient.focus();
-      } else {
-        return clients.openWindow(urlToOpen);
-      }
-    })
-  );
-}); 
+  importScripts();
+  self.skipWaiting();
+  workbox.clientsClaim();
+  workbox.registerRoute("/", new workbox.NetworkFirst({
+    "cacheName": "start-url",
+    plugins: [{
+      cacheWillUpdate: async ({
+        response: e
+      }) => e && "opaqueredirect" === e.type ? new Response(e.body, {
+        status: 200,
+        statusText: "OK",
+        headers: e.headers
+      }) : e
+    }]
+  }), 'GET');
+  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
+    "cacheName": "dev",
+    plugins: []
+  }), 'GET');
+
+}));
+//# sourceMappingURL=sw.js.map

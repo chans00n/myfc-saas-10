@@ -1,17 +1,26 @@
 {
-  "name": "MYFC - My Face Coach",
+  "name": "MYFC",
   "short_name": "MYFC",
-  "description": "Daily facial exercises and tracking",
-  "start_url": "/",
+  "theme_color": "#000000",
+  "background_color": "#000000",
   "display": "standalone",
-  "display_override": ["standalone"],
-  "background_color": "#4f46e5",
-  "theme_color": "#4f46e5",
   "orientation": "portrait",
-  "id": "/",
   "scope": "/",
-  "categories": ["fitness", "health", "lifestyle"],
+  "start_url": "/dashboard",
+  "description": "My Face Coach",
   "icons": [
+    {
+      "src": "/icons/120.png",
+      "sizes": "120x120",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "/icons/192.png",
       "sizes": "192x192",
@@ -29,51 +38,10 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/1024.png",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/apple-icon-180.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/167.png",
-      "sizes": "167x167",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/180.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "View your dashboard",
-      "url": "/dashboard",
-      "icons": [{ "src": "/icons/192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Profile",
-      "short_name": "Profile",
-      "description": "View your profile",
-      "url": "/profile",
-      "icons": [{ "src": "/icons/192.png", "sizes": "192x192" }]
-    }
-  ],
+  "id": "/",
+  "categories": ["fitness", "health", "lifestyle"],
   "screenshots": [
     {
       "src": "/screenshots/dashboard.png",

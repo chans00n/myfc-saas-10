@@ -1,19 +1,12 @@
-/** @type {import('next').NextConfig} */
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development' || process.env.DISABLE_PWA === 'true',
   register: true,
-  scope: '/',
-  sw: 'sw.js',
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  swcMinify: true,
-  workboxOptions: {
-    disableDevLogs: true,
-  }
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development' ? false : false,
+  buildExcludes: [/middleware-manifest.json$/],
 });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   images: {
