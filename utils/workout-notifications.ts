@@ -1,7 +1,7 @@
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { sendPushNotification } from '@/utils/push-notification';
-import { and, eq, gte } from 'drizzle-orm';
+import { and, eq, gte, sql } from 'drizzle-orm';
 
 // Send notification for a new workout
 export async function sendNewWorkoutNotifications(workout: {
@@ -23,8 +23,9 @@ export async function sendNewWorkoutNotifications(workout: {
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.push_notifications_enabled, true),
-          eq(usersTable.new_workout_notifications, true)
+          // Cast boolean to integer for comparison
+          sql`${usersTable.push_notifications_enabled}::integer = 1`,
+          sql`${usersTable.new_workout_notifications}::integer = 1`
         )
       );
     
@@ -97,8 +98,9 @@ export async function sendWorkoutReminders() {
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.push_notifications_enabled, true),
-          eq(usersTable.workout_reminder_enabled, true),
+          // Cast boolean to integer for comparison
+          sql`${usersTable.push_notifications_enabled}::integer = 1`,
+          sql`${usersTable.workout_reminder_enabled}::integer = 1`,
           eq(usersTable.workout_reminder_time, currentHour)
         )
       );
