@@ -2,14 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Settings, Users, Database, Bug, ExternalLink, PanelLeftClose, PanelLeft, Dumbbell } from 'lucide-react';
+import { Bell, Settings, Users, Database, Bug, ExternalLink, PanelLeftClose, PanelLeft, Dumbbell, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  onClose?: () => void;
+  defaultCollapsed?: boolean;
+}
+
+export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  
+  // Update collapsed state when defaultCollapsed changes
+  useEffect(() => {
+    setCollapsed(defaultCollapsed);
+  }, [defaultCollapsed]);
   
   // Define admin navigation items
   const navItems = [
@@ -54,21 +64,37 @@ export function AdminSidebar() {
   return (
     <div 
       className={cn(
-        "h-screen bg-neutral-50 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col sticky top-0 overflow-y-auto transition-all duration-300",
+        "h-screen bg-neutral-50 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col overflow-y-auto transition-all duration-300",
         collapsed ? "w-20" : "w-72"
       )}
     >
       {/* Sidebar Header */}
       <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
         {!collapsed && <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">MYFC Admin</h2>}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-50"
-        >
-          {collapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
-        </Button>
+        
+        <div className="flex items-center ml-auto">
+          {/* Mobile close button */}
+          {onClose && !collapsed && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="mr-2 lg:hidden text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-50"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {/* Collapse/expand button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setCollapsed(!collapsed)}
+            className="text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-50"
+          >
+            {collapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
       
       {/* Navigation */}
@@ -91,6 +117,7 @@ export function AdminSidebar() {
                     : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-50"
                 )}
                 title={collapsed ? item.name : undefined}
+                onClick={onClose && !item.active ? onClose : undefined}
               >
                 <item.icon className="h-5 w-5" />
                 {!collapsed && <span>{item.name}</span>}
@@ -108,7 +135,12 @@ export function AdminSidebar() {
           className={cn("w-full mb-4", collapsed && "px-2")} 
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2" title="Back to Main App">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center gap-2" 
+            title="Back to Main App"
+            onClick={onClose}
+          >
             <ExternalLink className="h-4 w-4" />
             {!collapsed && <span>Back to Main App</span>}
           </Link>

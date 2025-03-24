@@ -44,6 +44,21 @@ export default function WorkoutsTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   
+  // Determine if we're on mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Track window size for responsive behavior
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   // Fetch workouts on component mount
   const fetchWorkouts = async (forceRefresh = false) => {
     try {
@@ -255,6 +270,7 @@ export default function WorkoutsTable() {
               variant="outline" 
               onClick={handleRefresh} 
               disabled={isRefreshing}
+              className="whitespace-nowrap"
             >
               <ChevronUp className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               {isRefreshing ? 'Refreshing...' : 'Refresh'}
@@ -263,146 +279,225 @@ export default function WorkoutsTable() {
         </div>
       </div>
       
-      {/* Table */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleSort('title')}
-                className="font-medium flex items-center"
-              >
-                Title {getSortIcon('title')}
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleSort('duration_minutes')}
-                className="font-medium flex items-center whitespace-nowrap"
-              >
-                Duration {getSortIcon('duration_minutes')}
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleSort('intensity')}
-                className="font-medium flex items-center"
-              >
-                Intensity {getSortIcon('intensity')}
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleSort('created_at')}
-                className="font-medium flex items-center whitespace-nowrap"
-              >
-                Published {getSortIcon('created_at')}
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button 
-                variant="ghost" 
-                onClick={() => handleSort('is_active')}
-                className="font-medium flex items-center"
-              >
-                Status {getSortIcon('is_active')}
-              </Button>
-            </TableHead>
-            <TableHead>
-              <span className="font-medium">Actions</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentWorkouts.length === 0 ? (
+      {/* Responsive Table - Standard view for larger screens */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8">
-                No workouts found.
-              </TableCell>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('title')}
+                  className="font-medium flex items-center"
+                >
+                  Title {getSortIcon('title')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('duration_minutes')}
+                  className="font-medium flex items-center whitespace-nowrap"
+                >
+                  Duration {getSortIcon('duration_minutes')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('intensity')}
+                  className="font-medium flex items-center"
+                >
+                  Intensity {getSortIcon('intensity')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('created_at')}
+                  className="font-medium flex items-center whitespace-nowrap"
+                >
+                  Published {getSortIcon('created_at')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('is_active')}
+                  className="font-medium flex items-center"
+                >
+                  Status {getSortIcon('is_active')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <span className="font-medium">Actions</span>
+              </TableHead>
             </TableRow>
-          ) : (
-            currentWorkouts.map((workout) => (
-              <TableRow key={workout.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
+          </TableHeader>
+          <TableBody>
+            {currentWorkouts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  No workouts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              currentWorkouts.map((workout) => (
+                <TableRow key={workout.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {workout.thumbnail_url ? (
+                        <img 
+                          src={workout.thumbnail_url} 
+                          alt={workout.title} 
+                          className="h-10 w-16 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="h-10 w-16 bg-neutral-100 dark:bg-neutral-800 rounded flex items-center justify-center">
+                          <Timer className="h-5 w-5 text-neutral-400" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-medium">{workout.title}</div>
+                        {workout.description && (
+                          <div className="text-sm text-neutral-500 truncate max-w-xs">
+                            {workout.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Timer className="mr-2 h-4 w-4 text-neutral-500" />
+                      <span>{workout.duration_minutes} min</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={
+                        workout.intensity === 'beginner' ? 'outline' : 
+                        workout.intensity === 'intermediate' ? 'secondary' : 
+                        'default'
+                      }
+                    >
+                      {workout.intensity}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4 text-neutral-500" />
+                      <span title={new Date(workout.created_at).toLocaleString()}>
+                        {formatPublishedDate(workout.created_at)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      {workout.is_active ? (
+                        <>
+                          <Eye className="mr-2 h-4 w-4 text-green-500" />
+                          <span className="text-green-500">Active</span>
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="mr-2 h-4 w-4 text-neutral-500" />
+                          <span className="text-neutral-500">Inactive</span>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/admin/workouts/${workout.id}`} className="flex items-center">
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {/* Mobile Card View */}
+      <div className="md:hidden">
+        {currentWorkouts.length === 0 ? (
+          <div className="text-center py-8 text-neutral-500">
+            No workouts found.
+          </div>
+        ) : (
+          <div className="space-y-4 p-2">
+            {currentWorkouts.map((workout) => (
+              <div key={workout.id} className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-center gap-3 mb-3">
                     {workout.thumbnail_url ? (
                       <img 
                         src={workout.thumbnail_url} 
                         alt={workout.title} 
-                        className="h-10 w-16 object-cover rounded"
+                        className="h-12 w-20 object-cover rounded"
                       />
                     ) : (
-                      <div className="h-10 w-16 bg-neutral-100 dark:bg-neutral-800 rounded flex items-center justify-center">
-                        <Timer className="h-5 w-5 text-neutral-400" />
+                      <div className="h-12 w-20 bg-neutral-100 dark:bg-neutral-700 rounded flex items-center justify-center">
+                        <Timer className="h-6 w-6 text-neutral-400" />
                       </div>
                     )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-neutral-900 dark:text-neutral-100 truncate">{workout.title}</h3>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400 truncate">{workout.description || 'No description'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                    <div className="flex items-center text-neutral-700 dark:text-neutral-300">
+                      <Timer className="mr-2 h-4 w-4" />
+                      <span>{workout.duration_minutes} min</span>
+                    </div>
+                    <div className="flex items-center text-neutral-700 dark:text-neutral-300">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      <span>{formatPublishedDate(workout.created_at)}</span>
+                    </div>
                     <div>
-                      <div className="font-medium">{workout.title}</div>
-                      {workout.description && (
-                        <div className="text-sm text-neutral-500 truncate max-w-xs">
-                          {workout.description}
-                        </div>
+                      <Badge 
+                        variant={
+                          workout.intensity === 'beginner' ? 'outline' : 
+                          workout.intensity === 'intermediate' ? 'secondary' : 
+                          'default'
+                        }
+                      >
+                        {workout.intensity}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center">
+                      {workout.is_active ? (
+                        <>
+                          <Eye className="mr-2 h-4 w-4 text-green-500" />
+                          <span className="text-green-500">Active</span>
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="mr-2 h-4 w-4 text-neutral-500" />
+                          <span className="text-neutral-500">Inactive</span>
+                        </>
                       )}
                     </div>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <Timer className="mr-2 h-4 w-4 text-neutral-500" />
-                    <span>{workout.duration_minutes} min</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={
-                      workout.intensity === 'beginner' ? 'outline' : 
-                      workout.intensity === 'intermediate' ? 'secondary' : 
-                      'default'
-                    }
-                  >
-                    {workout.intensity}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <Calendar className="mr-2 h-4 w-4 text-neutral-500" />
-                    <span title={new Date(workout.created_at).toLocaleString()}>
-                      {formatPublishedDate(workout.created_at)}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    {workout.is_active ? (
-                      <>
-                        <Eye className="mr-2 h-4 w-4 text-green-500" />
-                        <span className="text-green-500">Active</span>
-                      </>
-                    ) : (
-                      <>
-                        <EyeOff className="mr-2 h-4 w-4 text-neutral-500" />
-                        <span className="text-neutral-500">Inactive</span>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/admin/workouts/${workout.id}`} className="flex items-center">
+                  
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link href={`/admin/workouts/${workout.id}`} className="flex items-center justify-center">
                       <Pencil className="mr-2 h-4 w-4" />
-                      Edit
+                      Edit Workout
                     </Link>
                   </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       
       {/* Pagination */}
       {totalPages > 1 && (
@@ -416,16 +511,26 @@ export default function WorkoutsTable() {
             Previous
           </Button>
           
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-            <Button
-              key={number}
-              variant={currentPage === number ? "default" : "outline"}
-              size="sm"
-              onClick={() => paginate(number)}
-            >
-              {number}
-            </Button>
-          ))}
+          {/* Show limited page numbers on mobile */}
+          {isMobile ? (
+            <div className="flex items-center space-x-1">
+              <span className="px-2 text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+            </div>
+          ) : (
+            // Full pagination on desktop
+            Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+              <Button
+                key={number}
+                variant={currentPage === number ? "default" : "outline"}
+                size="sm"
+                onClick={() => paginate(number)}
+              >
+                {number}
+              </Button>
+            ))
+          )}
           
           <Button
             variant="outline"
