@@ -591,18 +591,20 @@ export function WorkoutForm({
       )}
       
       {/* Form actions */}
-      <div className="flex gap-3 justify-end">
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push('/admin/workouts')}
           disabled={isSubmitting}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting}
+          className="w-full sm:w-auto"
         >
           {isSubmitting ? 'Saving...' : isEditing ? 'Update Workout' : 'Create Workout'}
         </Button>
