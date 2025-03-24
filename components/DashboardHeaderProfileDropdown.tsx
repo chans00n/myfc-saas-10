@@ -13,11 +13,13 @@ import { } from "@supabase/supabase-js"
 import { createClient } from '@/utils/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { generateStripeBillingPortalLink } from "@/utils/stripe/api"
+import BillingLink from './BillingLink'
+import CrispSupport from "./CrispSupport"
 
 export default async function DashboardHeaderProfileDropdown() {
     const supabase = createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
-    const billingPortalURL = await generateStripeBillingPortalLink(user!.email!)
+    
     return (
         <nav className="flex items-center">
             <Button variant="ghost" size="icon" className="mr-2">
@@ -46,18 +48,17 @@ export default async function DashboardHeaderProfileDropdown() {
                             <span>Settings</span>
                         </DropdownMenuItem>
                     </Link>
-                    <Link href="#">
-                        <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <BillingLink>
+                          <div className="flex items-center">
                             <ReceiptText className="mr-2 h-4 w-4" />
-                            <Link href={billingPortalURL}>Billing</Link>
-                        </DropdownMenuItem>
-                    </Link>
-                    <Link href="#">
-                        <DropdownMenuItem>
-                            <HelpCircle className="mr-2 h-4 w-4" />
-                            <span>Help</span>
-                        </DropdownMenuItem>
-                    </Link>
+                            <span>Billing</span>
+                          </div>
+                        </BillingLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <CrispSupport />
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                         <form action={logout} className="w-full">

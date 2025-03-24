@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProviderServer } from "@/components/ThemeProviderServer";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Script from "next/script";
 import { ServiceWorkerRegistry } from "@/components/ServiceWorkerRegistry";
 import { Toaster } from "sonner";
+import { CrispWrapper } from '@/components/CrispWrapper';
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
+import { db } from "@/utils/db/db";
+import { usersTable } from "@/utils/db/schema";
+import { eq } from "drizzle-orm";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -119,11 +125,43 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Default theme
+  let theme: 'light' | 'dark' = 'light';
+  
+  try {
+    // Get the current user
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      try {
+        // Fetch user's theme preference from database
+        const userRecord = await db
+          .select()
+          .from(usersTable)
+          .where(eq(usersTable.email, user.email!))
+          .limit(1);
+        
+        // The theme_preference column might not exist yet, so use optional chaining
+        // to avoid errors if the property doesn't exist
+        if (userRecord.length > 0 && userRecord[0]?.theme_preference) {
+          theme = userRecord[0].theme_preference as 'light' | 'dark';
+        }
+      } catch (dbError) {
+        // Continue with default theme
+        console.error("Database error fetching theme preference:", dbError);
+      }
+    }
+  } catch (error) {
+    // Continue with default theme
+    console.error("Authentication error:", error);
+  }
+
   return (
     <html lang="en">
       <head>
@@ -192,11 +230,13 @@ export default function RootLayout({
       </head>
       
       <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>
-        <ThemeProviderServer>
-          <ServiceWorkerRegistry />
-          {children}
-          <Toaster position="bottom-right" closeButton richColors />
-        </ThemeProviderServer>
+        <ThemeProvider initialTheme={theme}>
+          <CrispWrapper>
+            <ServiceWorkerRegistry />
+            {children}
+            <Toaster position="bottom-right" closeButton richColors />
+          </CrispWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

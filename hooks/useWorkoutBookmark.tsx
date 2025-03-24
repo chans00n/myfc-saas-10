@@ -30,16 +30,45 @@ const BookmarkContext = createContext<BookmarkContextType>({
   toggleBookmark: async () => false,
 });
 
+// Add a debounce function to prevent multiple rapid API calls
+const debounce = <F extends (...args: any[]) => any>(
+  func: F,
+  waitFor: number
+) => {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+    return new Promise(resolve => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(() => {
+        resolve(func(...args));
+        timeout = null;
+      }, waitFor);
+    });
+  };
+};
+
 // Provider component
 export function BookmarkProvider({ children }: { children: ReactNode }) {
   const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState<WorkoutId[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
 
   // Fetch all bookmarks once on mount
-  const fetchAllBookmarks = async () => {
+  const fetchAllBookmarks = async (): Promise<void> => {
+    // If we've fetched within the last 2 seconds, skip this fetch
+    const now = Date.now();
+    if (now - lastFetchTime < 2000) {
+      return;
+    }
+    
     try {
-      console.log('[BOOKMARK] Starting to fetch all bookmarks');
       setIsLoading(true);
+      setLastFetchTime(now);
+      
       const timestamp = Date.now(); // Add cache-busting parameter
       const response = await fetch(`/api/bookmarks/all?_t=${timestamp}`, {
         headers: {
@@ -50,63 +79,38 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[BOOKMARK] Failed to fetch bookmarks: Status ${response.status}`, errorText);
+        console.error(`Failed to fetch bookmarks: Status ${response.status}`, errorText);
         return;
       }
       
       const data = await response.json();
-      console.log('[BOOKMARK] Received bookmark data:', data);
       setBookmarkedWorkouts(data.bookmarkedWorkoutIds || []);
-      console.log('[BOOKMARK] Updated bookmarkedWorkouts state:', data.bookmarkedWorkoutIds || []);
     } catch (error) {
-      console.error('[BOOKMARK] Error fetching bookmarks:', error);
+      console.error('Error fetching bookmarks:', error);
     } finally {
       setIsLoading(false);
-      console.log('[BOOKMARK] Finished loading bookmarks');
     }
   };
 
-  // Initialize on mount
+  // Initialize on mount - only once
   useEffect(() => {
-    console.log('[BOOKMARK] Provider mounted, fetching bookmarks');
     fetchAllBookmarks();
+    // No dependencies means this only runs once on mount
   }, []);
 
   // Check if a workout is bookmarked
-  const isBookmarked = (workoutId: WorkoutId): boolean => {
+  const isBookmarked = useCallback((workoutId: WorkoutId): boolean => {
     // Normalize the target workout ID
     const workoutIdStr = String(workoutId).trim();
     
-    // Additional debugging
-    console.log(`[BOOKMARK] isBookmarked check for: "${workoutIdStr}" (${typeof workoutId})`);
-    console.log(`[BOOKMARK] Current bookmarks array length: ${bookmarkedWorkouts.length}`);
-    
-    // For debugging, log each bookmark and comparison result
-    if (bookmarkedWorkouts.length > 0) {
-      console.log(`[BOOKMARK] Detailed comparison for ${workoutIdStr}:`);
-      bookmarkedWorkouts.forEach((id, index) => {
-        const idStr = String(id).trim();
-        const matches = idStr === workoutIdStr;
-        console.log(`[BOOKMARK] - Compare [${index}]: "${idStr}" === "${workoutIdStr}" => ${matches}`);
-      });
-    }
-    
     // Check if any bookmark matches the ID
-    const result = bookmarkedWorkouts.some(id => {
-      const idStr = String(id).trim();
-      return idStr === workoutIdStr;
-    });
-    
-    console.log(`[BOOKMARK] Final isBookmarked result for ${workoutIdStr}: ${result}`);
-    return result;
-  };
+    return bookmarkedWorkouts.some(id => String(id).trim() === workoutIdStr);
+  }, [bookmarkedWorkouts]);
 
-  // Toggle bookmark status
-  const toggleBookmark = async (workoutId: WorkoutId): Promise<boolean> => {
-    console.log(`[BOOKMARK] Toggling bookmark for workout ${workoutId}`);
+  // Toggle bookmark status with explicit typing
+  const toggleBookmarkImpl = async (workoutId: WorkoutId): Promise<boolean> => {
     try {
-      const timestamp = Date.now(); // Add cache-busting parameter
-      console.log(`[BOOKMARK] Sending POST request to /api/bookmarks for workout ${workoutId}`);
+      const timestamp = Date.now();
       const response = await fetch('/api/bookmarks', {
         method: 'POST',
         headers: {
@@ -116,48 +120,50 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
         },
         body: JSON.stringify({ 
           workoutId: String(workoutId),
-          _t: timestamp // Add timestamp to prevent caching
+          _t: timestamp
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[BOOKMARK] Failed to toggle bookmark: Status ${response.status}`, errorText);
+        console.error(`Failed to toggle bookmark: Status ${response.status}`, errorText);
         throw new Error(`Failed to toggle bookmark: ${response.status} ${errorText}`);
       }
 
       const data = await response.json();
-      console.log(`[BOOKMARK] Toggle response:`, data);
       
       // Update local state based on the response
       if (data.isBookmarked) {
-        console.log(`[BOOKMARK] Adding workout ${workoutId} to bookmarks`);
         setBookmarkedWorkouts(prev => {
           const newState = [...prev, workoutId];
-          console.log('[BOOKMARK] New bookmarked workouts state:', newState);
           return newState;
         });
       } else {
-        console.log(`[BOOKMARK] Removing workout ${workoutId} from bookmarks`);
         setBookmarkedWorkouts(prev => {
           const newState = prev.filter(id => String(id) !== String(workoutId));
-          console.log('[BOOKMARK] New bookmarked workouts state:', newState);
           return newState;
         });
       }
 
       return data.isBookmarked;
     } catch (error) {
-      console.error('[BOOKMARK] Error toggling bookmark:', error);
+      console.error('Error toggling bookmark:', error);
       return isBookmarked(workoutId); // Return current state if there's an error
     }
   };
+  
+  // Create a properly typed wrapper for toggleBookmark
+  const toggleBookmark = useCallback(async (workoutId: WorkoutId): Promise<boolean> => {
+    // Apply debounce but correctly handle the Promise<boolean> return type
+    const debouncedToggle = debounce(toggleBookmarkImpl, 300);
+    return await debouncedToggle(workoutId);
+  }, [isBookmarked]);
 
-  // Refresh all bookmarks
-  const refreshBookmarks = async () => {
-    console.log('[BOOKMARK] Manually refreshing all bookmarks');
-    await fetchAllBookmarks();
-  };
+  // Refresh all bookmarks - with proper Promise<void> return type
+  const refreshBookmarks = useCallback(async (): Promise<void> => {
+    const debouncedRefresh = debounce(fetchAllBookmarks, 300);
+    await debouncedRefresh();
+  }, []);
 
   // Memoize context value to prevent unnecessary rerenders
   const contextValue = useMemo(() => ({
@@ -166,7 +172,7 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
     refreshBookmarks,
     isBookmarked,
     toggleBookmark,
-  }), [bookmarkedWorkouts, isLoading]);
+  }), [bookmarkedWorkouts, isLoading, refreshBookmarks, isBookmarked, toggleBookmark]);
 
   return (
     <BookmarkContext.Provider value={contextValue}>
@@ -188,18 +194,21 @@ export function useWorkoutBookmark(workoutId?: WorkoutId) {
   // Get the current state from context
   const { bookmarkedWorkouts, isLoading: contextLoading, isBookmarked, toggleBookmark: contextToggle } = context;
 
-  // Check if this specific workout is bookmarked - runs when workoutId or bookmarkedWorkouts changes
+  // Check if this specific workout is bookmarked - memoized to reduce unnecessary updates
   useEffect(() => {
     if (workoutId !== undefined) {
-      console.log(`[BOOKMARK] Hook for workout ${workoutId} initialized. Is bookmarked:`, isBookmarked(workoutId));
-      setBookmarked(isBookmarked(workoutId));
+      const newState = isBookmarked(workoutId);
+      // Only update state if it actually changed
+      if (newState !== bookmarked) {
+        setBookmarked(newState);
+      }
     }
-  }, [workoutId, bookmarkedWorkouts]); // Depend on bookmarkedWorkouts to update when they change
+  }, [workoutId, bookmarkedWorkouts, isBookmarked, bookmarked]);
 
   // Wrapper for toggle function that sets local loading state
   const toggleBookmark = useCallback(async () => {
     if (workoutId === undefined) {
-      console.warn('[BOOKMARK] Cannot toggle bookmark: workoutId is undefined');
+      console.warn('Cannot toggle bookmark: workoutId is undefined');
       return false;
     }
     
@@ -209,7 +218,7 @@ export function useWorkoutBookmark(workoutId?: WorkoutId) {
       setBookmarked(result);
       return result;
     } catch (error) {
-      console.error('[BOOKMARK] Error in toggleBookmark:', error);
+      console.error('Error in toggleBookmark:', error);
       return bookmarked; // Return current state if error
     } finally {
       setLoading(false);

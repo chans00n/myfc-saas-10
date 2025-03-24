@@ -17,34 +17,21 @@ export default function CardBookmarkButton({
   size = 'md',
   lightMode = false
 }: CardBookmarkButtonProps) {
-  console.log(`[BOOKMARK_BUTTON] Rendering CardBookmarkButton for workout ${workoutId}, type: ${typeof workoutId}`);
-  
   // Use the original workoutId without trying to convert it
   const { isBookmarked, isLoading, toggleBookmark } = useWorkoutBookmark(workoutId);
-  
-  useEffect(() => {
-    console.log(`[BOOKMARK_BUTTON] Effect: workout ${workoutId} isBookmarked=${isBookmarked}, isLoading=${isLoading}`);
-  }, [workoutId, isBookmarked, isLoading]);
 
   const handleToggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Add more explicit debugging
-    console.log(`[BOOKMARK_BUTTON] Button clicked for workout ${workoutId}, current status: ${isBookmarked}`);
-    console.log(`[BOOKMARK_BUTTON] Button state: isLoading=${isLoading}, disabled=${isLoading}`);
-    
     // Only proceed if not already loading
     if (isLoading) {
-      console.log(`[BOOKMARK_BUTTON] Ignoring click because button is in loading state`);
       return;
     }
     
     // Make the API call
-    toggleBookmark().then(newStatus => {
-      console.log(`[BOOKMARK_BUTTON] Toggle result for workout ${workoutId}: ${newStatus}`);
-    }).catch(err => {
-      console.error(`[BOOKMARK_BUTTON] Error toggling bookmark for workout ${workoutId}:`, err);
+    toggleBookmark().catch(err => {
+      console.error(`Error toggling bookmark for workout ${workoutId}:`, err);
     });
   };
 
