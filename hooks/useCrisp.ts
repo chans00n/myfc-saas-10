@@ -25,6 +25,9 @@ export const useCrisp = () => {
         window.$crisp.push(["on", "chat:closed", function() {
           // Hide the chat launcher when chat is closed
           window.$crisp.push(["do", "chat:hide"]);
+          
+          // Remove the custom close button when chat is closed
+          removeCustomCloseButton();
         }]);
 
         // Add event listener for when chat is opened
@@ -37,6 +40,16 @@ export const useCrisp = () => {
       console.error('Error hiding Crisp chat on load:', error);
     }
   }, []);
+
+  // Function to remove the custom close button
+  const removeCustomCloseButton = () => {
+    try {
+      const existingButton = document.getElementById('crisp-custom-close-btn');
+      if (existingButton) existingButton.remove();
+    } catch (error) {
+      console.error('Error removing custom close button:', error);
+    }
+  };
 
   // Function to add a custom close button to the Crisp chat
   const addCustomCloseButton = () => {
@@ -51,8 +64,7 @@ export const useCrisp = () => {
         if (!isStandalone) return;
         
         // Remove any existing custom close button first
-        const existingButton = document.getElementById('crisp-custom-close-btn');
-        if (existingButton) existingButton.remove();
+        removeCustomCloseButton();
         
         // Create a new button
         const closeButton = document.createElement('button');
@@ -72,8 +84,12 @@ export const useCrisp = () => {
         
         // Add click handler
         closeButton.addEventListener('click', () => {
+          // Close and hide the chat
           Crisp.chat.close();
           Crisp.chat.hide();
+          
+          // Remove the button itself after clicking
+          removeCustomCloseButton();
         });
         
         // Find the Crisp chat container and append the button
@@ -109,6 +125,9 @@ export const useCrisp = () => {
     try {
       if (typeof window === 'undefined') return;
       Crisp.chat.hide();
+      
+      // Make sure to remove the custom button when hiding chat
+      removeCustomCloseButton();
     } catch (error) {
       console.error('Error hiding Crisp chat:', error);
     }
