@@ -26,7 +26,7 @@ export default async function WorkoutComplete({ params }: { params: { id: string
   }
 
   // Complete the workout (we're using the workout duration as the time taken for simplicity)
-  await completeWorkout(data.user.id, params.id, workout.duration_minutes);
+  await completeWorkout(data.user.id, workout.id, workout.duration_minutes);
   
   // Get updated streak
   const userStreak = await getUserStreak(data.user.id);

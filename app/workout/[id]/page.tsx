@@ -134,67 +134,91 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
             <p className="text-neutral-600 dark:text-neutral-400 mb-4">
               This workout includes the following movements. Tap on any movement to view more details.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="space-y-3">
               {movements.map((item) => (
                 <Link 
                   key={item.id} 
-                  href={`/dashboard/movements/${item.movements?.id}`} 
-                  className="bg-gray-50 dark:bg-neutral-800 rounded-lg overflow-hidden border border-gray-200 dark:border-neutral-700 hover:shadow-md transition-shadow"
+                  href={`/dashboard/movements/${item.movements?.id}`}
+                  className="block bg-gray-50 dark:bg-neutral-800 rounded-lg overflow-hidden border border-gray-200 dark:border-neutral-700 hover:shadow-md transition-shadow"
                 >
-                  <div className="relative h-32 bg-gray-200 dark:bg-neutral-700">
-                    {item.movements?.thumbnail_url ? (
-                      <Image 
-                        src={item.movements.thumbnail_url}
-                        alt={item.movements.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2 bg-white dark:bg-neutral-900 rounded-full px-2 py-1 text-xs font-medium">
-                      #{item.sequence_order}
+                  <div className="flex items-center p-3">
+                    {/* Sequence number badge */}
+                    <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-full flex items-center justify-center mr-3 font-medium">
+                      {item.sequence_order}
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-medium text-neutral-800 dark:text-neutral-100">{item.movements?.name}</h3>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 line-clamp-2">{item.movements?.description}</p>
                     
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {item.duration_seconds && (
-                        <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-medium px-2 py-1 rounded">
-                          {item.duration_seconds}s
-                        </span>
-                      )}
-                      {item.repetitions && (
-                        <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-medium px-2 py-1 rounded">
-                          {item.repetitions} reps
-                        </span>
-                      )}
-                      {item.sets && (
-                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded">
-                          {item.sets} sets
-                        </span>
-                      )}
-                      {item.movements?.focus_areas && (
-                        <span className="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-medium px-2 py-1 rounded">
-                          {item.movements.focus_areas.name}
-                        </span>
+                    {/* Thumbnail */}
+                    <div className="relative h-16 w-24 bg-gray-200 dark:bg-neutral-700 rounded-md mr-4 flex-shrink-0 overflow-hidden">
+                      {item.movements?.thumbnail_url ? (
+                        <Image 
+                          src={item.movements.thumbnail_url}
+                          alt={item.movements.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
                       )}
                     </div>
-                  </div>
-                  <div className="px-4 py-2 border-t border-gray-200 dark:border-neutral-700 flex justify-end">
-                    <span className="text-indigo-600 dark:text-indigo-400 text-sm font-medium flex items-center">
-                      View Details
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    
+                    {/* Content */}
+                    <div className="flex-grow">
+                      <h3 className="font-medium text-neutral-800 dark:text-neutral-100">{item.movements?.name}</h3>
+                      {item.movements?.description && (
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-1 mt-0.5">
+                          {item.movements.description}
+                        </p>
+                      )}
+                      
+                      {/* Stats */}
+                      <div className="flex flex-wrap gap-2 mt-1.5">
+                        {item.duration_seconds && (
+                          <span className="bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-2 py-0.5 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {item.duration_seconds}s
+                          </span>
+                        )}
+                        {item.repetitions && (
+                          <span className="bg-purple-50 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs font-medium px-2 py-0.5 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            {item.repetitions} reps
+                          </span>
+                        )}
+                        {item.sets && (
+                          <span className="bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-medium px-2 py-0.5 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            {item.sets} sets
+                          </span>
+                        )}
+                        {item.movements?.focus_areas && (
+                          <span className="bg-emerald-50 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-medium px-2 py-0.5 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                            {item.movements.focus_areas.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Arrow */}
+                    <div className="ml-2 flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </span>
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -202,30 +226,47 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
           </section>
         )}
         
-        {/* Workout details section */}
+        {/* Focus Areas Tag Cloud - replacing the Workout Details section */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-4 text-neutral-800 dark:text-neutral-100">Workout Details</h2>
-          {exercises.length > 0 ? (
-            <div className="space-y-4">
-              {exercises.map((exercise: any, index: number) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="font-medium text-lg">{index + 1}. {exercise.name}</h3>
-                  <p className="text-gray-600 text-sm mt-1">{exercise.description}</p>
-                  <div className="flex justify-between mt-2 text-sm">
-                    <span className="text-indigo-600">{exercise.reps || '-'} reps</span>
-                    <span className="text-indigo-600">{exercise.duration || '-'} seconds each</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <h2 className="text-2xl font-bold mb-4 text-neutral-800 dark:text-neutral-100">Focus Areas</h2>
+          
+          {movements.length > 0 ? (
+            <>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+                This workout targets the following facial muscle groups:
+              </p>
+              
+              <div className="flex flex-wrap gap-2">
+                {/* Extract unique focus areas from movements */}
+                {Array.from(new Set(movements
+                  .filter(item => item.movements?.focus_areas)
+                  .map(item => item.movements.focus_areas)
+                  .filter(Boolean) // Remove null/undefined entries
+                  .map(focusArea => ({
+                    id: focusArea.id,
+                    name: focusArea.name
+                  }))))
+                  .map(focusArea => (
+                    <span 
+                      key={focusArea.id}
+                      className="inline-flex items-center rounded-full px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-sm font-medium"
+                    >
+                      {focusArea.name}
+                    </span>
+                  ))
+                }
+              </div>
+            </>
           ) : (
-            <p className="text-neutral-600 dark:text-neutral-400">Follow along with the video for detailed instructions.</p>
+            <p className="text-neutral-600 dark:text-neutral-400">
+              Focus area information is not available for this workout.
+            </p>
           )}
         </section>
         
         {/* Coach section */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-4 text-neutral-800 dark:text-neutral-100">About Coach Zionna</h2>
+          <h2 className="text-2xl font-bold mb-4 text-neutral-800 dark:text-neutral-100">Notes from Coach Zionna</h2>
           <div className="flex items-center">
             <div className="mr-4 w-16 h-16 rounded-full overflow-hidden bg-gray-200 relative flex-shrink-0">
               <CoachImage 
@@ -235,7 +276,15 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
               />
             </div>
             <div>
-              <p className="text-neutral-600 dark:text-neutral-400 text-sm">Expert in facial fitness with 5+ years of coaching experience. Specializes in effective, targeted workouts for facial muscle toning.</p>
+              {workout.coach_note ? (
+                <blockquote className="border-l-2 pl-6 italic">
+                  <span className="text-xl text-neutral-400 leading-none mr-1">"</span>
+                  {workout.coach_note}
+                  <span className="text-xl text-neutral-400 leading-none ml-1">"</span>
+                </blockquote>
+              ) : (
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm italic">No special notes from the coach for this workout.</p>
+              )}
             </div>
           </div>
         </section>
@@ -267,26 +316,18 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
       </div>
       
       {/* Fixed bottom buttons */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-white px-6 py-4 border-t border-gray-200 flex space-x-4">
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-neutral-800 dark:border-neutral-700 px-6 py-4 border-t border-gray-200 flex space-x-4">
         <Link href={`/workout/${workout.id}/start`} className="flex-1">
           <button className="w-full bg-neutral-600 hover:bg-neutral-700 text-white font-medium py-3 rounded-lg transition duration-300">
             Start Workout
           </button>
         </Link>
         
-        <form action={async () => {
-          'use server'
-          try {
-            await completeWorkout(data.user.id, workout!.id, workout!.duration_minutes);
-            redirect('/dashboard');
-          } catch (err) {
-            console.error('Error completing workout:', err);
-          }
-        }} className="flex-1">
-          <button type="submit" className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition duration-300">
+        <Link href={`/workout/${workout.id}/complete`} className="flex-1">
+          <button className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 font-medium py-3 rounded-lg transition duration-300">
             Mark as Completed
           </button>
-        </form>
+        </Link>
       </div>
     </div>
   );
