@@ -5,7 +5,6 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 import Image from 'next/image';
 
 export default function AdminLayout({
@@ -15,7 +14,6 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { theme } = useTheme();
 
   // Handle window resize to determine mobile view
   useEffect(() => {
@@ -27,8 +25,8 @@ export default function AdminLayout({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Determine which logo to show based on theme
-  const logoSrc = theme === 'dark' ? '/myfc-logo-dark.png' : '/myfc-logo.png';
+  // Use the 80.png icon for both light and dark mode
+  const logoSrc = '/icons/80.png';
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-neutral-100 dark:bg-neutral-950 relative">
@@ -68,8 +66,8 @@ export default function AdminLayout({
           <Image 
             src={logoSrc} 
             alt="MYFC Logo" 
-            width={100} 
-            height={30} 
+            width={80} 
+            height={80} 
             className="h-7 w-auto"
           />
         </div>

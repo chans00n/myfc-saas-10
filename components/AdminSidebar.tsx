@@ -7,7 +7,6 @@ import { Bell, Settings, Users, Database, Bug, ExternalLink, PanelLeftClose, Pan
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface AdminSidebarProps {
   onClose?: () => void;
@@ -17,7 +16,6 @@ interface AdminSidebarProps {
 export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const { theme } = useTheme();
   
   // Update collapsed state when defaultCollapsed changes
   useEffect(() => {
@@ -64,8 +62,8 @@ export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarP
     },
   ];
 
-  // Determine which logo to show based on theme
-  const logoSrc = theme === 'dark' ? '/myfc-logo-dark.png' : '/myfc-logo.png';
+  // Use the 80.png icon for both light and dark mode
+  const logoSrc = '/icons/80.png';
 
   return (
     <div 
@@ -81,8 +79,8 @@ export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarP
             <Image 
               src={logoSrc} 
               alt="MYFC Logo" 
-              width={120} 
-              height={40} 
+              width={80} 
+              height={80} 
               className="h-8 w-auto" 
             />
           </div>
