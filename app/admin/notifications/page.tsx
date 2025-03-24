@@ -83,7 +83,7 @@ export default function NotificationsTestPage() {
   return (
     <div className="container py-10 space-y-8">
       <h1 className="text-3xl font-bold">Notification Testing</h1>
-      <p className="text-muted-foreground">
+      <p className="text-neutral-500 dark:text-neutral-400">
         Use this page to test the notification system. You can send new workout notifications 
         and workout reminders to users who have opted in.
       </p>

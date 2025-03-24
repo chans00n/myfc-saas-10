@@ -1,10 +1,30 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
-import { eq } from 'drizzle-orm';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
+    // Create supabase client
+    const supabase = createClient();
+    
+    // Get session
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Check if user is authenticated
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // TODO: Add actual admin role check here based on your auth system
+    // For now, we'll use domain check for @myfc.app emails
+    const isAdmin = session.user.email?.endsWith('@myfc.app') || session.user.email === 'admin@example.com';
+    
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    
+    // Fetch users from the database
     const allUsers = await db.select().from(usersTable);
     
     return NextResponse.json({
@@ -12,12 +32,13 @@ export async function GET() {
         id: user.id,
         email: user.email,
         name: user.name,
+        plan: user.plan,
+        plan_name: user.plan_name,
+        stripe_id: user.stripe_id,
+        avatar_url: user.avatar_url,
+        theme_preference: user.theme_preference,
         push_notifications_enabled: user.push_notifications_enabled === true || user.push_notifications_enabled === 1,
         email_notifications_enabled: user.email_notifications_enabled === true || user.email_notifications_enabled === 1,
-        new_workout_notifications: user.new_workout_notifications === true || user.new_workout_notifications === 1,
-        workout_reminder_enabled: user.workout_reminder_enabled === true || user.workout_reminder_enabled === 1,
-        new_workout_notification_time: user.new_workout_notification_time,
-        workout_reminder_time: user.workout_reminder_time,
       }))
     });
   } catch (error) {
