@@ -111,12 +111,18 @@ function correctIconUrl(url) {
 // Helper function to determine caching strategy by URL
 function getCacheStrategy(url) {
   try {
-    // Convert relative URLs to absolute using scope
-    const parsedUrl = new URL(url, SCOPE);
+    // Ensure we're working with a URL object
+    const parsedUrl = typeof url === 'string' ? new URL(url, SCOPE) : url;
+    // If the URL is an object but not a proper URL instance, try to create one
+    if (!(parsedUrl instanceof URL)) {
+      const urlString = parsedUrl.toString ? parsedUrl.toString() : String(parsedUrl);
+      parsedUrl = new URL(urlString, SCOPE);
+    }
+    
     const { pathname } = parsedUrl;
     
     // Special handling for diagnostic page
-    if (pathname.endsWith('/pwa-status.html')) {
+    if (pathname && pathname.endsWith('/pwa-status.html')) {
       return {
         strategy: 'network-first',
         cache: DYNAMIC_CACHE
@@ -125,8 +131,9 @@ function getCacheStrategy(url) {
     
     // Skip bookmark API calls - always use network
     if (
+      pathname && (
       pathname.includes('/api/bookmarks') || 
-      pathname.includes('/api/bookmarks/all')
+      pathname.includes('/api/bookmarks/all'))
     ) {
       return {
         strategy: 'network-only',
@@ -135,7 +142,7 @@ function getCacheStrategy(url) {
     }
     
     // API responses - stale-while-revalidate with short TTL
-    if (pathname.includes('/api/')) {
+    if (pathname && pathname.includes('/api/')) {
       return {
         strategy: 'stale-while-revalidate',
         cache: API_CACHE,
@@ -145,9 +152,10 @@ function getCacheStrategy(url) {
     
     // Images - cache-first with longer TTL
     if (
+      pathname && (
       pathname.match(/\.(jpg|jpeg|png|gif|svg|webp|avif)$/) ||
       pathname.includes('/icons/') ||
-      pathname.startsWith('/apple-touch-icon')
+      pathname.startsWith('/apple-touch-icon'))
     ) {
       return {
         strategy: 'cache-first',
@@ -158,8 +166,9 @@ function getCacheStrategy(url) {
     
     // Static assets - cache-first
     if (
+      pathname && (
       pathname.match(/\.(js|css|woff|woff2|ttf|eot)$/) ||
-      pathname.includes('/_next/static/')
+      pathname.includes('/_next/static/'))
     ) {
       return {
         strategy: 'cache-first',
@@ -415,4 +424,79 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'ONLINE_STATUS') {
     console.log('[SW] Online status changed to:', event.data.status);
   }
+});
+
+// Push event handler
+self.addEventListener('push', (event) => {
+  console.log('[Service Worker] Push received');
+  
+  let notificationData = {};
+  
+  try {
+    if (event.data) {
+      try {
+        notificationData = event.data.json();
+        console.log('[Service Worker] Push notification data:', notificationData);
+      } catch (e) {
+        console.error('[Service Worker] Error parsing push data as JSON:', e);
+        notificationData = {
+          title: 'New Notification',
+          body: event.data ? event.data.text() : 'No payload',
+          icon: '/icons/192.png'
+        };
+      }
+    } else {
+      console.warn('[Service Worker] Push event received without data');
+      notificationData = {
+        title: 'New Notification',
+        body: 'No content available',
+        icon: '/icons/192.png'
+      };
+    }
+    
+    const title = notificationData.title || 'New Notification';
+    const options = {
+      body: notificationData.body || '',
+      icon: notificationData.icon || '/icons/192.png',
+      badge: '/icons/120.png',
+      data: notificationData.data || {},
+      tag: notificationData.tag || 'default'
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(title, options)
+        .then(() => {
+          console.log('[Service Worker] Notification shown successfully');
+        })
+        .catch(err => {
+          console.error('[Service Worker] Error showing notification:', err);
+        })
+    );
+  } catch (err) {
+    console.error('[Service Worker] Error handling push event:', err);
+  }
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  console.log('[Service Worker] Notification click received');
+  
+  event.notification.close();
+  
+  // Navigate to appropriate URL based on notification data
+  const urlToOpen = event.notification.data?.url || '/dashboard';
+  
+  event.waitUntil(
+    clients.matchAll({type: 'window'}).then(windowClients => {
+      // Check if there is already a window open
+      const matchingClient = windowClients.find(client => 
+        client.url.includes(urlToOpen) && 'focus' in client);
+        
+      if (matchingClient) {
+        return matchingClient.focus();
+      } else {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
 }); 

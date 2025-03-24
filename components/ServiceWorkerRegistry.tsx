@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 
-// Temporary flag to completely disable service worker while fixing issues
-const DISABLE_SERVICE_WORKER = true;
+// Enable service worker for push notifications
+const DISABLE_SERVICE_WORKER = false;
 
 export function ServiceWorkerRegistry() {
   useEffect(() => {
@@ -30,10 +30,8 @@ export function ServiceWorkerRegistry() {
           // Check if we're on the members.myfc.app subdomain
           const hostname = window.location.hostname;
           const isMembersSubdomain = hostname === 'members.myfc.app';
-          const pathname = window.location.pathname;
-          const isInSubfolder = pathname.startsWith('/dashboard/') || pathname === '/dashboard';
           
-          console.log(`[PWA] Running on ${hostname}, subdomain: ${isMembersSubdomain ? 'members.myfc.app' : 'no'}, path: ${pathname}`);
+          console.log(`[PWA] Running on ${hostname}, subdomain: ${isMembersSubdomain ? 'members.myfc.app' : 'no'}`);
           
           // Choose appropriate service worker path and scope
           // Always use absolute paths for service workers to avoid 404s in subfolders

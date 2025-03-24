@@ -145,7 +145,6 @@ export default async function Dashboard() {
             
             {/* Popular Workouts Carousel */}
             <div className="mb-8">
-                <h2 className="text-xl font-bold mb-4">Recommended For You</h2>
                 {popularWorkouts.length > 0 ? (
                     <WorkoutCarousel 
                         workouts={popularWorkouts} 

@@ -7,6 +7,8 @@ import { redirect, useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BillingSection } from '@/components/BillingSection';
+import { PushNotificationSettings } from '@/components/PushNotificationSettings';
+import { NotificationTester } from '@/components/NotificationTester';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -315,6 +317,11 @@ export default function ProfilePage() {
                 <label className="ml-2 block text-sm text-neutral-700 dark:text-neutral-300" htmlFor="reminderNotifications">
                   Daily reminder notifications
                 </label>
+              </div>
+              
+              <div className="mt-6 border-t border-neutral-200 dark:border-neutral-700 pt-5">
+                <PushNotificationSettings />
+                <NotificationTester />
               </div>
             </div>
           </div>

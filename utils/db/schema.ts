@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, time } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
     id: text('id').primaryKey(),
@@ -9,6 +9,12 @@ export const usersTable = pgTable('users_table', {
     stripe_id: text('stripe_id').notNull(),
     avatar_url: text('avatar_url'),
     theme_preference: text('theme_preference').default('light'),
+    push_notifications_enabled: integer('push_notifications_enabled').default(0),
+    email_notifications_enabled: integer('email_notifications_enabled').default(1),
+    new_workout_notifications: integer('new_workout_notifications').default(1),
+    new_workout_notification_time: text('new_workout_notification_time').default('08:00'),
+    workout_reminder_enabled: integer('workout_reminder_enabled').default(0),
+    workout_reminder_time: text('workout_reminder_time').default('17:00'),
 });
 
 export const facialProgressPhotosTable = pgTable('facial_progress_photos', {
@@ -22,7 +28,19 @@ export const facialProgressPhotosTable = pgTable('facial_progress_photos', {
     metadata: text('metadata'), // JSON string with additional metadata
 });
 
+export const pushSubscriptionsTable = pgTable('push_subscriptions', {
+    id: text('id').primaryKey(),
+    user_id: text('user_id').notNull().references(() => usersTable.id),
+    endpoint: text('endpoint').notNull(),
+    p256dh: text('p256dh').notNull(),
+    auth: text('auth').notNull(),
+    created_at: timestamp('created_at').defaultNow(),
+    updated_at: timestamp('updated_at').defaultNow(),
+});
+
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUser = typeof usersTable.$inferSelect;
 export type InsertFacialProgressPhoto = typeof facialProgressPhotosTable.$inferInsert;
 export type SelectFacialProgressPhoto = typeof facialProgressPhotosTable.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptionsTable.$inferInsert;
+export type SelectPushSubscription = typeof pushSubscriptionsTable.$inferSelect;
