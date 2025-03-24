@@ -94,6 +94,20 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Add this detection before the existing cache strategy function
+function correctIconUrl(url) {
+  // Check if the URL is an external URL to myfc.app
+  if (url.includes('members.myfc.app') && (url.includes('/icons/') || url.includes('/screenshots/'))) {
+    // Extract the path part (after the domain)
+    const pathMatch = url.match(/https:\/\/members\.myfc\.app(\/.*)/);
+    if (pathMatch && pathMatch[1]) {
+      // Convert to a relative path
+      return pathMatch[1];
+    }
+  }
+  return url;
+}
+
 // Helper function to determine caching strategy by URL
 function getCacheStrategy(url) {
   try {
@@ -200,14 +214,26 @@ async function cacheWithTimestamp(cache, request, response, cloneResponse = true
   return response;
 }
 
-// Fetch event with appropriate caching strategies
+// Fetch event - intercept network requests
 self.addEventListener('fetch', (event) => {
-  // Ignore non-GET requests
+  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
   
+  // Get the URL from the request
+  const url = event.request.url;
+  
+  // Correct any icon URLs that might be using absolute paths
+  const correctedUrl = correctIconUrl(url);
+  
+  // If URL was corrected, create a new request with the corrected URL
+  const request = correctedUrl !== url 
+    ? new Request(correctedUrl, event.request) 
+    : event.request;
+  
+  // Choose caching strategy based on the request URL
+  const { strategy, cache, expiration } = getCacheStrategy(request.url);
+  
   try {
-    const url = new URL(event.request.url);
-    
     // Handle diagnostic page specially
     if (url.pathname.endsWith('/pwa-status.html')) {
       event.respondWith(fetch(event.request));
@@ -228,9 +254,6 @@ self.addEventListener('fetch', (event) => {
       return; // Don't intercept, let browser handle natively
     }
     
-    // Get appropriate caching strategy
-    const { strategy, cache: cacheName, expiration } = getCacheStrategy(event.request.url);
-    
     // Skip handling if strategy is network-only
     if (strategy === 'network-only') {
       console.log('[SW] Using network-only for:', event.request.url);
@@ -243,7 +266,7 @@ self.addEventListener('fetch', (event) => {
     if (strategy === 'cache-first') {
       // Cache First for static assets and images
       event.respondWith(
-        caches.open(cacheName)
+        caches.open(cache)
           .then(cache => {
             return cache.match(event.request)
               .then(cachedResponse => {
@@ -279,7 +302,7 @@ self.addEventListener('fetch', (event) => {
     } else if (strategy === 'stale-while-revalidate') {
       // Stale-while-revalidate for API responses
       event.respondWith(
-        caches.open(cacheName)
+        caches.open(cache)
           .then(cache => {
             return cache.match(event.request)
               .then(cachedResponse => {
@@ -321,7 +344,7 @@ self.addEventListener('fetch', (event) => {
           .then(networkResponse => {
             console.log('[SW] Network-first success for:', event.request.url);
             // Also cache the successful response
-            caches.open(cacheName).then(cache => {
+            caches.open(cache).then(cache => {
               cacheWithTimestamp(cache, event.request, networkResponse.clone(), false);
             });
             return networkResponse;
