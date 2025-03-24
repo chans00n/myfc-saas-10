@@ -1,11 +1,13 @@
 "use client"
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Bell, Settings, Users, Database, Bug, ExternalLink, PanelLeftClose, PanelLeft, Dumbbell, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AdminSidebarProps {
   onClose?: () => void;
@@ -15,6 +17,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const { theme } = useTheme();
   
   // Update collapsed state when defaultCollapsed changes
   useEffect(() => {
@@ -61,6 +64,9 @@ export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarP
     },
   ];
 
+  // Determine which logo to show based on theme
+  const logoSrc = theme === 'dark' ? '/myfc-logo-dark.png' : '/myfc-logo.png';
+
   return (
     <div 
       className={cn(
@@ -70,7 +76,27 @@ export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarP
     >
       {/* Sidebar Header */}
       <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
-        {!collapsed && <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">MYFC Admin</h2>}
+        {!collapsed ? (
+          <div className="flex-shrink-0">
+            <Image 
+              src={logoSrc} 
+              alt="MYFC Logo" 
+              width={120} 
+              height={40} 
+              className="h-8 w-auto" 
+            />
+          </div>
+        ) : (
+          <div className="flex-shrink-0 mx-auto">
+            <Image 
+              src={logoSrc} 
+              alt="MYFC Logo" 
+              width={30} 
+              height={30} 
+              className="h-8 w-auto" 
+            />
+          </div>
+        )}
         
         <div className="flex items-center ml-auto">
           {/* Mobile close button */}
@@ -147,7 +173,7 @@ export function AdminSidebar({ onClose, defaultCollapsed = true }: AdminSidebarP
         </Button>
         {!collapsed && (
           <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            © {new Date().getFullYear()} MYFC Admin
+            © {new Date().getFullYear()} MYFC
           </p>
         )}
       </div>

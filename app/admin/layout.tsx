@@ -5,6 +5,8 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import Image from 'next/image';
 
 export default function AdminLayout({
   children,
@@ -13,6 +15,7 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { theme } = useTheme();
 
   // Handle window resize to determine mobile view
   useEffect(() => {
@@ -23,6 +26,9 @@ export default function AdminLayout({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Determine which logo to show based on theme
+  const logoSrc = theme === 'dark' ? '/myfc-logo-dark.png' : '/myfc-logo.png';
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-neutral-100 dark:bg-neutral-950 relative">
@@ -59,7 +65,13 @@ export default function AdminLayout({
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-semibold">MYFC Admin</h1>
+          <Image 
+            src={logoSrc} 
+            alt="MYFC Logo" 
+            width={100} 
+            height={30} 
+            className="h-7 w-auto"
+          />
         </div>
         
         <main className="flex-1 p-4 lg:p-6">{children}</main>
