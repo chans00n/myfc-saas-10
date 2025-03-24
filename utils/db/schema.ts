@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp, time } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, time, boolean } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
     id: text('id').primaryKey(),
@@ -9,11 +9,11 @@ export const usersTable = pgTable('users_table', {
     stripe_id: text('stripe_id').notNull(),
     avatar_url: text('avatar_url'),
     theme_preference: text('theme_preference').default('light'),
-    push_notifications_enabled: integer('push_notifications_enabled').default(0),
-    email_notifications_enabled: integer('email_notifications_enabled').default(1),
-    new_workout_notifications: integer('new_workout_notifications').default(1),
+    push_notifications_enabled: boolean('push_notifications_enabled').default(false),
+    email_notifications_enabled: boolean('email_notifications_enabled').default(true),
+    new_workout_notifications: boolean('new_workout_notifications').default(true),
     new_workout_notification_time: text('new_workout_notification_time').default('08:00'),
-    workout_reminder_enabled: integer('workout_reminder_enabled').default(0),
+    workout_reminder_enabled: boolean('workout_reminder_enabled').default(false),
     workout_reminder_time: text('workout_reminder_time').default('17:00'),
 });
 
