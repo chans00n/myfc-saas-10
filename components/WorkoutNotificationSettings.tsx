@@ -68,9 +68,9 @@ export function WorkoutNotificationSettings() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          new_workout_notifications: preferences.new_workout_notifications ? 1 : 0,
+          new_workout_notifications: preferences.new_workout_notifications,
           new_workout_notification_time: preferences.new_workout_notification_time,
-          workout_reminder_enabled: preferences.workout_reminder_enabled ? 1 : 0,
+          workout_reminder_enabled: preferences.workout_reminder_enabled,
           workout_reminder_time: preferences.workout_reminder_time,
         }),
       });

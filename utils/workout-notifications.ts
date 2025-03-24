@@ -23,8 +23,8 @@ export async function sendNewWorkoutNotifications(workout: {
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.push_notifications_enabled, 1),
-          eq(usersTable.new_workout_notifications, 1)
+          eq(usersTable.push_notifications_enabled, true),
+          eq(usersTable.new_workout_notifications, true)
         )
       );
     
@@ -97,8 +97,8 @@ export async function sendWorkoutReminders() {
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.push_notifications_enabled, 1),
-          eq(usersTable.workout_reminder_enabled, 1),
+          eq(usersTable.push_notifications_enabled, true),
+          eq(usersTable.workout_reminder_enabled, true),
           eq(usersTable.workout_reminder_time, currentHour)
         )
       );
