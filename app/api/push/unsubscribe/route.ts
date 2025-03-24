@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     if (count === 0) {
       await db
         .update(usersTable)
-        .set({ push_notifications_enabled: 0 })
+        .set({ push_notifications_enabled: false })
         .where(eq(usersTable.id, user.id));
     }
     

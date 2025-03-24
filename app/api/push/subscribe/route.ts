@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     // Update user preferences
     await db
       .update(usersTable)
-      .set({ push_notifications_enabled: 1 })
+      .set({ push_notifications_enabled: true })
       .where(eq(usersTable.id, user.id));
     
     return NextResponse.json(
