@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, SmartphoneIcon } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -63,7 +63,7 @@ export function PushNotificationSettings() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Push Notifications</h3>
+            <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Device Notification Permissions</h3>
             <p className="text-sm text-neutral-500 dark:text-neutral-400">{statusMessage}</p>
           </div>
           <Switch disabled checked={false} />
@@ -87,8 +87,8 @@ export function PushNotificationSettings() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Push Notifications</h3>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">Get notified about important updates</p>
+            <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Device Notification Permissions</h3>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">Enable browser notifications on this device</p>
           </div>
           <Button 
             onClick={handleRequestPermission}
@@ -100,6 +100,9 @@ export function PushNotificationSettings() {
             Enable
           </Button>
         </div>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          Note: After enabling device permissions, you still need to enable the specific notification types above.
+        </p>
       </div>
     );
   }
@@ -109,9 +112,9 @@ export function PushNotificationSettings() {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Push Notifications</h3>
+          <h3 className="font-medium text-neutral-800 dark:text-neutral-200">Device Notification Permissions</h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            {isSubscribed ? 'Receive notifications on this device' : 'Not receiving notifications on this device'}
+            {isSubscribed ? 'This device can receive notifications' : 'Not receiving notifications on this device'}
           </p>
         </div>
         <Switch 
@@ -119,6 +122,12 @@ export function PushNotificationSettings() {
           onCheckedChange={handleToggleSubscription} 
         />
       </div>
+      
+      {isSubscribed && (
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          Device permissions enabled. Make sure to also enable the specific notification types above.
+        </p>
+      )}
       
       {error && (
         <p className="text-sm text-red-500 mt-1">{error}</p>

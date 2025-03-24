@@ -8,7 +8,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BillingSection } from '@/components/BillingSection';
 import { PushNotificationSettings } from '@/components/PushNotificationSettings';
-import { NotificationTester } from '@/components/NotificationTester';
+import { WorkoutNotificationSettings } from '@/components/WorkoutNotificationSettings';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -293,35 +293,10 @@ export default function ProfilePage() {
             <h2 className="text-lg font-semibold mb-4 dark:text-neutral-100">Preferences</h2>
             
             <div className="space-y-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="emailNotifications"
-                  name="emailNotifications"
-                  defaultChecked
-                  className="h-4 w-4 text-neutral-800 border-neutral-300 dark:border-neutral-600 rounded focus:ring-neutral-800 dark:focus:ring-neutral-300"
-                />
-                <label className="ml-2 block text-sm text-neutral-700 dark:text-neutral-300" htmlFor="emailNotifications">
-                  Email notifications for new workouts
-                </label>
-              </div>
-              
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="reminderNotifications"
-                  name="reminderNotifications"
-                  defaultChecked
-                  className="h-4 w-4 text-neutral-800 border-neutral-300 dark:border-neutral-600 rounded focus:ring-neutral-800 dark:focus:ring-neutral-300"
-                />
-                <label className="ml-2 block text-sm text-neutral-700 dark:text-neutral-300" htmlFor="reminderNotifications">
-                  Daily reminder notifications
-                </label>
-              </div>
+              <WorkoutNotificationSettings />
               
               <div className="mt-6 border-t border-neutral-200 dark:border-neutral-700 pt-5">
                 <PushNotificationSettings />
-                <NotificationTester />
               </div>
             </div>
           </div>
