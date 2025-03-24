@@ -26,11 +26,66 @@ export const useCrisp = () => {
           // Hide the chat launcher when chat is closed
           window.$crisp.push(["do", "chat:hide"]);
         }]);
+
+        // Add event listener for when chat is opened
+        window.$crisp.push(["on", "chat:opened", function() {
+          addCustomCloseButton();
+        }]);
+
       }, 300); // Small delay to ensure Crisp is loaded
     } catch (error) {
       console.error('Error hiding Crisp chat on load:', error);
     }
   }, []);
+
+  // Function to add a custom close button to the Crisp chat
+  const addCustomCloseButton = () => {
+    try {
+      // Wait a bit for the chat interface to fully load
+      setTimeout(() => {
+        // Check if running in standalone mode (PWA)
+        const isStandalone = window.navigator.standalone === true || 
+          window.matchMedia('(display-mode: standalone)').matches;
+        
+        // Only add the button if in PWA mode
+        if (!isStandalone) return;
+        
+        // Remove any existing custom close button first
+        const existingButton = document.getElementById('crisp-custom-close-btn');
+        if (existingButton) existingButton.remove();
+        
+        // Create a new button
+        const closeButton = document.createElement('button');
+        closeButton.id = 'crisp-custom-close-btn';
+        closeButton.textContent = 'Close Chat';
+        closeButton.style.position = 'absolute';
+        closeButton.style.bottom = '10px';
+        closeButton.style.left = '50%';
+        closeButton.style.transform = 'translateX(-50%)';
+        closeButton.style.backgroundColor = '#4f46e5'; // Indigo color matching the theme
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '5px';
+        closeButton.style.padding = '8px 16px';
+        closeButton.style.fontWeight = 'bold';
+        closeButton.style.zIndex = '1000000'; // High z-index to ensure it's above other elements
+        
+        // Add click handler
+        closeButton.addEventListener('click', () => {
+          Crisp.chat.close();
+          Crisp.chat.hide();
+        });
+        
+        // Find the Crisp chat container and append the button
+        const crispContainer = document.querySelector('.crisp-client');
+        if (crispContainer) {
+          crispContainer.appendChild(closeButton);
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error adding custom close button to Crisp chat:', error);
+    }
+  };
 
   // Show the Crisp chat widget
   const show = useCallback(() => {
@@ -41,6 +96,9 @@ export const useCrisp = () => {
       
       Crisp.chat.show();
       Crisp.chat.open();
+      
+      // Add our custom close button when chat is shown
+      addCustomCloseButton();
     } catch (error) {
       console.error('Error showing Crisp chat:', error);
     }
@@ -62,6 +120,9 @@ export const useCrisp = () => {
       if (typeof window === 'undefined') return;
       Crisp.chat.show();
       Crisp.chat.setHelpdeskView();
+      
+      // Add our custom close button when help center is shown
+      addCustomCloseButton();
     } catch (error) {
       console.error('Error showing Crisp help center:', error);
     }
