@@ -141,11 +141,11 @@ export default function EditWorkoutPage() {
   }
   
   return (
-    <div className="container py-10" key={`workout-container-${refreshCounter}`}>
-      <div className="mb-8 flex justify-between">
-        <div>
-          <Button variant="ghost" size="sm" className="mb-2" asChild>
-            <Link href="/admin/workouts">
+    <div className="space-y-8" key={`workout-container-${refreshCounter}`}>
+      <div className="mb-8 flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between">
+        <div className="w-full md:w-auto">
+          <Button variant="ghost" size="sm" className="mb-2 w-full md:w-auto justify-start" asChild>
+            <Link href="/admin/workouts" className="flex items-center">
               <ChevronLeft className="mr-2 h-4 w-4" /> Back to Workouts
             </Link>
           </Button>
@@ -156,13 +156,13 @@ export default function EditWorkoutPage() {
             </p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={handleRefresh} 
             disabled={isRefreshing}
-            className="h-9"
+            className="h-9 w-full sm:w-auto"
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
@@ -171,7 +171,7 @@ export default function EditWorkoutPage() {
             variant="default" 
             size="sm" 
             onClick={handleHardRefresh}
-            className="h-9"
+            className="h-9 w-full sm:w-auto"
           >
             Force Reload
           </Button>
@@ -179,7 +179,7 @@ export default function EditWorkoutPage() {
             variant="destructive" 
             size="sm" 
             onClick={handleFullClearAndReload}
-            className="h-9"
+            className="h-9 w-full sm:w-auto"
           >
             <RotateCcw className="mr-2 h-4 w-4" />
             Clear Cache & Reload
