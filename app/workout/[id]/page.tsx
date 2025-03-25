@@ -238,23 +238,33 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
               
               <div className="flex flex-wrap gap-2">
                 {/* Extract unique focus areas from movements */}
-                {Array.from(new Set(movements
-                  .filter(item => item.movements?.focus_areas)
-                  .map(item => item.movements.focus_areas)
-                  .filter(Boolean) // Remove null/undefined entries
-                  .map(focusArea => ({
-                    id: focusArea.id,
-                    name: focusArea.name
-                  }))))
-                  .map(focusArea => (
+                {(() => {
+                  // Create a Map to store unique focus areas by ID
+                  const uniqueFocusAreasMap = new Map();
+                  
+                  // Populate the map with focus areas
+                  movements
+                    .filter(item => item.movements?.focus_areas)
+                    .forEach(item => {
+                      const focusArea = item.movements.focus_areas;
+                      if (focusArea && focusArea.id) {
+                        uniqueFocusAreasMap.set(focusArea.id, {
+                          id: focusArea.id,
+                          name: focusArea.name
+                        });
+                      }
+                    });
+                  
+                  // Convert the map values to an array
+                  return Array.from(uniqueFocusAreasMap.values()).map(focusArea => (
                     <span 
                       key={focusArea.id}
                       className="inline-flex items-center rounded-full px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-sm font-medium"
                     >
                       {focusArea.name}
                     </span>
-                  ))
-                }
+                  ));
+                })()}
               </div>
             </>
           ) : (
@@ -331,4 +341,4 @@ export default async function WorkoutDetailPage({ params }: { params: { id: stri
       </div>
     </div>
   );
-} 
+}
