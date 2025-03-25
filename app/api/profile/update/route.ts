@@ -19,30 +19,56 @@ export async function POST(request: Request) {
     // Parse the form data
     const formData = await request.formData();
     const name = formData.get('name') as string;
-    const phone = formData.get('phone') as string;
-    const emailNotifications = formData.get('emailNotifications') === 'on';
-    const reminderNotifications = formData.get('reminderNotifications') === 'on';
+    const gender = formData.get('gender') as string;
+    const birthday = formData.get('birthday') as string;
+    const location = formData.get('location') as string;
+    
+    // Validate the data
+    if (!name || name.trim() === '') {
+      return NextResponse.json(
+        { error: 'Name is required' },
+        { status: 400 }
+      );
+    }
+    
+    // Prepare the update data
+    const updateData: Record<string, any> = { name };
+    
+    // Only add fields if they have values
+    if (gender) updateData.gender = gender;
+    if (birthday) updateData.birthday = birthday;
+    if (location) updateData.location = location;
     
     // Update the user's record in the database
-    // Only update the name field for now since that's all we have in the schema
     await db
       .update(usersTable)
-      .set({ name })
+      .set(updateData)
       .where(eq(usersTable.email, user.email!));
     
-    // In a real app, you'd also store the other preferences in a separate table
-    // For example:
-    // await db
-    //   .update(userPreferencesTable)
-    //   .set({ 
-    //     phone,
-    //     email_notifications: emailNotifications, 
-    //     reminder_notifications: reminderNotifications
-    //   })
-    //   .where(eq(userPreferencesTable.user_id, user.id));
+    // Also update the name in Supabase Auth metadata
+    await supabase.auth.updateUser({
+      data: { name }
+    });
+    
+    // Clear any caches
+    try {
+      await fetch('/api/user/clear-cache', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (cacheError) {
+      console.error('Failed to clear cache:', cacheError);
+      // Continue anyway
+    }
     
     return NextResponse.json(
-      { success: true, message: 'Profile updated successfully' },
+      { 
+        success: true, 
+        message: 'Profile updated successfully',
+        data: { name, gender, birthday, location }
+      },
       { status: 200 }
     );
   } catch (error) {

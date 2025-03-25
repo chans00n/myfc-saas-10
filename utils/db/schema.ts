@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp, time, boolean } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, time, boolean, date } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users_table', {
     id: text('id').primaryKey(),
@@ -15,6 +15,9 @@ export const usersTable = pgTable('users_table', {
     new_workout_notification_time: text('new_workout_notification_time').default('08:00'),
     workout_reminder_enabled: boolean('workout_reminder_enabled').default(false),
     workout_reminder_time: text('workout_reminder_time').default('17:00'),
+    gender: text('gender'),
+    birthday: date('birthday'),
+    location: text('location'),
 });
 
 export const facialProgressPhotosTable = pgTable('facial_progress_photos', {

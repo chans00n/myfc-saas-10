@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FormEvent } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { SimpleAvatar } from "@/components/ui/simple-avatar";
 import { redirect, useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -9,12 +10,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { BillingSection } from '@/components/BillingSection';
 import { PushNotificationSettings } from '@/components/PushNotificationSettings';
 import { WorkoutNotificationSettings } from '@/components/WorkoutNotificationSettings';
-import Link from 'next/link';
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { theme } = useTheme();
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userData, setUserData] = useState<{
     id?: string;
@@ -24,6 +26,9 @@ export default function ProfilePage() {
     plan_name?: string;
     created_at?: string;
     avatar_url?: string;
+    gender?: string;
+    birthday?: string;
+    location?: string;
   }>({});
   
   // Only log in development
@@ -64,11 +69,14 @@ export default function ProfilePage() {
       setUserData({
         id: authUser.id,
         email: authUser.email,
-        name: authUser.metadata?.name || authUser.email?.split('@')[0] || 'User',
+        name: authUser.metadata?.name || profileData?.name || authUser.email?.split('@')[0] || 'User',
         plan: profileData?.plan || authUser.metadata?.plan || 'free',
         plan_name: profileData?.plan_name || 'Basic Plan',
         created_at: authUser.created_at,
         avatar_url: userAvatarUrl,
+        gender: profileData?.gender || '',
+        birthday: profileData?.birthday || '',
+        location: profileData?.location || '',
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -127,12 +135,13 @@ export default function ProfilePage() {
       
       if (result.error) {
         console.error("Upload error:", result.error);
-        alert("Failed to upload image: " + result.error);
+        toast.error("Failed to upload image: " + result.error);
         // Revert to the previous avatar URL if available
         setAvatarUrl(userData.avatar_url || null);
       } else {
         // Update the avatar URL with the one from Supabase
         setAvatarUrl(result.avatarUrl);
+        toast.success("Profile photo updated successfully");
         
         // Update user data with new avatar URL
         setUserData(prev => ({
@@ -161,9 +170,52 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      alert("An error occurred while uploading your avatar");
+      toast.error("An error occurred while uploading your avatar");
     } finally {
       setIsUploading(false);
+    }
+  };
+  
+  // Handle profile form submission
+  const handleProfileSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    try {
+      setIsSaving(true);
+      
+      const response = await fetch("/api/profile/update", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const result = await response.json();
+      
+      if (result.error) {
+        console.error("Update error:", result.error);
+        toast.error("Failed to update profile: " + result.error);
+      } else {
+        toast.success("Profile updated successfully");
+        
+        // Update local state with new values
+        setUserData(prev => ({
+          ...prev,
+          name: result.data.name,
+          gender: result.data.gender,
+          birthday: result.data.birthday,
+          location: result.data.location
+        }));
+        
+        // Refresh data
+        fetchUserData();
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("An error occurred while updating your profile");
+    } finally {
+      setIsSaving(false);
     }
   };
   
@@ -233,7 +285,7 @@ export default function ProfilePage() {
       
       <div className="max-w-md mx-auto px-6">
         {/* Personal Information Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 p-6 mb-8 -mt-12 z-10 relative">
+        <form onSubmit={handleProfileSubmit} className="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-100 dark:border-neutral-700 p-6 mb-8 -mt-12 z-10 relative">
           <h2 className="text-lg font-semibold mb-4 text-neutral-800 dark:text-neutral-100">Personal Information</h2>
           
           <div className="space-y-4">
@@ -247,6 +299,7 @@ export default function ProfilePage() {
                 name="name"
                 defaultValue={userData.name}
                 className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
+                required
               />
             </div>
             
@@ -264,6 +317,51 @@ export default function ProfilePage() {
               />
               <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Email cannot be changed</p>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1" htmlFor="gender">
+                Gender
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                defaultValue={userData.gender || ''}
+                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
+              >
+                <option value="">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1" htmlFor="birthday">
+                Birthday
+              </label>
+              <input
+                type="date"
+                id="birthday"
+                name="birthday"
+                defaultValue={userData.birthday || ''}
+                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1" htmlFor="location">
+                Location
+              </label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                defaultValue={userData.location || ''}
+                placeholder="City, Country"
+                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
+              />
+            </div>
             
             <div>
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
@@ -273,8 +371,33 @@ export default function ProfilePage() {
                 {userData.plan_name || 'Basic Plan'}
               </div>
             </div>
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="w-full inline-flex items-center justify-center px-4 py-2 bg-neutral-800 text-white dark:bg-neutral-700 dark:text-neutral-100 font-medium rounded-lg hover:bg-neutral-900 dark:hover:bg-neutral-600 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
         
         {/* Theme Settings */}
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 mb-8">
@@ -289,7 +412,7 @@ export default function ProfilePage() {
           </div>
         </div>
         
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        <div className="space-y-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700 p-6">
             <h2 className="text-lg font-semibold mb-4 dark:text-neutral-100">Preferences</h2>
             
@@ -305,18 +428,6 @@ export default function ProfilePage() {
           {/* Billing Management Section */}
           <BillingSection />
           
-          <div className="flex flex-col md:flex-row md:justify-end">
-            <button
-              type="submit"
-              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-neutral-800 text-white dark:bg-neutral-700 dark:text-neutral-100 font-medium rounded-lg hover:bg-neutral-900 dark:hover:bg-neutral-600 transition-colors duration-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-              </svg>
-              Save Changes
-            </button>
-          </div>
-          
           {/* Legal Links */}
           <div className="mt-8 pt-4 border-t border-neutral-200 dark:border-neutral-700">
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
@@ -331,7 +442,7 @@ export default function ProfilePage() {
               </Link>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </main>
   );
