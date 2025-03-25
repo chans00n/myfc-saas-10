@@ -38,11 +38,12 @@ export default function AdminLayout({
         />
       )}
       
-      {/* Sidebar - fixed position on mobile, regular on desktop */}
+      {/* Sidebar - fixed position on both mobile and desktop */}
       <div 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:relative lg:z-0 lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 transition-transform duration-300 h-full",
+          "lg:h-screen lg:sticky lg:top-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         <AdminSidebar 
@@ -52,7 +53,7 @@ export default function AdminLayout({
       </div>
       
       {/* Main content */}
-      <div className="flex-1 bg-white dark:bg-neutral-900 min-w-0">
+      <div className="flex-1 bg-white dark:bg-neutral-900 min-w-0 w-full">
         {/* Mobile header with menu button */}
         <div className="sticky top-0 z-30 flex items-center p-4 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 lg:hidden">
           <Button 
@@ -72,7 +73,7 @@ export default function AdminLayout({
           />
         </div>
         
-        <main className="flex-1 p-4 lg:p-6">{children}</main>
+        <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main>
       </div>
     </div>
   );
