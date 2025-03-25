@@ -107,6 +107,9 @@ export default function ProfilePage() {
     // Fetch data once when component mounts
     fetchUserData().finally(() => {
       if (!isMounted) return;
+      
+      // Add additional logging to debug the state after it's been set
+      console.log('userData state after fetch:', userData);
     });
     
     return () => {
@@ -428,7 +431,8 @@ export default function ProfilePage() {
               <select
                 id="gender"
                 name="gender"
-                defaultValue={userData.gender || ''}
+                value={userData.gender || ''}
+                onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))}
                 className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
               >
                 <option value="">Prefer not to say</option>
