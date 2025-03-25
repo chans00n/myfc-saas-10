@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { PageTransition } from "@/components/ui/page-transition";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
-import { ScrollProgress } from "@/components/ui/scroll-progress";
 
 export function MicroInteractionsExample() {
   const [refreshCount, setRefreshCount] = useState(0);
@@ -23,16 +22,6 @@ export function MicroInteractionsExample() {
       <PageTransition>
         <div className="container mx-auto px-4 py-8 space-y-12">
           <h1 className="text-3xl font-bold">Micro Interactions Examples</h1>
-          
-          {/* Notice the page scrollbar progress indicator is already active at the top */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Scroll Progress Indicator</h2>
-            <p className="mb-2">You can see the scroll progress indicator at the top of the page.</p>
-            <div className="border border-neutral-200 dark:border-neutral-700 p-4 rounded-md">
-              <ScrollProgress color="#10b981" height={8} className="position-relative" />
-              <p>This is a local example (not the global one)</p>
-            </div>
-          </section>
           
           <section>
             <h2 className="text-2xl font-semibold mb-4">Touch Feedback on Buttons</h2>
