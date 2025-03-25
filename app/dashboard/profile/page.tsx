@@ -535,13 +535,6 @@ export default function ProfilePage() {
           {/* Billing Management Section */}
           <BillingSection />
           
-          {/* Legal Links */}
-          <div className="flex flex-col sm:flex-row gap-4 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
-            <Link href="/legal/privacy" className="hover:underline">Privacy Policy</Link>
-            <Link href="/legal/terms" className="hover:underline">Terms of Service</Link>
-            <Link href="/legal/changelog" className="hover:underline">Changelog</Link>
-          </div>
-
           {/* Danger Zone */}
           <div className="mt-16">
             <h2 className="text-xl font-bold text-red-600 dark:text-red-500 mb-4">Danger Zone</h2>
@@ -564,6 +557,15 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* Legal Links - Moving this below Danger Zone */}
+          
+          {/* Legal Links */}
+          <div className="flex flex-col sm:flex-row gap-4 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
+            <Link href="/legal/privacy" className="hover:underline">Privacy Policy</Link>
+            <Link href="/legal/terms" className="hover:underline">Terms of Service</Link>
+            <Link href="/legal/changelog" className="hover:underline">Changelog</Link>
           </div>
 
           {/* Delete Account Confirmation */}
