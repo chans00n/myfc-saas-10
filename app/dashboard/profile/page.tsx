@@ -11,6 +11,9 @@ import { BillingSection } from '@/components/BillingSection';
 import { PushNotificationSettings } from '@/components/PushNotificationSettings';
 import { WorkoutNotificationSettings } from '@/components/WorkoutNotificationSettings';
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -30,6 +33,12 @@ export default function ProfilePage() {
     birthday?: string;
     location?: string;
   }>({});
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   
   // Only log in development
   useEffect(() => {
@@ -219,6 +228,91 @@ export default function ProfilePage() {
     }
   };
   
+  // Function to detect user's location
+  const detectUserLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    try {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Use OpenStreetMap Nominatim API for reverse geocoding
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+        );
+        
+        if (!response.ok) {
+          throw new Error("Failed to get location details");
+        }
+        
+        const data = await response.json();
+        
+        // Extract city and country
+        const city = data.address.city || 
+                    data.address.town || 
+                    data.address.village || 
+                    data.address.hamlet || 
+                    "";
+        const country = data.address.country || "";
+        
+        // Format location as "City, Country"
+        const locationString = [city, country].filter(Boolean).join(", ");
+        
+        // Update the location input field
+        const locationInput = document.getElementById("location") as HTMLInputElement;
+        if (locationInput) {
+          locationInput.value = locationString;
+        }
+        
+        toast.success(`Your location has been set to ${locationString}`);
+      }, (error) => {
+        toast.error(`Failed to get your location: ${error.message}`);
+      });
+    } catch (error) {
+      toast.error("An error occurred while getting your location");
+    }
+  };
+
+  // Handle account deletion with confirmation
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== userData.email) {
+      setDeleteError("Email confirmation doesn't match");
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError("");
+    
+    try {
+      const response = await fetch("/api/user/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete account");
+      }
+      
+      // Account deleted successfully, redirect to home page
+      toast.success("Your account has been deleted");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      setDeleteError(error.message || "Failed to delete account");
+      setIsDeleting(false);
+    }
+  };
+  
   return (
     <main className="pb-24">
       {/* Modern gradient profile header */}
@@ -353,14 +447,27 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1" htmlFor="location">
                 Location
               </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                defaultValue={userData.location || ''}
-                placeholder="City, Country"
-                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
-              />
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  defaultValue={userData.location || ''}
+                  placeholder="City, Country"
+                  className="flex-grow px-3 py-2 border border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:border-neutral-800 dark:focus:ring-neutral-300 dark:focus:border-neutral-300"
+                />
+                <button 
+                  type="button" 
+                  onClick={detectUserLocation}
+                  className="px-3 py-2 bg-neutral-100 border border-neutral-300 text-neutral-700 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                  title="Detect my location"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
             </div>
             
             <div>
@@ -429,19 +536,89 @@ export default function ProfilePage() {
           <BillingSection />
           
           {/* Legal Links */}
-          <div className="mt-8 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
-              <Link href="/legal/privacy-policy" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/legal/terms-of-service" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/legal/changelog" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
-                Changelog
-              </Link>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
+            <Link href="/legal/privacy" className="hover:underline">Privacy Policy</Link>
+            <Link href="/legal/terms" className="hover:underline">Terms of Service</Link>
+            <Link href="/legal/changelog" className="hover:underline">Changelog</Link>
           </div>
+
+          {/* Danger Zone */}
+          <div className="mt-16">
+            <h2 className="text-xl font-bold text-red-600 dark:text-red-500 mb-4">Danger Zone</h2>
+            <Card className="border border-red-200 dark:border-red-900">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h3 className="font-medium text-lg">Delete Account</h3>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                  </div>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full md:w-auto"
+                  >
+                    Delete Account
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Delete Account Confirmation */}
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <Card className="max-w-md w-full">
+                <CardHeader>
+                  <CardTitle className="text-red-600 dark:text-red-500">Delete Account</CardTitle>
+                  <CardDescription>
+                    This action cannot be undone. All your data will be permanently removed.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        To confirm, type your email address
+                      </label>
+                      <Input 
+                        type="email" 
+                        value={deleteConfirmation}
+                        onChange={(e) => setDeleteConfirmation(e.target.value)}
+                        placeholder={userData.email}
+                        className="w-full"
+                      />
+                    </div>
+                    {deleteError && (
+                      <p className="text-red-500 text-sm">{deleteError}</p>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteConfirmation("");
+                      setDeleteError("");
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    className="w-full sm:w-auto"
+                  >
+                    {isDeleting ? 'Deleting...' : 'Permanently Delete Account'}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </main>
