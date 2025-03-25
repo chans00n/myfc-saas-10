@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 import { db } from "@/utils/db/db";
 import { usersTable } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -237,6 +238,11 @@ export default async function RootLayout({
         <ThemeProvider initialTheme={theme}>
           <CrispWrapper>
             <ServiceWorkerRegistry />
+            <ScrollProgress 
+              color="#4f46e5"
+              height={5}
+              zIndex={9999}
+            />
             {children}
             <Toaster position="bottom-right" closeButton richColors />
           </CrispWrapper>
