@@ -81,12 +81,11 @@ export function SimpleSheet({
         className={`
           fixed bg-white dark:bg-neutral-800 shadow-lg z-50 w-[280px] 
           ${positionClasses} ${className}
-          pt-safe-top pb-safe-bottom pr-safe-right pl-safe-left
           flex flex-col
         `}
       >
         {/* Content wrapper with proper padding accounting for safe areas */}
-        <div className="p-6 relative flex-1 overflow-y-auto">
+        <div className="p-6 pt-10 relative flex-1 overflow-y-auto">
           {/* Close button */}
           <button 
             onClick={onClose} 
