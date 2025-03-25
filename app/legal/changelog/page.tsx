@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
-  title: "Changelog | My Facial Fitness",
-  description: "Track the latest updates and improvements to My Facial Fitness",
+  title: "Changelog | MYFC",
+  description: "Track the latest updates and improvements to MYFC",
 };
 
 type ChangeType = "new" | "improved" | "fixed" | "removed";
@@ -108,7 +107,7 @@ export default function Changelog() {
       version: "1.0.0",
       date: "June 15, 2023",
       title: "Initial Release",
-      description: "The first public release of My Facial Fitness App.",
+      description: "The first public release of MYFC App.",
       changes: [
         { type: "new", description: "Complete facial workout library with 50+ exercises" },
         { type: "new", description: "Personalized workout recommendations" },
@@ -153,68 +152,65 @@ export default function Changelog() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8 md:pt-16 md:pb-16">
-      <Card className="shadow-sm">
-        <CardHeader className="border-b pb-6">
-          <CardTitle className="text-3xl">Changelog</CardTitle>
-          <p className="text-muted-foreground mt-2">Track updates and improvements to My Facial Fitness</p>
-          <p className="text-xs text-neutral-500 mt-1">
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-8">
-            {releases.map((release, index) => (
-              <div key={release.version} className={index !== 0 ? "pt-8" : ""}>
-                {index !== 0 && <Separator className="mb-8" />}
+      <div className="mb-12">
+        <h1 className="text-3xl font-bold mb-2">Changelog</h1>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-1">Track updates and improvements to MYFC</p>
+        <p className="text-xs text-neutral-500">
+          Last updated: {new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </p>
+      </div>
+
+      <div className="space-y-12">
+        {releases.map((release, index) => (
+          <div key={release.version}>
+            {index !== 0 && <Separator className="mb-12" />}
+            
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+              <Badge className={getSemanticVersionColor(release.version)} variant="outline">
+                v{release.version}
+              </Badge>
+              <h2 className="text-xl font-semibold">{release.title}</h2>
+              <span className="text-sm text-neutral-500 md:ml-auto">
+                {release.date}
+              </span>
+            </div>
+            
+            <p className="text-neutral-700 dark:text-neutral-300 mb-6">
+              {release.description}
+            </p>
+            
+            <div className="space-y-4">
+              {/* Group changes by type */}
+              {['new', 'improved', 'fixed', 'removed'].map(changeType => {
+                const filteredChanges = release.changes.filter(change => change.type === changeType);
+                if (filteredChanges.length === 0) return null;
                 
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
-                  <Badge className={getSemanticVersionColor(release.version)} variant="outline">
-                    v{release.version}
-                  </Badge>
-                  <h3 className="text-xl font-semibold">{release.title}</h3>
-                  <span className="text-sm text-neutral-500 md:ml-auto">
-                    {release.date}
-                  </span>
-                </div>
-                
-                <p className="text-neutral-700 dark:text-neutral-300 mb-4">
-                  {release.description}
-                </p>
-                
-                <div className="space-y-3 mt-4">
-                  {/* Group changes by type */}
-                  {['new', 'improved', 'fixed', 'removed'].map(changeType => {
-                    const filteredChanges = release.changes.filter(change => change.type === changeType);
-                    if (filteredChanges.length === 0) return null;
-                    
-                    return (
-                      <div key={changeType} className="space-y-2">
-                        <h4 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                          {getChangeTypeLabel(changeType as ChangeType)}
-                        </h4>
-                        <div className="ml-4 space-y-2">
-                          {filteredChanges.map((change, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <span className="text-primary mt-1">•</span>
-                              <span className="text-neutral-700 dark:text-neutral-300">
-                                {change.description}
-                              </span>
-                            </div>
-                          ))}
+                return (
+                  <div key={changeType} className="space-y-2">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {getChangeTypeLabel(changeType as ChangeType)}
+                    </h3>
+                    <div className="ml-4 space-y-2">
+                      {filteredChanges.map((change, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <span className="text-primary mt-1">•</span>
+                          <span className="text-neutral-700 dark:text-neutral-300">
+                            {change.description}
+                          </span>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
     </div>
   );
 } 
