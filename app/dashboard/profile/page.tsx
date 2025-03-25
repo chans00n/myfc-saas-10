@@ -559,10 +559,8 @@ export default function ProfilePage() {
             </Card>
           </div>
           
-          {/* Legal Links - Moving this below Danger Zone */}
-          
           {/* Legal Links */}
-          <div className="flex flex-col sm:flex-row gap-4 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
+          <div className="flex flex-row justify-center items-center gap-6 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
             <Link href="/legal/privacy" className="hover:underline">Privacy Policy</Link>
             <Link href="/legal/terms" className="hover:underline">Terms of Service</Link>
             <Link href="/legal/changelog" className="hover:underline">Changelog</Link>
