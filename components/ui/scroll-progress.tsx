@@ -45,7 +45,7 @@ export function ScrollProgress({
   return (
     <div 
       className={cn(
-        "fixed top-0 left-0 w-full transition-transform duration-150", 
+        "fixed top-0 left-0 right-0 w-full transition-transform duration-150", 
         className
       )}
       style={{ 

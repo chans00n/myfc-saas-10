@@ -239,9 +239,9 @@ export default async function RootLayout({
           <CrispWrapper>
             <ServiceWorkerRegistry />
             <ScrollProgress 
-              color="#4f46e5"
-              height={5}
-              zIndex={9999}
+              color="#ff0000"
+              height={10}
+              zIndex={99999}
             />
             {children}
             <Toaster position="bottom-right" closeButton richColors />
