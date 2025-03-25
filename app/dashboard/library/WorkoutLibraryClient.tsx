@@ -48,6 +48,8 @@ export default function WorkoutLibraryClient({
   const [focusArea, setFocusArea] = useState(currentFocusArea);
   const [search, setSearch] = useState(currentSearch || '');
   const [isSearching, setIsSearching] = useState(false);
+  const [totalWorkoutsCount, setTotalWorkoutsCount] = useState(totalWorkouts);
+  const [totalPagesCount, setTotalPagesCount] = useState(totalPages);
   
   // Create a calendar representation of workouts
   const calendarWorkouts = createCalendarData(workouts);
@@ -81,6 +83,42 @@ export default function WorkoutLibraryClient({
     // Update the URL
     router.push(`${pathname}?${params.toString()}`);
   }, [page, view, sort, order, intensity, focusArea, search, pathname, router, searchParams]);
+  
+  // Fetch updated workouts when filter parameters change
+  useEffect(() => {
+    const fetchFilteredWorkouts = async () => {
+      try {
+        // Construct the query string with all current filter parameters
+        const params = new URLSearchParams();
+        if (page !== 1) params.set('page', page.toString());
+        if (view !== 'list') params.set('view', view);
+        if (sort !== 'created_at') params.set('sort', sort);
+        if (order !== 'desc') params.set('order', order);
+        if (intensity) params.set('intensity', intensity);
+        if (focusArea) params.set('focus', focusArea);
+        if (search && search.trim() !== '') params.set('q', search);
+        
+        // Make a fetch request to the server to get filtered workouts
+        const response = await fetch(`/api/workouts/library?${params.toString()}`);
+        const data = await response.json();
+        
+        if (data.workouts) {
+          setWorkouts(data.workouts);
+          if (data.totalWorkouts !== undefined) {
+            setTotalWorkoutsCount(data.totalWorkouts);
+          }
+          if (data.totalPages !== undefined) {
+            setTotalPagesCount(data.totalPages);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching filtered workouts:', error);
+      }
+    };
+    
+    // Run the fetch function
+    fetchFilteredWorkouts();
+  }, [page, sort, order, intensity, focusArea, search]);
   
   // Handle search input
   const handleSearch = (e: React.FormEvent) => {
@@ -265,7 +303,7 @@ export default function WorkoutLibraryClient({
       {/* Results Summary */}
       <div className="mb-6">
         <p className="text-neutral-600 dark:text-neutral-400">
-          {totalWorkouts} workout{totalWorkouts !== 1 ? 's' : ''} found
+          {totalWorkoutsCount} workout{totalWorkoutsCount !== 1 ? 's' : ''} found
           {currentSearch ? ` for "${currentSearch}"` : ''}
           {currentIntensity ? ` • ${currentIntensity.charAt(0).toUpperCase() + currentIntensity.slice(1)} intensity` : ''}
           {currentFocusArea ? ` • Focus: ${currentFocusArea}` : ''}
@@ -353,7 +391,7 @@ export default function WorkoutLibraryClient({
           )}
           
           {/* Pagination - Only show if there are pages */}
-          {totalPages > 1 && (
+          {totalPagesCount > 1 && (
             <div className="mt-8 mb-20 flex justify-center">
               <nav className="inline-flex rounded-md shadow">
                 <button
@@ -367,10 +405,10 @@ export default function WorkoutLibraryClient({
                 </button>
                 
                 {/* Page numbers */}
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                {Array.from({ length: totalPagesCount }, (_, i) => i + 1)
                   .filter(p => {
                     // Show pages around current page and first/last page
-                    return p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)
+                    return p === 1 || p === totalPagesCount || (p >= page - 1 && p <= page + 1)
                   })
                   .map((p, i, array) => {
                     // Add ellipsis if there's a gap
@@ -398,10 +436,10 @@ export default function WorkoutLibraryClient({
                   })}
                 
                 <button
-                  onClick={() => setPage(Math.min(totalPages, page + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => setPage(Math.min(totalPagesCount, page + 1))}
+                  disabled={page === totalPagesCount}
                   className={`relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                    page === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'
+                    page === totalPagesCount ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Next
