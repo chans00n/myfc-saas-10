@@ -272,7 +272,7 @@ const FacialTrackingCapture = () => {
                 autoPlay 
                 playsInline 
                 muted 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transform scale-x-[-1]" 
               />
             </div>
             
@@ -293,7 +293,7 @@ const FacialTrackingCapture = () => {
                 autoPlay 
                 playsInline 
                 muted 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transform scale-x-[-1]"
               />
               <div className="absolute inset-0 pointer-events-none">
                 <div className="w-full h-full border-4 border-dashed border-white/50 rounded-full transform scale-75"></div>
