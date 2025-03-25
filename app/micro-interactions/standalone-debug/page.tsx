@@ -1,164 +1,230 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function StandaloneDebug() {
+  const [scrollY, setScrollY] = useState(0);
+  const [windowHeight, setWindowHeight] = useState(0);
+  const [documentHeight, setDocumentHeight] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollMethod, setScrollMethod] = useState("Not detected");
+  const [errorMessage, setErrorMessage] = useState("");
+  const debugInterval = useRef<any>(null);
   
   useEffect(() => {
-    // Force-inject CSS to ensure it's not being overridden
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .progress-container {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 20px !important;
-        background-color: #333 !important;
-        z-index: 2147483647 !important; /* Maximum possible z-index */
-      }
-      
-      .progress-bar {
-        height: 100% !important;
-        background-color: #ff0000 !important;
-        width: ${progress}% !important;
-        transition: width 0.1s ease-out !important;
-      }
-      
-      .toast-message {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        background: #333 !important;
-        color: white !important;
-        padding: 10px 20px !important;
-        border-radius: 4px !important;
-        z-index: 2147483647 !important;
-        animation: fadeIn 0.3s, fadeOut 0.3s 2.7s !important;
-        opacity: 0 !important;
-        animation-fill-mode: forwards !important;
-      }
-      
-      @keyframes fadeIn {
-        from { opacity: 0 !important; }
-        to { opacity: 1 !important; }
-      }
-      
-      @keyframes fadeOut {
-        from { opacity: 1 !important; }
-        to { opacity: 0 !important; }
-      }
-      
-      .debug-button {
-        background-color: #4f46e5 !important;
-        color: white !important;
-        border: none !important;
-        padding: 10px 20px !important;
-        font-size: 16px !important;
-        border-radius: 4px !important;
-        cursor: pointer !important;
-        margin: 10px 5px !important;
-        transform: scale(1) !important;
-        transition: transform 0.1s !important;
-      }
-      
-      .debug-button:active {
-        transform: scale(0.95) !important;
-      }
-    `;
-    document.head.appendChild(style);
+    // Try to log debug info to help diagnose the issue
+    console.log("Debug page mounted");
     
-    const updateProgress = () => {
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrollPercentage = (winScroll / height) * 100;
-      setProgress(scrollPercentage);
-      
-      if (winScroll > 10) {
-        setScrolled(true);
-      }
-    };
+    try {
+      // Capture initial dimensions
+      const updateDimensions = () => {
+        try {
+          setWindowHeight(window.innerHeight);
+          setDocumentHeight(document.documentElement.scrollHeight);
 
-    window.addEventListener('scroll', updateProgress);
-    
-    // Add container for progress bar
-    const container = document.createElement('div');
-    container.className = 'progress-container';
-    const bar = document.createElement('div');
-    bar.className = 'progress-bar';
-    container.appendChild(bar);
-    document.body.appendChild(container);
-    
-    return () => {
-      window.removeEventListener('scroll', updateProgress);
-      document.body.removeChild(container);
-      document.head.removeChild(style);
-    };
-  }, [progress]);
+          // Try different scroll position methods
+          const scrollTop1 = window.pageYOffset;
+          const scrollTop2 = document.documentElement.scrollTop;
+          const scrollTop3 = document.body.scrollTop;
+          
+          let activeMethod = "None working";
+          let scrollPosition = 0;
+          
+          if (scrollTop1 > 0) {
+            activeMethod = "window.pageYOffset";
+            scrollPosition = scrollTop1;
+          } else if (scrollTop2 > 0) {
+            activeMethod = "documentElement.scrollTop";
+            scrollPosition = scrollTop2;
+          } else if (scrollTop3 > 0) {
+            activeMethod = "body.scrollTop";
+            scrollPosition = scrollTop3;
+          } else {
+            // Use any value, even if 0
+            activeMethod = "Using window.pageYOffset (default)";
+            scrollPosition = scrollTop1;
+          }
+          
+          setScrollMethod(activeMethod);
+          setScrollY(scrollPosition);
+          
+          // Calculate progress
+          const height = document.documentElement.scrollHeight - window.innerHeight;
+          const calcProgress = height > 0 ? (scrollPosition / height) * 100 : 0;
+          setProgress(Math.min(100, Math.max(0, calcProgress)));
+          
+          console.log("Scroll debug:", { 
+            position: scrollPosition, 
+            windowHeight: window.innerHeight,
+            documentHeight: document.documentElement.scrollHeight,
+            method: activeMethod,
+            progress: calcProgress
+          });
+        } catch (err: any) {
+          console.error("Error updating dimensions:", err);
+          setErrorMessage(err.message || "Unknown error updating dimensions");
+        }
+      };
+      
+      // Update immediately and then on events
+      updateDimensions();
+      
+      // Set up multiple ways to detect scrolling
+      window.addEventListener('scroll', updateDimensions);
+      window.addEventListener('resize', updateDimensions);
+      
+      // Backup polling method in case events don't fire
+      debugInterval.current = setInterval(updateDimensions, 500);
+      
+      // Create test element to show we can manipulate DOM
+      const testEl = document.createElement('div');
+      testEl.style.position = 'fixed';
+      testEl.style.bottom = '10px';
+      testEl.style.left = '10px';
+      testEl.style.background = '#ff00ff';
+      testEl.style.color = 'white';
+      testEl.style.padding = '5px';
+      testEl.style.zIndex = '2147483647';
+      testEl.style.fontSize = '12px';
+      testEl.textContent = 'DOM Test Element';
+      document.body.appendChild(testEl);
+      
+      return () => {
+        window.removeEventListener('scroll', updateDimensions);
+        window.removeEventListener('resize', updateDimensions);
+        if (debugInterval.current) clearInterval(debugInterval.current);
+        if (document.body.contains(testEl)) document.body.removeChild(testEl);
+      };
+    } catch (err: any) {
+      console.error("Critical setup error:", err);
+      setErrorMessage(`Critical error: ${err.message || "Unknown setup error"}`);
+      return () => {};
+    }
+  }, []);
+  
+  const forceScroll = () => {
+    try {
+      window.scrollTo({
+        top: 100, 
+        behavior: 'smooth'
+      });
+    } catch (err: any) {
+      setErrorMessage(`Scroll error: ${err.message || "Unknown scroll error"}`);
+    }
+  };
 
-  const showToast = (message: string) => {
-    const toast = document.createElement('div');
-    toast.className = 'toast-message';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 3000);
+  const resetScroll = () => {
+    try {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } catch (err: any) {
+      setErrorMessage(`Reset error: ${err.message || "Unknown reset error"}`);
+    }
   };
 
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '20px', marginTop: '40px' }}>
-        Standalone Debug Page
+        Advanced Scroll Debugging
       </h1>
       
-      <div style={{ padding: '15px', backgroundColor: '#fff3cd', border: '1px solid #ffeeba', borderRadius: '4px', marginBottom: '20px' }}>
-        <h2 style={{ fontWeight: 'bold', marginBottom: '10px' }}>Progress Indicator:</h2>
-        <p>Current progress: {Math.round(progress)}%</p>
-        <p>Scrolled: {scrolled ? 'Yes ✅' : 'No ❌'}</p>
-        <p><strong>You should see a red bar at the very top of the window.</strong></p>
+      <div style={{ 
+        padding: '15px', 
+        backgroundColor: '#f8d7da', 
+        border: '1px solid #f5c6cb', 
+        borderRadius: '4px', 
+        marginBottom: '20px',
+        fontSize: '14px',
+        fontFamily: 'monospace'
+      }}>
+        <p><strong>Raw Scroll Values:</strong></p>
+        <pre style={{ margin: '10px 0', whiteSpace: 'pre-wrap' }}>
+          {`Window Height: ${windowHeight}px
+Document Height: ${documentHeight}px
+Current Scroll Y: ${scrollY}px
+Scroll Progress: ${progress.toFixed(2)}%
+Active Method: ${scrollMethod}
+${errorMessage ? `ERROR: ${errorMessage}` : ''}`}
+        </pre>
+        
+        <div style={{ marginTop: '15px' }}>
+          <button
+            onClick={forceScroll}
+            style={{ 
+              background: '#4f46e5', 
+              color: 'white',
+              border: 'none',
+              padding: '8px 15px',
+              borderRadius: '4px',
+              marginRight: '10px'
+            }}
+          >
+            Force Scroll Down 100px
+          </button>
+          
+          <button
+            onClick={resetScroll}
+            style={{ 
+              background: '#6c757d', 
+              color: 'white',
+              border: 'none',
+              padding: '8px 15px',
+              borderRadius: '4px'
+            }}
+          >
+            Reset Scroll
+          </button>
+        </div>
       </div>
       
-      <div style={{ marginBottom: '20px' }}>
-        <h2 style={{ fontWeight: 'bold', fontSize: '20px', marginBottom: '10px' }}>Button Interactions</h2>
-        <button 
-          className="debug-button"
-          onClick={() => showToast('Button Clicked!')}
-        >
-          Test Button (Press Me)
-        </button>
-        
-        <button 
-          className="debug-button"
-          style={{ backgroundColor: '#dc2626' }}
-          onClick={() => showToast('Error Message!')}
-        >
-          Show Toast
-        </button>
+      <div style={{ 
+        height: '20px', 
+        width: '100%', 
+        backgroundColor: '#e9ecef',
+        borderRadius: '4px',
+        overflow: 'hidden',
+        marginBottom: '20px'
+      }}>
+        <div 
+          style={{ 
+            height: '100%', 
+            width: `${progress}%`, 
+            backgroundColor: '#ff0000',
+            transition: 'width 0.2s'
+          }} 
+        />
       </div>
+      
+      <p style={{ marginBottom: '20px' }}>
+        This page shows the raw scroll values and creates a visual progress bar.
+        If scrolling isn't detected, try the "Force Scroll" button.
+        <br /><br />
+        <strong>Check the browser console (F12) for additional debug information.</strong>
+      </p>
       
       {/* Add lots of scrollable content */}
       <div style={{ marginTop: '30px' }}>
-        <h2 style={{ fontWeight: 'bold', fontSize: '20px', marginBottom: '10px' }}>Scroll Down</h2>
-        <p>Scroll down to see the progress indicator change.</p>
+        <h2 style={{ fontWeight: 'bold', fontSize: '20px', marginBottom: '10px' }}>Scroll Content</h2>
         
         {[...Array(10)].map((_, i) => (
           <div 
             key={i} 
             style={{ 
               height: '200px', 
-              backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#e5e5e5',
+              backgroundColor: i % 2 === 0 ? '#f8f9fa' : '#e9ecef',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '10px',
-              borderRadius: '4px'
+              borderRadius: '4px',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#6c757d'
             }}
           >
-            Scroll Section {i+1}
+            Section {i+1}
           </div>
         ))}
       </div>
