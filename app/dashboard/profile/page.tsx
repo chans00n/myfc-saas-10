@@ -9,6 +9,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { BillingSection } from '@/components/BillingSection';
 import { PushNotificationSettings } from '@/components/PushNotificationSettings';
 import { WorkoutNotificationSettings } from '@/components/WorkoutNotificationSettings';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -314,6 +315,21 @@ export default function ProfilePage() {
               </svg>
               Save Changes
             </button>
+          </div>
+          
+          {/* Legal Links */}
+          <div className="mt-8 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
+              <Link href="/legal/privacy-policy" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/legal/terms-of-service" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/legal/changelog" className="hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline transition-colors">
+                Changelog
+              </Link>
+            </div>
           </div>
         </form>
       </div>
