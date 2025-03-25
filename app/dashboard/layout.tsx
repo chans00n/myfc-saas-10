@@ -62,7 +62,7 @@ export default async function DashboardLayout({
                 
                 <div className="md:hidden flex justify-between items-center p-4 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700" 
                      style={{
-                         paddingTop: 'env(safe-area-inset-top)',
+                         paddingTop: 'max(16px, env(safe-area-inset-top))',
                          paddingLeft: 'max(16px, env(safe-area-inset-left))',
                          paddingRight: 'max(16px, env(safe-area-inset-right))'
                      }}>
@@ -94,7 +94,7 @@ export default async function DashboardLayout({
                 
                 <div className="flex-1 md:ml-64 pb-24 md:pb-8"
                      style={{
-                         paddingBottom: 'max(96px, calc(64px + env(safe-area-inset-bottom)))'
+                         paddingBottom: 'max(120px, calc(90px + env(safe-area-inset-bottom)))'
                      }}>
                     {children}
                 </div>
