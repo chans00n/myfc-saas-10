@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +11,6 @@ interface PageTransitionProps {
 
 export function PageTransition({ children, className }: PageTransitionProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayChildren, setDisplayChildren] = useState(children);
 
@@ -25,7 +24,7 @@ export function PageTransition({ children, className }: PageTransitionProps) {
     }, 300); // Match this with the CSS transition time
     
     return () => clearTimeout(timer);
-  }, [pathname, searchParams, children]);
+  }, [pathname, children]);
 
   return (
     <div 
