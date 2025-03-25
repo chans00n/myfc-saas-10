@@ -39,18 +39,34 @@ export async function GET(request: Request) {
     }
     
     // Get DB user record in the same request
-    const userRecord = await db.select().from(usersTable)
-      .where(eq(usersTable.email, data.user.email!));
+    const userRecord = await db.select()
+      .from(usersTable)
+      .where(eq(usersTable.email, data.user.email!))
+      .limit(1);
     
     // Combine the data
     const userData = {
       auth: {
         id: data.user.id,
         email: data.user.email,
-        metadata: data.user.user_metadata
+        metadata: data.user.user_metadata,
+        created_at: data.user.created_at
       },
       profile: userRecord && userRecord.length > 0 ? userRecord[0] : null
     };
+    
+    // Log the user data to help with debugging
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('User record from DB:', userRecord && userRecord.length > 0 ? {
+        // Log key fields
+        id: userRecord[0].id,
+        email: userRecord[0].email,
+        name: userRecord[0].name,
+        gender: userRecord[0].gender,
+        birthday: userRecord[0].birthday,
+        location: userRecord[0].location
+      } : 'No user record found');
+    }
     
     // Cache the result
     if (authCookie) {

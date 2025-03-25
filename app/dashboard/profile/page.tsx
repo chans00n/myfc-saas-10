@@ -81,11 +81,20 @@ export default function ProfilePage() {
         name: authUser.metadata?.name || profileData?.name || authUser.email?.split('@')[0] || 'User',
         plan: profileData?.plan || authUser.metadata?.plan || 'free',
         plan_name: profileData?.plan_name || 'Basic Plan',
-        created_at: authUser.created_at,
+        created_at: authUser.created_at || authUser.metadata?.created_at,
         avatar_url: userAvatarUrl,
         gender: profileData?.gender || '',
         birthday: profileData?.birthday || '',
         location: profileData?.location || '',
+      });
+
+      console.log('User data loaded:', {
+        id: authUser.id,
+        email: authUser.email,
+        gender: profileData?.gender,
+        birthday: profileData?.birthday,
+        location: profileData?.location,
+        created_at: authUser.created_at || authUser.metadata?.created_at,
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -537,12 +546,11 @@ export default function ProfilePage() {
           
           {/* Danger Zone */}
           <div className="mt-16">
-            <h2 className="text-xl font-bold text-red-600 dark:text-red-500 mb-4">Danger Zone</h2>
             <Card className="border border-red-200 dark:border-red-900">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <h3 className="font-medium text-lg">Delete Account</h3>
+                    <h3 className="font-bold text-red-600 dark:text-red-500 text-lg">Delete Account (DANGER ZONE)</h3>
                     <p className="text-neutral-600 dark:text-neutral-400 text-sm">
                       Permanently delete your account and all associated data. This action cannot be undone.
                     </p>
