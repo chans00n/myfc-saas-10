@@ -29,7 +29,7 @@ export default async function UsersPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50">Users</h1>

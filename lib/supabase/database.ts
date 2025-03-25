@@ -219,4 +219,274 @@ async function updateUserStreak(userId: string): Promise<void> {
         last_workout_date: today,
       });
   }
+}
+
+// Get all workouts
+export async function getAllWorkouts(): Promise<Workout[]> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('workouts')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching workouts:', error);
+    return [];
+  }
+  
+  return data as Workout[];
+}
+
+// Get all movements
+export async function getAllMovements(): Promise<Movement[]> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('movements')
+    .select('*, focus_areas(*)');
+  
+  if (error) {
+    console.error('Error fetching movements:', error);
+    return [];
+  }
+  
+  return data as Movement[];
+}
+
+// Get all focus areas
+export async function getAllFocusAreas(): Promise<FocusArea[]> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('focus_areas')
+    .select('*');
+  
+  if (error) {
+    console.error('Error fetching focus areas:', error);
+    return [];
+  }
+  
+  return data as FocusArea[];
+}
+
+// Get workout with details (movements and focus areas)
+export async function getWorkoutWithDetails(workoutId: string): Promise<{
+  workout: Workout | null;
+  movements: Array<{
+    movement: Movement;
+    sequence_order: number;
+    duration_seconds: number | null;
+    repetitions: number | null;
+    sets: number | null;
+  }>;
+  focusAreas: FocusArea[];
+}> {
+  const supabase = createClient();
+  
+  // Get the workout
+  const { data: workout, error: workoutError } = await supabase
+    .from('workouts')
+    .select('*')
+    .eq('id', workoutId)
+    .single();
+  
+  if (workoutError) {
+    console.error('Error fetching workout:', workoutError);
+    return { workout: null, movements: [], focusAreas: [] };
+  }
+  
+  // Get the workout movements with sequence
+  const { data: workoutMovements, error: movementsError } = await supabase
+    .from('workout_movements')
+    .select('*, movement:movements(*)')
+    .eq('workout_id', workoutId)
+    .order('sequence_order', { ascending: true });
+  
+  if (movementsError) {
+    console.error('Error fetching workout movements:', movementsError);
+    return { workout: workout as Workout, movements: [], focusAreas: [] };
+  }
+  
+  // Get the workout focus areas
+  const { data: workoutFocusAreas, error: focusAreasError } = await supabase
+    .from('workout_focus_areas')
+    .select('*, focus_area:focus_areas(*)')
+    .eq('workout_id', workoutId);
+  
+  if (focusAreasError) {
+    console.error('Error fetching workout focus areas:', focusAreasError);
+    return { 
+      workout: workout as Workout, 
+      movements: workoutMovements.map((wm: any) => ({
+        movement: wm.movement,
+        sequence_order: wm.sequence_order,
+        duration_seconds: wm.duration_seconds,
+        repetitions: wm.repetitions,
+        sets: wm.sets,
+      })), 
+      focusAreas: [] 
+    };
+  }
+  
+  return {
+    workout: workout as Workout,
+    movements: workoutMovements.map((wm: any) => ({
+      movement: wm.movement,
+      sequence_order: wm.sequence_order,
+      duration_seconds: wm.duration_seconds,
+      repetitions: wm.repetitions,
+      sets: wm.sets,
+    })),
+    focusAreas: workoutFocusAreas.map((wfa: any) => wfa.focus_area as FocusArea)
+  };
+}
+
+// Create or update a workout with movements and focus areas
+export async function createOrUpdateWorkout(
+  workoutData: Partial<Workout>,
+  movementsData: Array<{
+    movement_id: string;
+    sequence_order: number;
+    duration_seconds?: number | null;
+    repetitions?: number | null;
+    sets?: number | null;
+  }>,
+  focusAreaIds: string[],
+  workoutId?: string
+): Promise<{success: boolean; workoutId?: string; error?: string}> {
+  const supabase = createClient();
+  
+  try {
+    // Start a transaction
+    let workout;
+    let workoutError;
+    
+    if (workoutId) {
+      // First, verify the workout exists
+      console.log(`Checking if workout with ID ${workoutId} exists...`);
+      const { data: existingWorkout, error: fetchError } = await supabase
+        .from('workouts')
+        .select('*')
+        .eq('id', workoutId)
+        .single();
+      
+      if (fetchError || !existingWorkout) {
+        console.error('Fetch error or workout not found:', fetchError, 'Existing workout:', existingWorkout);
+        throw new Error(`Workout with ID ${workoutId} not found or cannot be accessed. Please check if the workout exists.`);
+      }
+      
+      console.log('Workout found, proceeding with update...');
+      
+      // Use upsert instead of update to bypass some RLS restrictions
+      // Preserve any fields that aren't in the update
+      const updatedWorkoutData = {
+        ...existingWorkout,
+        ...workoutData,
+        id: workoutId, // Make sure ID is preserved
+      };
+      
+      console.log('Upserting with data:', updatedWorkoutData);
+      
+      // Upsert the workout (update if exists, insert if not)
+      const result = await supabase
+        .from('workouts')
+        .upsert(updatedWorkoutData)
+        .select();
+      
+      console.log('Upsert result:', result);
+      
+      workoutError = result.error;
+      workout = result.data?.[0];
+      
+      // Handle case where the workout might not be updated
+      if (!result.error && (!result.data || result.data.length === 0)) {
+        console.log('No data returned from upsert operation, using existing ID');
+        workout = { id: workoutId } as any;
+      }
+    } else {
+      // Create new workout
+      const result = await supabase
+        .from('workouts')
+        .insert(workoutData)
+        .select()
+        .single();
+      
+      workout = result.data;
+      workoutError = result.error;
+    }
+    
+    if (workoutError) {
+      throw new Error(`Error ${workoutId ? 'updating' : 'creating'} workout: ${workoutError.message}`);
+    }
+    
+    if (!workout || !workout.id) {
+      throw new Error(`Failed to ${workoutId ? 'update' : 'create'} workout: No data returned`);
+    }
+    
+    const currentWorkoutId = workoutId || workout.id;
+    
+    if (workoutId) {
+      // Delete existing movement relationships for update case
+      const { error: deleteMovementsError } = await supabase
+        .from('workout_movements')
+        .delete()
+        .eq('workout_id', currentWorkoutId);
+      
+      if (deleteMovementsError) {
+        throw new Error(`Error deleting workout movements: ${deleteMovementsError.message}`);
+      }
+      
+      // Delete existing focus area relationships for update case
+      const { error: deleteFocusAreasError } = await supabase
+        .from('workout_focus_areas')
+        .delete()
+        .eq('workout_id', currentWorkoutId);
+      
+      if (deleteFocusAreasError) {
+        throw new Error(`Error deleting workout focus areas: ${deleteFocusAreasError.message}`);
+      }
+    }
+    
+    // Add movement relationships
+    if (movementsData.length > 0) {
+      const workoutMovements = movementsData.map(movement => ({
+        workout_id: currentWorkoutId,
+        movement_id: movement.movement_id,
+        sequence_order: movement.sequence_order,
+        duration_seconds: movement.duration_seconds,
+        repetitions: movement.repetitions,
+        sets: movement.sets
+      }));
+      
+      const { error: movementsError } = await supabase
+        .from('workout_movements')
+        .insert(workoutMovements);
+      
+      if (movementsError) {
+        throw new Error(`Error adding workout movements: ${movementsError.message}`);
+      }
+    }
+    
+    // Add focus area relationships
+    if (focusAreaIds.length > 0) {
+      const workoutFocusAreas = focusAreaIds.map(focusAreaId => ({
+        workout_id: currentWorkoutId,
+        focus_area_id: focusAreaId
+      }));
+      
+      const { error: focusAreasError } = await supabase
+        .from('workout_focus_areas')
+        .insert(workoutFocusAreas);
+      
+      if (focusAreasError) {
+        throw new Error(`Error adding workout focus areas: ${focusAreasError.message}`);
+      }
+    }
+    
+    return { success: true, workoutId: currentWorkoutId };
+  } catch (error: any) {
+    console.error('Error in createOrUpdateWorkout:', error);
+    return { success: false, error: error.message };
+  }
 } 

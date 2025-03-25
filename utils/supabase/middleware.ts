@@ -39,6 +39,25 @@ export async function updateSession(request: NextRequest) {
         return supabaseResponse
     }
 
+    // Check for admin routes
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        if (!user) {
+            // Redirect to login if not authenticated
+            url.pathname = '/login'
+            return NextResponse.redirect(url)
+        }
+        
+        // TODO: Replace with your actual admin check
+        // For now, we'll use domain check for @myfc.app emails
+        const isAdmin = user.email?.endsWith('@myfc.app') || user.email === 'admin@example.com'
+        
+        if (!isAdmin) {
+            // Redirect non-admin users to dashboard
+            url.pathname = '/dashboard'
+            return NextResponse.redirect(url)
+        }
+    }
+
     if (
         !user &&
         !request.nextUrl.pathname.startsWith('/login') &&

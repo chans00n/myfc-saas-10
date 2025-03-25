@@ -37,7 +37,7 @@ export default function CreateWorkoutPage() {
   }, []);
   
   return (
-    <div className="container py-10">
+    <div className="space-y-8">
       <div className="mb-8">
         <Button variant="ghost" size="sm" className="mb-2" asChild>
           <Link href="/admin/workouts">

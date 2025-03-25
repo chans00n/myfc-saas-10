@@ -65,7 +65,7 @@ export default function NotificationsDebugPage() {
   };
 
   return (
-    <div className="container py-10 space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Notifications Debug</h1>
         <p className="text-muted-foreground mt-2">

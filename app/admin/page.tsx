@@ -2,7 +2,7 @@ import { UserStatsOverview } from '@/components/admin/UserStatsOverview';
 
 export default function AdminPage() {
   return (
-    <div className="container py-10">
+    <div className="space-y-8">
       <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50">MYFC Admin Dashboard</h1>
       <p className="mt-2 mb-8 text-neutral-600 dark:text-neutral-400">
         Welcome to the MYFC Admin Dashboard. Use the navigation on the left to manage your application.
