@@ -4,6 +4,8 @@ const withPWA = require('@ducanh2912/next-pwa').default({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development' ? false : false,
   buildExcludes: [/middleware-manifest.json$/],
+  debug: false,
+  disableLogging: true,
 });
 
 /** @type {import('next').NextConfig} */

@@ -25,16 +25,21 @@ export function ServiceWorkerRegistry() {
         return; // Don't proceed with registration
       }
       
+      // Disable the Workbox development logs
+      if (typeof window !== 'undefined') {
+        // @ts-ignore - Workbox specific property
+        self.__WB_DISABLE_DEV_LOGS = true;
+      }
+      
       const registerServiceWorker = async () => {
         try {
-          // Check if we're on the members.myfc.app subdomain
+          // Get the current hostname to determine if we're on the members subdomain
           const hostname = window.location.hostname;
-          const isMembersSubdomain = hostname === 'members.myfc.app';
+          const isMembersSubdomain = hostname.includes('members.myfc.app');
           
           console.log(`[PWA] Running on ${hostname}, subdomain: ${isMembersSubdomain ? 'members.myfc.app' : 'no'}`);
           
-          // Choose appropriate service worker path and scope
-          // Always use absolute paths for service workers to avoid 404s in subfolders
+          // Service worker path and scope
           const swPath = '/sw.js';
           const swScope = '/';
           
@@ -53,19 +58,15 @@ export function ServiceWorkerRegistry() {
         } catch (error) {
           console.error('[PWA] Service worker registration failed:', error);
           
-          // Try fallback service worker as a last resort
+          // If the main registration fails, try a fallback
           try {
-            // Always use absolute paths for fallback as well
-            const fallbackPath = '/fallback-sw.js';
-            const fallbackScope = '/';
-            
+            const fallbackPath = '/sw-fallback.js';
             console.log(`[PWA] Trying fallback service worker from ${fallbackPath}`);
-            const fallbackReg = await navigator.serviceWorker.register(fallbackPath, {
-              scope: fallbackScope
-            });
+            
+            const fallbackReg = await navigator.serviceWorker.register(fallbackPath);
             console.log('[PWA] Fallback service worker registered with scope:', fallbackReg.scope);
           } catch (fallbackError) {
-            console.error('[PWA] Fallback service worker also failed:', fallbackError);
+            console.error('[PWA] Fallback service worker registration also failed:', fallbackError);
           }
         }
       };
