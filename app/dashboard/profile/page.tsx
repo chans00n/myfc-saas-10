@@ -569,8 +569,8 @@ export default function ProfilePage() {
           
           {/* Legal Links */}
           <div className="flex flex-row justify-center items-center gap-6 text-sm text-neutral-500 dark:text-neutral-400 mt-8">
-            <Link href="/legal/privacy" className="hover:underline">Privacy Policy</Link>
-            <Link href="/legal/terms" className="hover:underline">Terms of Service</Link>
+            <Link href="/legal/privacy-policy" className="hover:underline">Privacy Policy</Link>
+            <Link href="/legal/terms-of-service" className="hover:underline">Terms of Service</Link>
             <Link href="/legal/changelog" className="hover:underline">Changelog</Link>
           </div>
 
