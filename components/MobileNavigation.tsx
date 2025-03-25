@@ -68,7 +68,8 @@ export default function MobileNavigation() {
       className="md:hidden flex justify-around items-center fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-700 h-16 z-10"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)',
-        height: 'calc(64px + env(safe-area-inset-bottom))'
+        height: 'calc(74px + env(safe-area-inset-bottom))',
+        paddingTop: '10px'
       }}
     >
       {navItems.map((item) => {
