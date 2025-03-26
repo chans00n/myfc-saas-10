@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Script from "next/script";
@@ -16,22 +16,22 @@ import { dynamic } from './config';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MyFC",
-  description: "My Face Coach App",
-  manifest: "/manifest.json",
+  title: "MYFC - My Face Coach",
+  description: "Daily facial exercises and tracking",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover'
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "MYFC",
+    statusBarStyle: 'black-translucent',
+    title: 'MYFC'
   },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: "cover",
+  themeColor: '#171717',
+  manifest: '/manifest.json'
 };
 
 // Force dynamic rendering for authenticated routes
@@ -79,7 +79,7 @@ export default async function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       
-      <body className={`${inter.className} h-full bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>
+      <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 h-full`}>
         <ThemeProvider initialTheme={theme}>
           <CrispWrapper>
             <ServiceWorkerRegistry />
