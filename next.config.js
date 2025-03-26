@@ -4,8 +4,8 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: false,
-  scope: '/',
-  sw: '/sw.js',
+  buildExcludes: [/middleware-manifest\.json$/],
+  publicExcludes: ['!sw.js', '!workbox-*.js', '!worker-*.js', '!fallback-*.js', '!precache-manifest.*.js'],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
@@ -119,12 +119,29 @@ const withPWA = require('next-pwa')({
       }
     },
     {
-      urlPattern: ({ url }) => {
-        const isSameOrigin = self.origin === url.origin
-        if (!isSameOrigin) return false
-        const pathname = url.pathname
-        if (pathname.startsWith('/api/')) return false
-        return true
+      urlPattern: ({url}) => {
+        const isSameOrigin = self.origin === url.origin;
+        if (!isSameOrigin) return false;
+        const pathname = url.pathname;
+        if (pathname.startsWith('/api/auth') || pathname.startsWith('/api/webhook')) return false;
+        return pathname.startsWith('/api/');
+      },
+      handler: 'NetworkFirst',
+      method: 'GET',
+      options: {
+        cacheName: 'apis',
+        expiration: {
+          maxEntries: 16,
+          maxAgeSeconds: 24 * 60 * 60
+        },
+        networkTimeoutSeconds: 10
+      }
+    },
+    {
+      urlPattern: ({url}) => {
+        const isSameOrigin = self.origin === url.origin;
+        if (!isSameOrigin) return false;
+        return !url.pathname.startsWith('/api/');
       },
       handler: 'NetworkFirst',
       options: {
@@ -137,15 +154,49 @@ const withPWA = require('next-pwa')({
       }
     }
   ]
-})
+});
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'qpkvjfczwgcrnubdqmgp.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/**',
+      }
+    ],
   },
   experimental: {
-    serverActions: true,
-  }
-}
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+};
 
-module.exports = withPWA(nextConfig) 
+module.exports = withPWA(nextConfig); 

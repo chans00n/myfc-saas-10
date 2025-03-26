@@ -1,14 +1,13 @@
 {
   "name": "MYFC - My Face Coach",
   "short_name": "MYFC",
-  "theme_color": "#171717",
-  "background_color": "#171717",
-  "display": "standalone",
-  "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/dashboard",
   "description": "Daily facial exercises and tracking",
-  "display_override": ["standalone", "fullscreen"],
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "scope": "/",
+  "orientation": "portrait",
+  "background_color": "#171717",
+  "theme_color": "#171717",
   "icons": [
     {
       "src": "/icons/192.png",

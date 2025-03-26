@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Script from "next/script";
@@ -16,22 +16,22 @@ import { dynamic } from './config';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MYFC - My Face Coach",
-  description: "Daily facial exercises and tracking",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover'
-  },
+  title: "MYFC",
+  description: "My Face Coach App",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'MYFC'
+    statusBarStyle: "black-translucent",
+    title: "MYFC",
   },
-  themeColor: '#171717',
-  manifest: '/manifest.json'
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 // Force dynamic rendering for authenticated routes
