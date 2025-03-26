@@ -67,10 +67,9 @@ export default function MobileNavigation() {
     <div 
       className="md:hidden flex justify-around items-center fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-700 z-10"
       style={{
-        height: 'calc(82px + env(safe-area-inset-bottom))',
-        paddingBottom: 'calc(28px + env(safe-area-inset-bottom))',
-        paddingTop: '10px',
-        marginBottom: 'env(safe-area-inset-bottom)'
+        paddingBottom: 'max(env(safe-area-inset-bottom), 20px)',
+        height: 'auto',
+        paddingTop: '12px'
       }}
     >
       {navItems.map((item) => {
