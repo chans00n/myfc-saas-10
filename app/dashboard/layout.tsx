@@ -94,7 +94,7 @@ export default async function DashboardLayout({
                 
                 <div className="flex-1 md:ml-64 pb-24 md:pb-8"
                      style={{
-                         paddingBottom: 'calc(64px + env(safe-area-inset-bottom))'
+                         paddingBottom: '50px'
                      }}>
                     {children}
                 </div>
