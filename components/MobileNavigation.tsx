@@ -65,11 +65,9 @@ export default function MobileNavigation() {
   
   return (
     <div 
-      className="md:hidden flex justify-around items-center fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-700 z-10 pb-safe"
+      className="md:hidden flex justify-around items-center fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-700 z-10"
       style={{
-        height: '64px',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingTop: '4px'
+        height: '50px'
       }}
     >
       {navItems.map((item) => {
@@ -79,7 +77,7 @@ export default function MobileNavigation() {
             key={item.name}
             href={item.href} 
             className={`flex flex-col items-center justify-center w-full ${
-              active && !item.isSpecial ? 'bg-neutral-100 dark:bg-neutral-700/50 rounded-md mx-2 py-1' : 'py-1'
+              active && !item.isSpecial ? 'bg-neutral-100 dark:bg-neutral-700/50 rounded-md mx-2' : ''
             } ${
               item.isSpecial ? '-mt-8' : ''
             }`}>
