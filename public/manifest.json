@@ -8,6 +8,7 @@
   "scope": "/",
   "start_url": "/dashboard",
   "description": "My Face Coach",
+  "display_override": ["standalone", "fullscreen"],
   "icons": [
     {
       "src": "/icons/120.png",

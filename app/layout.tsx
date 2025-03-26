@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   title: "MyFC",
   description: "My Face Coach App",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MYFC",
+  },
 };
 
 export const viewport: Viewport = {
@@ -26,6 +31,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 // Force dynamic rendering for authenticated routes
@@ -64,15 +70,16 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <link rel="apple-touch-icon" href="/icons/192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#000000" />
       </head>
       
-      <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>
+      <body className={`${inter.className} h-full bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100`}>
         <ThemeProvider initialTheme={theme}>
           <CrispWrapper>
             <ServiceWorkerRegistry />
