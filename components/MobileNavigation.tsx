@@ -81,7 +81,7 @@ export default function MobileNavigation() {
             className={`flex flex-col items-center justify-center w-full ${
               active && !item.isSpecial ? 'bg-neutral-100 dark:bg-neutral-700/50 rounded-md mx-2' : ''
             } ${
-              item.isSpecial ? '-mt-8' : ''
+              item.isSpecial ? 'mt-6' : ''
             }`}>
             {item.icon(active)}
             <span className={`text-[10px] mt-0.5 ${
