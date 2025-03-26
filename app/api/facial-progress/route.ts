@@ -4,6 +4,9 @@ import { db } from '@/utils/db/db';
 import { facialProgressPhotosTable } from '@/utils/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import crypto from 'crypto';
+import { dynamic, runtime, preferredRegion } from '@/app/config';
+
+export { dynamic, runtime, preferredRegion };
 
 // POST endpoint to upload a new facial progress photo
 export async function POST(request: Request) {

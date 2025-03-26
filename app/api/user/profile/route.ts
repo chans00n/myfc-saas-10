@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from 'drizzle-orm';
+import { dynamic, runtime, preferredRegion } from '@/app/config'
 
 // Cache with longer TTL for better performance
 const userDataCache: Record<string, {timestamp: number; data: any}> = {};
@@ -87,4 +88,6 @@ export async function GET(request: Request) {
     console.error('Error in consolidated user API:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
-} 
+}
+
+export { dynamic, runtime, preferredRegion } 

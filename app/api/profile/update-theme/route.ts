@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from 'drizzle-orm';
+import { dynamic, runtime, preferredRegion } from '@/app/config'
+
+export { dynamic, runtime, preferredRegion }
 
 export async function POST(request: NextRequest) {
   const supabase = createClient();

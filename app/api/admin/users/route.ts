@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { createClient } from '@/utils/supabase/server';
+import { dynamic, runtime, preferredRegion } from '@/app/config';
+
+export { dynamic, runtime, preferredRegion };
 
 export async function GET() {
   try {

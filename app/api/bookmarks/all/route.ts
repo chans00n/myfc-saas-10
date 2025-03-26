@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { getUserBookmarks } from '@/utils/supabase/database';
+import { dynamic, runtime, preferredRegion } from '@/app/config'
 
 // Define the type for WorkoutBookmark for better type safety
 interface WorkoutBookmark {
   workout_id: string;
   [key: string]: any; // For other properties
 }
+
+export { dynamic, runtime, preferredRegion }
 
 /**
  * GET /api/bookmarks/all - Fetches all bookmarks for the current user

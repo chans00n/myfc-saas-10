@@ -1,5 +1,8 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import { dynamic, runtime, preferredRegion } from '@/app/config'
+
+export { dynamic, runtime, preferredRegion }
 
 // Simple counter for logging
 let requestCount = 0;

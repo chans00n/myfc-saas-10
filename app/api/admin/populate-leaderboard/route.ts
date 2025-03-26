@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { dynamic, runtime, preferredRegion } from '@/app/config'
+
+export { dynamic, runtime, preferredRegion }
 
 export async function GET(request: NextRequest) {
   try {

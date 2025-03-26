@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { dynamic, runtime, preferredRegion } from '@/app/config'
+
+export { dynamic, runtime, preferredRegion }
 
 // This route can be scheduled with a cron job service like Vercel Cron
 // Example cron schedule: 0 0 * * * (daily at midnight)
