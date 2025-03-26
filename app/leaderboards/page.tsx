@@ -236,8 +236,14 @@ export default function LeaderboardsPage() {
       
       <div className="flex-1 md:ml-64 pb-24 md:pb-8 pt-16 md:pt-0">
         <div className="container max-w-6xl mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Community Leaderboards</h1>
+        <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">See how you rank against other MYFC members!</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">MYFC Leaderboards</h1>
+                </div>
+            </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             
             {isAdmin && (
               <Button
@@ -251,9 +257,6 @@ export default function LeaderboardsPage() {
             )}
           </div>
           
-          <p className="text-neutral-600 dark:text-neutral-400 mb-8">
-            See how you rank against other members of the MYFC community!
-          </p>
           
           <Leaderboards categories={categories} userId={userId} />
         </div>
