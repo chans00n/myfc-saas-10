@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { format } from "date-fns";
@@ -158,10 +159,13 @@ const FacialProgressGallery = () => {
           {selectedPhoto ? (
             <div className="border rounded-lg overflow-hidden">
               <div className="relative pb-[125%]">
-                <img 
+                <Image 
                   src={selectedPhoto.photo_url} 
                   alt={`Progress photo from ${formatDate(selectedPhoto.timestamp)}`}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={true}
                 />
               </div>
               <div className="p-2 text-xs text-center bg-neutral-100">
@@ -180,10 +184,13 @@ const FacialProgressGallery = () => {
           {comparisonPhoto ? (
             <div className="border rounded-lg overflow-hidden">
               <div className="relative pb-[125%]">
-                <img 
+                <Image 
                   src={comparisonPhoto.photo_url} 
                   alt={`Progress photo from ${formatDate(comparisonPhoto.timestamp)}`}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={true}
                 />
               </div>
               <div className="p-2 text-xs text-center bg-neutral-100">
@@ -212,10 +219,12 @@ const FacialProgressGallery = () => {
               `}
             >
               <div className="relative pb-[100%]">
-                <img 
+                <Image 
                   src={photo.photo_url} 
                   alt={`Progress photo from ${formatDate(photo.timestamp)}`}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 33vw, 25vw"
                 />
               </div>
               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">

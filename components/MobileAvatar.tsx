@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { SimpleSheet, SimpleSheetTitle, SimpleSheetDescription } from "@/components/ui/simple-sheet";
 import { ThemeToggle } from './ThemeToggle';
@@ -68,12 +69,14 @@ export function MobileAvatar({ userEmail, userAvatarUrl }: MobileAvatarProps) {
       >
         {userAvatarUrl ? (
           <div className="h-9 w-9 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700">
-            <img 
+            <Image 
               src={userAvatarUrl}
               alt={userEmail || 'User'}
+              width={36}
+              height={36}
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
-              crossOrigin="anonymous"
+              unoptimized
             />
           </div>
         ) : (
@@ -95,12 +98,14 @@ export function MobileAvatar({ userEmail, userAvatarUrl }: MobileAvatarProps) {
             <div className="mr-4">
               {userAvatarUrl ? (
                 <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-neutral-200 dark:border-neutral-600">
-                  <img 
+                  <Image 
                     src={userAvatarUrl}
                     alt={userEmail || 'User'}
+                    width={56}
+                    height={56}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
-                    crossOrigin="anonymous"
+                    unoptimized
                   />
                 </div>
               ) : (

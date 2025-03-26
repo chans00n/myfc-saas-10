@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -195,27 +196,27 @@ const FacialTrackingCapture = () => {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex justify-center mb-6">
+    <div className="flex justify-center mb-6 pt-6">
       <div className="flex items-center">
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-neutral-200 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 1 ? 'bg-neutral-800 dark:bg-neutral-200 text-neutral-200 dark:text-neutral-800' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'}`}>
           1
         </div>
         <div className="w-16 h-1 bg-muted">
           <div className={`h-full bg-primary ${step > 1 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-primary text-primary-foreground' : step > 2 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 2 ? 'bg-neutral-800 dark:bg-neutral-200 text-neutral-200 dark:text-neutral-800' : step > 2 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
           2
         </div>
         <div className="w-16 h-1 bg-muted">
           <div className={`h-full bg-primary ${step > 2 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 3 ? 'bg-primary text-primary-foreground' : step > 3 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 3 ? 'bg-neutral-800 dark:bg-neutral-200 text-neutral-200 dark:text-neutral-800' : step > 3 ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'}`}>
           3
         </div>
         <div className="w-16 h-1 bg-muted">
           <div className={`h-full bg-primary ${step > 3 ? 'w-full' : 'w-0'}`}></div>
         </div>
-        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 4 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+        <div className={`rounded-full w-8 h-8 flex items-center justify-center ${step === 4 ? 'bg-neutral-800 dark:bg-neutral-200 text-neutral-200 dark:text-neutral-800' : 'bg-muted text-muted-foreground'}`}>
           4
         </div>
       </div>
@@ -224,7 +225,7 @@ const FacialTrackingCapture = () => {
 
   const renderStepLabel = () => (
     <div className="flex justify-center mb-4 text-sm text-muted-foreground">
-      <div className="flex w-full max-w-md justify-between px-4">
+      <div className="flex w-full max-w-md justify-between px-2">
         <div className="text-center">Set up</div>
         <div className="text-center">Align</div>
         <div className="text-center">Capture</div>
@@ -235,12 +236,6 @@ const FacialTrackingCapture = () => {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-center text-2xl">Facial Fitness Photo Capture</CardTitle>
-        <CardDescription className="text-center">
-          Create consistent, high-quality photos to track your progress
-        </CardDescription>
-      </CardHeader>
       <CardContent>
         {renderStepIndicator()}
         {renderStepLabel()}
@@ -341,7 +336,17 @@ const FacialTrackingCapture = () => {
         {step === 3 && (
           <div>
             <div className="aspect-[3/4] bg-black rounded-lg overflow-hidden relative mb-4">
-              {capturedPhoto && <img src={capturedPhoto} alt="Captured facial progress" className="w-full h-full object-cover" />}
+              {capturedPhoto && (
+                <div className="relative w-full h-full">
+                  <Image 
+                    src={capturedPhoto} 
+                    alt="Captured facial progress" 
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex space-x-4 mb-4">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   Table,
   TableBody,
@@ -347,10 +348,13 @@ export default function WorkoutsTable() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       {workout.thumbnail_url ? (
-                        <img 
+                        <Image 
                           src={workout.thumbnail_url} 
                           alt={workout.title} 
-                          className="h-10 w-16 object-cover rounded"
+                          width={64}
+                          height={40}
+                          className="object-cover rounded"
+                          unoptimized
                         />
                       ) : (
                         <div className="h-10 w-16 bg-neutral-100 dark:bg-neutral-800 rounded flex items-center justify-center">
@@ -435,10 +439,13 @@ export default function WorkoutsTable() {
                 <div className="p-4">
                   <div className="flex items-center gap-3 mb-3">
                     {workout.thumbnail_url ? (
-                      <img 
+                      <Image 
                         src={workout.thumbnail_url} 
                         alt={workout.title} 
-                        className="h-12 w-20 object-cover rounded"
+                        width={80}
+                        height={48}
+                        className="object-cover rounded"
+                        unoptimized
                       />
                     ) : (
                       <div className="h-12 w-20 bg-neutral-100 dark:bg-neutral-700 rounded flex items-center justify-center">

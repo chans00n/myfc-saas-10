@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react";
+import Image from "next/image";
 import { getImageSizes } from "@/utils/image-sizes";
 
 interface AvatarProps {
@@ -30,14 +31,16 @@ export const SimpleAvatar = React.memo(function SimpleAvatar({
       style={{ width: size, height: size }}
     >
       {!imageError && src ? (
-        <img
+        <Image
           src={src}
           alt={alt}
+          width={size}
+          height={size}
           className="w-full h-full object-cover"
           onError={handleImageError}
           referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
-          loading="lazy"
+          priority={false}
+          sizes={`${size}px`}
         />
       ) : (
         <span className="text-neutral-800 font-medium text-sm">

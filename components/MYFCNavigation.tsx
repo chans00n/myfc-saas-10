@@ -63,12 +63,14 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
       >
         {userAvatarUrl ? (
           <div className="h-9 w-9 rounded-full overflow-hidden border border-neutral-200">
-            <img 
+            <Image 
               src={userAvatarUrl}
               alt={userEmail || 'User'}
+              width={36}
+              height={36}
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
-              crossOrigin="anonymous"
+              unoptimized
             />
           </div>
         ) : (
@@ -90,12 +92,14 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
             <div className="mr-4">
               {userAvatarUrl ? (
                 <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-neutral-200 dark:border-neutral-600">
-                  <img 
+                  <Image 
                     src={userAvatarUrl}
                     alt={userEmail || 'User'}
+                    width={56}
+                    height={56}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
-                    crossOrigin="anonymous"
+                    unoptimized
                   />
                 </div>
               ) : (
