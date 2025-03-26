@@ -1,16 +1,24 @@
-const withPWA = require('@ducanh2912/next-pwa').default({
+const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development' ? false : false,
-  buildExcludes: [/middleware-manifest.json$/],
-  debug: false,
-  disableLogging: true,
+  disable: process.env.NODE_ENV === 'development',
+  buildExcludes: [/middleware-manifest\.json$/],
+  publicExcludes: ['!sw.js', '!workbox-*.js'],
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
   images: {
     remotePatterns: [
       {
@@ -38,11 +46,25 @@ const nextConfig = {
         pathname: '/**',
       }
     ],
+    domains: ['*'],
   },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+  },
+  async headers() {
+    return [
+      {
+        source: '/(dashboard|admin|api)/:path*',
+        headers: [
+          {
+            key: 'x-middleware-cache',
+            value: 'no-cache',
+          },
+        ],
+      },
+    ]
   },
 };
 
