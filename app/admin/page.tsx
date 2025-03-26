@@ -1,4 +1,9 @@
 import { UserStatsOverview } from '@/components/admin/UserStatsOverview';
+import { dynamic } from '../config'
+
+// Force dynamic rendering
+export const revalidate = 0
+export { dynamic }
 
 export default function AdminPage() {
   return (

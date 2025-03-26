@@ -76,10 +76,13 @@ export default async function ProgressPage() {
   return (
     <main className="pb-24 md:pb-0">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col gap-2 mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">My Progress</h1>
-          <p className="text-neutral-800 dark:text-neutral-400">Track your facial fitness journey over time</p>
-        </div>
+      <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Track your facial fitness journey</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">MYFC Progress</h1>
+                </div>
+            </div>
+
 
         {totalWorkoutCount > 0 ? (
           <>

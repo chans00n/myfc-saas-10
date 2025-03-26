@@ -336,12 +336,14 @@ export default function ProfilePage() {
               <div
                 className="h-28 w-28 rounded-full overflow-hidden border-2 border-neutral-300/30 dark:border-white/20 shadow-xl"
               >
-                <img
+                <Image
                   src={avatarUrl}
                   alt={userData.name || "User"}
+                  width={112}
+                  height={112}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
-                  crossOrigin="anonymous"
+                  unoptimized
                 />
               </div>
             ) : (
@@ -496,7 +498,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full inline-flex items-center justify-center px-4 py-2 bg-neutral-800 text-white dark:bg-neutral-700 dark:text-neutral-100 font-medium rounded-lg hover:bg-neutral-900 dark:hover:bg-neutral-600 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full inline-flex items-center justify-center px-4 py-2 bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-800 font-medium rounded-lg hover:bg-neutral-900 dark:hover:bg-neutral-600 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSaving ? (
                   <>

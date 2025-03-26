@@ -12,9 +12,6 @@ export default async function MovementLibraryPage({
 }: {
   searchParams: { 
     page?: string;
-    sort?: string;
-    order?: string;
-    difficulty?: string;
     focus?: string;
     q?: string;
   }
@@ -36,11 +33,6 @@ export default async function MovementLibraryPage({
 
   // Get and validate query parameters
   const page = parseInt(searchParams.page || '1', 10);
-  const sortBy = searchParams.sort || 'name';
-  const sortOrder = searchParams.order === 'asc' ? 'asc' : 'desc';
-  const difficultyFilter = ['beginner', 'intermediate', 'advanced'].includes(searchParams.difficulty || '') 
-    ? searchParams.difficulty as 'beginner' | 'intermediate' | 'advanced'
-    : null;
   const focusAreaFilter = searchParams.focus || null;
   const searchQuery = searchParams.q || null;
 
@@ -58,19 +50,20 @@ export default async function MovementLibraryPage({
   const { data: movements, count = 0, totalPages = 0 } = await getMovementsLibrary({
     page,
     limit: 12,
-    sortBy,
-    sortOrder,
-    difficulty: difficultyFilter,
-    focusAreaId,
+    sortBy: 'name',
+    sortOrder: 'asc',
+    focusAreaId: focusAreaFilter,
     search: searchQuery
   });
 
   return (
     <main className="container max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Movement Library</h1>
-        <p className="text-gray-600 dark:text-gray-400">Browse and explore facial exercises by area and difficulty</p>
-      </div>
+      <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Master your facial techniques</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">Movement Library</h1>
+                </div>
+            </div>
       
       {/* Pass all data to the client component for interactive features */}
       <MovementLibraryClient 
@@ -78,9 +71,9 @@ export default async function MovementLibraryPage({
         totalMovements={count}
         totalPages={totalPages}
         currentPage={page}
-        currentSort={sortBy}
-        currentOrder={sortOrder}
-        currentDifficulty={difficultyFilter}
+        currentSort="name"
+        currentOrder="asc"
+        currentDifficulty={null}
         currentFocusArea={focusAreaFilter}
         currentSearch={searchQuery}
         focusAreas={focusAreas}

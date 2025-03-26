@@ -12,6 +12,7 @@ import { Workout } from '@/types/database';
 import FeaturedWorkoutCard from '@/app/components/dashboard/FeaturedWorkoutCard';
 import StreakDisplay from '@/app/components/dashboard/StreakDisplay';
 import QuickLinks from '@/app/components/dashboard/QuickLinks';
+import { dynamic } from '../config'
 
 /**
  * Returns a random encouraging message for the user
@@ -42,6 +43,10 @@ function getRandomGreeting(): string {
     
     return greetings[Math.floor(Math.random() * greetings.length)];
 }
+
+// Force dynamic rendering
+export const revalidate = 0
+export { dynamic }
 
 export default async function Dashboard() {
     const supabase = createClient()

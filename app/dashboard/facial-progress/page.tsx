@@ -9,13 +9,13 @@ export const metadata = {
 
 export default function FacialProgressPage() {
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Facial Progress Tracking</h1>
-        <p className="text-neutral-400 mt-2">
-          Document your facial fitness journey with consistent weekly photos
-        </p>
-      </div>
+    <div className="mx-auto py-8 p-4">
+            <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Document your facial fitness journey</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">Facial Progress Tracking</h1>
+                </div>
+            </div>
 
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -42,20 +42,20 @@ export default function FacialProgressPage() {
             <CardContent>
               <ul className="space-y-2 text-sm">
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Visualize subtle changes that occur over time</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Visualize subtle changes that occur over time</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Stay motivated by seeing your facial transformation</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Stay motivated by seeing your facial transformation</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Identify which exercises are most effective for you</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Identify which exercises are most effective for you</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Create before and after comparisons to share your success</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Create before and after comparisons to share your success</span>
                 </li>
               </ul>
             </CardContent>
@@ -68,20 +68,20 @@ export default function FacialProgressPage() {
             <CardContent>
               <ul className="space-y-2 text-sm">
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Take photos weekly on the same day</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Take photos weekly on the same day</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Maintain consistent lighting and position</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Maintain consistent lighting and position</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Use the alignment guides for accurate comparisons</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Use the alignment guides for accurate comparisons</span>
                 </li>
                 <li className="flex">
-                  <span className="mr-2 text-neutral-800">•</span>
-                  <span className="text-neutral-600">Keep a neutral expression in all photos</span>
+                  <span className="mr-2 text-neutral-800 dark:text-neutral-400">•</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Keep a neutral expression in all photos</span>
                 </li>
               </ul>
             </CardContent>

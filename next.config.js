@@ -4,11 +4,15 @@ const withPWA = require('next-pwa')({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   buildExcludes: [/middleware-manifest\.json$/],
-  publicExcludes: ['!sw.js', '!workbox-*.js'],
+  publicExcludes: ['!sw.js', '!workbox-*.js', '!worker-*.js', '!fallback-*.js', '!precache-manifest.*.js'],
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, path: false };
+    return config;
+  },
   reactStrictMode: true,
   logging: {
     fetches: {

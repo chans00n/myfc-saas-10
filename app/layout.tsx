@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 import { db } from "@/utils/db/db";
 import { usersTable } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
+import { dynamic } from './config';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,11 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
+
+// Force dynamic rendering for authenticated routes
+export const revalidate = 0;
+export const dynamicParams = true;
+export { dynamic };
 
 export default async function RootLayout({
   children,

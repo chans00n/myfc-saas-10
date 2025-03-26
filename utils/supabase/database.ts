@@ -440,7 +440,7 @@ export async function getMovementsLibrary({
       .from('movements')
       .select(`
         *,
-        focus_areas(id, name, description, image_url)
+        focus_areas!inner(id, name, description, image_url)
       `, { count: 'exact' });
     
     // Apply filters
@@ -454,7 +454,7 @@ export async function getMovementsLibrary({
     
     // Filter by focus area if provided
     if (focusAreaId) {
-      query = query.eq('focus_area_id', focusAreaId);
+      query = query.eq('focus_areas.name', focusAreaId);
     }
     
     // Apply sorting

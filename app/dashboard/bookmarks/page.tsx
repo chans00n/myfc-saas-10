@@ -27,12 +27,13 @@ export default async function BookmarksPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-100">Your Bookmarked Workouts</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Workouts you've saved for quick access
-        </p>
-      </header>
+       <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Save your favorite lifts for quick access</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">MYFC Bookmarks</h1>
+                </div>
+            </div>
+
 
       {bookmarks.length === 0 ? (
         <div className="bg-white dark:bg-neutral-800 rounded-lg p-8 text-center shadow-sm">

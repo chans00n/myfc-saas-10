@@ -62,10 +62,12 @@ export default async function WorkoutLibraryPage({
 
   return (
     <main className="container max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Workout Library</h1>
-        <p className="text-gray-600 dark:text-gray-400">Discover and explore our collection of workouts</p>
-      </div>
+      <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Discover and explore our collection of lifts</p>
+                    <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">Workout Library</h1>
+                </div>
+            </div>
       
       {/* Pass all data to the client component for interactive features */}
       <WorkoutLibraryClient 
