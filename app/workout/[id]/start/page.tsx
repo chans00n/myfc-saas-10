@@ -66,7 +66,7 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
   // Track workout start when the page loads
   useEffect(() => {
     if (workout) {
-      featureEvents.startWorkout(workout.title);
+      featureEvents.startWorkout(workout.type || 'facial', workout.title);
       setStartTime(Date.now());
     }
   }, [workout]);
@@ -76,7 +76,7 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
     // Track workout completion if it was started
     if (startTime && workout) {
       const duration = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
-      featureEvents.completeWorkout(workout.title, duration);
+      featureEvents.completeWorkout(workout.type || 'facial', duration, workout.title);
     }
     router.back();
   };
