@@ -103,7 +103,7 @@ export async function signup(currentState: { message: string }, formData: FormDa
     }
 }
 
-export async function loginUser(currentState: { message: string }, formData: FormData) {
+export async function loginUser(currentState: { message: string, userType: string }, formData: FormData) {
     const supabase = createClient()
 
     const data = {
@@ -114,14 +114,23 @@ export async function loginUser(currentState: { message: string }, formData: For
     const { error } = await supabase.auth.signInWithPassword(data)
 
     if (error) {
-        return { message: error.message }
+        return { message: error.message, userType: '' }
     }
+
+    // Get user's subscription status
+    const { data: userData } = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, data.email))
+        .limit(1)
+
+    const userType = userData?.[0]?.plan || 'free'
 
     revalidatePath('/', 'layout')
     redirect('/dashboard')
+    
+    return { message: '', userType }
 }
-
-
 
 export async function logout() {
     const supabase = createClient()
@@ -142,7 +151,6 @@ export async function signInWithGoogle() {
         redirect(data.url) // use the redirect API for your server framework
     }
 }
-
 
 export async function signInWithGithub() {
     const supabase = createClient()

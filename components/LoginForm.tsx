@@ -29,7 +29,8 @@ function SubmitButton() {
 
 export default function LoginForm() {
     const initialState = {
-        message: ''
+        message: '',
+        userType: ''
     }
     const [formState, formAction] = useFormState(loginUser, initialState)
     
@@ -39,7 +40,7 @@ export default function LoginForm() {
             toast.error(formState.message)
         } else if (formState && !formState.message) {
             // If there's no error message, the login was successful
-            authEvents.login('email')
+            authEvents.login('email', formState.userType || 'free')
         }
     }, [formState])
     

@@ -2,16 +2,18 @@ import { trackEvent } from '@/lib/analytics'
 
 // Authentication Events
 export const authEvents = {
-  signUp: (method: 'email' | 'google' | 'github') =>
+  signUp: (method: 'email' | 'google' | 'github', userType: string = 'free') =>
     trackEvent('sign_up', {
       category: 'authentication',
       label: method,
+      user_type: userType
     }),
   
-  login: (method: 'email' | 'google' | 'github') =>
+  login: (method: 'email' | 'google' | 'github', userType: string) =>
     trackEvent('login', {
       category: 'authentication',
       label: method,
+      user_type: userType
     }),
     
   logout: () =>
@@ -24,13 +26,15 @@ export const authEvents = {
 export const subscriptionEvents = {
   viewPricing: () =>
     trackEvent('view_pricing', {
-      category: 'subscription',
+      category: 'subscription'
     }),
     
   startTrial: (plan: string) =>
     trackEvent('start_trial', {
       category: 'subscription',
       label: plan,
+      plan_name: plan,
+      user_type: 'trial'
     }),
     
   subscribe: (plan: string, value: number) =>
@@ -38,6 +42,8 @@ export const subscriptionEvents = {
       category: 'subscription',
       label: plan,
       value: value,
+      plan_name: plan,
+      user_type: 'premium'
     }),
     
   cancelSubscription: (plan: string, reason?: string) =>
@@ -50,17 +56,22 @@ export const subscriptionEvents = {
 
 // Feature Usage Events
 export const featureEvents = {
-  startWorkout: (type: string) =>
+  startWorkout: (type: string, workoutTitle: string) =>
     trackEvent('start_workout', {
       category: 'feature_usage',
       label: type,
+      workout_type: type,
+      workout_title: workoutTitle
     }),
     
-  completeWorkout: (type: string, duration: number) =>
+  completeWorkout: (type: string, duration: number, workoutTitle: string) =>
     trackEvent('complete_workout', {
       category: 'feature_usage',
       label: type,
-      value: duration, // duration in seconds
+      value: duration,
+      workout_type: type,
+      workout_title: workoutTitle,
+      duration: duration
     }),
     
   trackProgress: (metric: string) =>
@@ -78,16 +89,18 @@ export const featureEvents = {
 
 // Engagement Events
 export const engagementEvents = {
-  viewKnowledgeBase: (article?: string) =>
+  viewKnowledgeBase: (article?: string, userType?: string) =>
     trackEvent('view_knowledge_base', {
       category: 'engagement',
       label: article,
+      user_type: userType
     }),
     
-  shareProgress: (platform: string) =>
+  shareProgress: (platform: string, workoutType?: string) =>
     trackEvent('share_progress', {
       category: 'engagement',
       label: platform,
+      workout_type: workoutType
     }),
     
   updateProfile: (fields: string[]) =>
