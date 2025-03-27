@@ -118,13 +118,13 @@ export async function loginUser(currentState: { message: string, userType: strin
     }
 
     // Get user's subscription status
-    const { data: userData } = await db
+    const userData = await db
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, data.email))
         .limit(1)
 
-    const userType = userData?.[0]?.plan || 'free'
+    const userType = userData[0]?.plan || 'free'
 
     revalidatePath('/', 'layout')
     redirect('/dashboard')
