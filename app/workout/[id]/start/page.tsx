@@ -33,7 +33,9 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
           setWorkout({
             id: params.id,
             title: "Morning Face Refresher",
-            video_url: randomVideo
+            video_url: randomVideo,
+            type: 'facial',
+            user_type: 'free' // Default user type
           });
           setIsLoading(false);
           return;
@@ -46,6 +48,11 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
           data.video_url = TEST_VIDEOS[0];
         }
         
+        // Ensure we have user type
+        if (!data.user_type) {
+          data.user_type = 'free';
+        }
+        
         setWorkout(data);
         setIsLoading(false);
       } catch (error) {
@@ -54,7 +61,9 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
         setWorkout({
           id: params.id,
           title: "Morning Face Refresher",
-          video_url: TEST_VIDEOS[0]
+          video_url: TEST_VIDEOS[0],
+          type: 'facial',
+          user_type: 'free' // Default user type
         });
         setIsLoading(false);
       }
@@ -66,7 +75,7 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
   // Track workout start when the page loads
   useEffect(() => {
     if (workout) {
-      featureEvents.startWorkout(workout.type || 'facial', workout.title);
+      featureEvents.startWorkout(workout.type || 'facial', workout.title, workout.user_type || 'free');
       setStartTime(Date.now());
     }
   }, [workout]);
@@ -76,7 +85,7 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
     // Track workout completion if it was started
     if (startTime && workout) {
       const duration = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
-      featureEvents.completeWorkout(workout.type || 'facial', duration, workout.title);
+      featureEvents.completeWorkout(workout.type || 'facial', duration, workout.title, workout.user_type || 'free');
     }
     router.back();
   };

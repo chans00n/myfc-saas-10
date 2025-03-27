@@ -56,22 +56,24 @@ export const subscriptionEvents = {
 
 // Feature Usage Events
 export const featureEvents = {
-  startWorkout: (type: string, workoutTitle: string) =>
+  startWorkout: (workoutType: string, workoutTitle: string, userType: string = 'free') =>
     trackEvent('start_workout', {
       category: 'feature_usage',
-      label: type,
-      workout_type: type,
-      workout_title: workoutTitle
+      label: workoutTitle,
+      workout_type: workoutType,
+      workout_title: workoutTitle,
+      user_type: userType
     }),
     
-  completeWorkout: (type: string, duration: number, workoutTitle: string) =>
+  completeWorkout: (workoutType: string, duration: number, workoutTitle: string, userType: string = 'free') =>
     trackEvent('complete_workout', {
       category: 'feature_usage',
-      label: type,
+      label: workoutTitle,
       value: duration,
-      workout_type: type,
+      workout_type: workoutType,
       workout_title: workoutTitle,
-      duration: duration
+      duration: duration,
+      user_type: userType
     }),
     
   trackProgress: (metric: string) =>
