@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import VideoPlayer from '@/app/components/VideoPlayer';
+import { featureEvents } from '@/lib/analytics/events';
 
 // Sample video URLs for testing
 const TEST_VIDEOS = [
@@ -16,6 +17,7 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [workout, setWorkout] = useState<any>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchWorkout = async () => {
@@ -61,8 +63,21 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
     fetchWorkout();
   }, [params.id]);
 
+  // Track workout start when the page loads
+  useEffect(() => {
+    if (workout) {
+      featureEvents.startWorkout(workout.title);
+      setStartTime(Date.now());
+    }
+  }, [workout]);
+
   // Handle closing the video and going back
   const handleBack = () => {
+    // Track workout completion if it was started
+    if (startTime && workout) {
+      const duration = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
+      featureEvents.completeWorkout(workout.title, duration);
+    }
     router.back();
   };
 

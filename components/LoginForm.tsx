@@ -7,6 +7,7 @@ import { loginUser } from '@/app/auth/actions'
 import { toast } from "sonner"
 import { useEffect } from "react"
 import { Loader2 } from "lucide-react"
+import { authEvents } from "@/lib/analytics/events"
 
 // Submit button with loading state
 function SubmitButton() {
@@ -28,7 +29,8 @@ function SubmitButton() {
 
 export default function LoginForm() {
     const initialState = {
-        message: ''
+        message: '',
+        success: false
     }
     const [formState, formAction] = useFormState(loginUser, initialState)
     
@@ -36,6 +38,10 @@ export default function LoginForm() {
     useEffect(() => {
         if (formState?.message) {
             toast.error(formState.message)
+        }
+        // Track successful login
+        if (formState?.success) {
+            authEvents.login('email')
         }
     }, [formState])
     

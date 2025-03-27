@@ -2,16 +2,15 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import Script from "next/script";
 import { ServiceWorkerRegistry } from "@/components/ServiceWorkerRegistry";
 import { Toaster } from "sonner";
-import { CrispWrapper } from '@/components/CrispWrapper';
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { db } from "@/utils/db/db";
 import { usersTable } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
 import { dynamic } from './config';
+import { Providers } from '@/components/Providers';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -70,7 +69,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <link rel="apple-touch-icon" href="/icons/192.png" />
@@ -81,11 +80,11 @@ export default async function RootLayout({
       
       <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 h-full`}>
         <ThemeProvider initialTheme={theme}>
-          <CrispWrapper>
+          <Providers>
             <ServiceWorkerRegistry />
             {children}
             <Toaster position="bottom-right" closeButton richColors />
-          </CrispWrapper>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

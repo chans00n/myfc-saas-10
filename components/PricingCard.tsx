@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check, Star } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { subscriptionEvents } from "@/lib/analytics/events"
 
 export interface PricingFeature {
   name: string
@@ -28,15 +29,27 @@ interface PricingCardProps {
 export default function PricingCard({ plan, onSelect }: PricingCardProps) {
   const [isLoading, setIsLoading] = useState(false)
   
+  // Track when user views pricing
+  useEffect(() => {
+    subscriptionEvents.viewPricing()
+  }, [])
+  
   const handleSelect = async () => {
     try {
       setIsLoading(true)
+      
+      // Track trial start or subscription
+      if (plan.interval === 'month') {
+        subscriptionEvents.startTrial(plan.name)
+      } else {
+        subscriptionEvents.subscribe(plan.name, plan.price)
+      }
+      
       await onSelect(plan.id)
     } catch (error) {
       console.error("Error selecting plan:", error)
     } finally {
-      // No need to set loading to false as we'll redirect
-      setIsLoading(false) // Add this in case redirect fails
+      setIsLoading(false)
     }
   }
   

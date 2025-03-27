@@ -394,16 +394,16 @@ export default function MYFCNavigation() {
             <Image 
               src="/logo.png" 
               alt="MYFC Logo" 
-              width={48} 
-              height={48} 
-              className="h-auto w-auto dark:hidden"
+              width={80} 
+              height={80} 
+              className="h-auto dark:hidden"
             />
             <Image 
               src="/logo_white.png" 
               alt="MYFC Logo" 
-              width={48} 
-              height={48} 
-              className="h-auto w-auto hidden dark:block"
+              width={80} 
+              height={80} 
+              className="h-auto hidden dark:block"
             />
           </div>
         </div>
