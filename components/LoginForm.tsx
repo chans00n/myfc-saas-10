@@ -29,8 +29,7 @@ function SubmitButton() {
 
 export default function LoginForm() {
     const initialState = {
-        message: '',
-        success: false
+        message: ''
     }
     const [formState, formAction] = useFormState(loginUser, initialState)
     
@@ -38,9 +37,8 @@ export default function LoginForm() {
     useEffect(() => {
         if (formState?.message) {
             toast.error(formState.message)
-        }
-        // Track successful login
-        if (formState?.success) {
+        } else if (formState && !formState.message) {
+            // If there's no error message, the login was successful
             authEvents.login('email')
         }
     }, [formState])
