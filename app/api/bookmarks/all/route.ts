@@ -1,51 +1,37 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { getUserBookmarks } from '@/utils/supabase/database';
-import { dynamic, runtime, preferredRegion } from '@/app/config'
+import { db } from '@/utils/db/db';
+import { bookmarksTable } from '@/utils/db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { dynamic } from '@/app/config'
 
-// Define the type for WorkoutBookmark for better type safety
-interface WorkoutBookmark {
-  workout_id: string;
-  [key: string]: any; // For other properties
-}
+export { dynamic }
 
-export { dynamic, runtime, preferredRegion }
+export const runtime = 'nodejs';
+export const preferredRegion = ['iad1']; // US East (N. Virginia)
 
 /**
  * GET /api/bookmarks/all - Fetches all bookmarks for the current user
  */
 export async function GET() {
-  const supabase = createClient();
-  
-  // Get the current user
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    console.error('Unauthorized access attempt to all bookmarks API');
-    return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
-    );
-  }
-
   try {
-    // Get all bookmarks for the user
-    const bookmarks = await getUserBookmarks(user.id);
+    const supabase = createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
     
-    // Extract workout IDs but preserve them as strings to avoid type issues
-    const bookmarkedWorkoutIds = bookmarks.map(bookmark => {
-      const workoutId = (bookmark as WorkoutBookmark).workout_id;
-      return workoutId; // Keep original ID format
-    });
-    
-    return NextResponse.json({
-      bookmarkedWorkoutIds
-    });
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Use Drizzle ORM to fetch bookmarks
+    const bookmarks = await db
+      .select()
+      .from(bookmarksTable)
+      .where(eq(bookmarksTable.user_id, user.id))
+      .orderBy(desc(bookmarksTable.created_at));
+
+    return NextResponse.json(bookmarks);
   } catch (error) {
-    console.error('Error fetching user bookmarks:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch bookmarks' },
-      { status: 500 }
-    );
+    console.error('Error fetching bookmarks:', error);
+    return NextResponse.json({ error: 'Failed to fetch bookmarks' }, { status: 500 });
   }
 } 

@@ -77,7 +77,7 @@ export default function Leaderboards({ categories, userId }: LeaderboardsProps) 
         return (
           <div key={category.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-4">
             <div className="mb-4">
-              <h2 className="text-xl font-semibold">{category.name}</h2>
+              <h2 className="text-xl text-neutral-800 dark:text-neutral-200 font-semibold">{category.name}</h2>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm">{category.description}</p>
             </div>
             
@@ -93,15 +93,15 @@ export default function Leaderboards({ categories, userId }: LeaderboardsProps) 
               <>
                 {userId && data.userRank && (
                   <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg mb-4 border border-neutral-200 dark:border-neutral-700">
-                    <p className="font-medium">Your Ranking</p>
+                    <p className="font-medium text-neutral-800 dark:text-neutral-200">Your Ranking</p>
                     <div className="flex justify-between items-center mt-2">
                       <div className="flex items-center gap-2">
                         <div className="bg-neutral-600 dark:bg-neutral-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                           {data.userRank.rank}
                         </div>
-                        <span className="font-medium">You</span>
+                        <span className="font-medium text-neutral-800 dark:text-neutral-200">You</span>
                       </div>
-                      <div className="font-semibold">
+                      <div className="font-semibold text-neutral-800 dark:text-neutral-200">
                         {data.userRank.score}
                       </div>
                     </div>

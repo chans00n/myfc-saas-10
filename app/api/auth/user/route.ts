@@ -1,8 +1,11 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { dynamic, runtime, preferredRegion } from '@/app/config'
+import { dynamic } from '@/app/config'
 
-export { dynamic, runtime, preferredRegion }
+export { dynamic }
+
+export const runtime = 'nodejs';
+export const preferredRegion = ['iad1']; // US East (N. Virginia)
 
 // Simple counter for logging
 let requestCount = 0;

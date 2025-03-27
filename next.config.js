@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const withPWA = require('next-pwa')({
   dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
-  disable: false,
   buildExcludes: [/middleware-manifest\.json$/],
   publicExcludes: ['!sw.js', '!workbox-*.js', '!worker-*.js', '!fallback-*.js', '!precache-manifest.*.js'],
   runtimeCaching: [

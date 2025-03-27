@@ -41,9 +41,19 @@ export const pushSubscriptionsTable = pgTable('push_subscriptions', {
     updated_at: timestamp('updated_at').defaultNow(),
 });
 
+export const bookmarksTable = pgTable('bookmarks', {
+    id: text('id').primaryKey(),
+    user_id: text('user_id').notNull().references(() => usersTable.id),
+    workout_id: text('workout_id').notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+    updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUser = typeof usersTable.$inferSelect;
 export type InsertFacialProgressPhoto = typeof facialProgressPhotosTable.$inferInsert;
 export type SelectFacialProgressPhoto = typeof facialProgressPhotosTable.$inferSelect;
 export type InsertPushSubscription = typeof pushSubscriptionsTable.$inferInsert;
 export type SelectPushSubscription = typeof pushSubscriptionsTable.$inferSelect;
+export type InsertBookmark = typeof bookmarksTable.$inferInsert;
+export type SelectBookmark = typeof bookmarksTable.$inferSelect;

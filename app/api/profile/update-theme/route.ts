@@ -3,9 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from 'drizzle-orm';
-import { dynamic, runtime, preferredRegion } from '@/app/config'
+import { dynamic } from '@/app/config'
 
-export { dynamic, runtime, preferredRegion }
+export { dynamic }
+
+export const runtime = 'nodejs';
+export const preferredRegion = ['iad1']; // US East (N. Virginia)
 
 export async function POST(request: NextRequest) {
   const supabase = createClient();

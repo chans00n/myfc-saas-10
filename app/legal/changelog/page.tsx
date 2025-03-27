@@ -152,17 +152,18 @@ export default function Changelog() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8 md:pt-16 md:pb-16">
-      <div className="mb-12">
-        <h1 className="text-3xl font-bold mb-2">Changelog</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mb-1">Track updates and improvements to MYFC</p>
-        <p className="text-xs text-neutral-500">
+            <div className="mb-8">
+            <p className="text-xs text-neutral-500">
           Last updated: {new Date().toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
           })}
         </p>
-      </div>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Track updates and improvements to MYFC</p>
+            <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-100">Changelog</h1>
+            
+          </div>
 
       <div className="space-y-12">
         {releases.map((release, index) => (
@@ -173,13 +174,13 @@ export default function Changelog() {
               <Badge className={getSemanticVersionColor(release.version)} variant="outline">
                 v{release.version}
               </Badge>
-              <h2 className="text-xl font-semibold">{release.title}</h2>
+              <h2 className="text-xl text-neutral-800 dark:text-neutral-200 font-semibold">{release.title}</h2>
               <span className="text-sm text-neutral-500 md:ml-auto">
                 {release.date}
               </span>
             </div>
             
-            <p className="text-neutral-700 dark:text-neutral-300 mb-6">
+            <p className="text-neutral-600 dark:text-neutral-400 mb-6">
               {release.description}
             </p>
             
@@ -191,14 +192,14 @@ export default function Changelog() {
                 
                 return (
                   <div key={changeType} className="space-y-2">
-                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                    <h3 className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
                       {getChangeTypeLabel(changeType as ChangeType)}
                     </h3>
                     <div className="ml-4 space-y-2">
                       {filteredChanges.map((change, idx) => (
                         <div key={idx} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">•</span>
-                          <span className="text-neutral-700 dark:text-neutral-300">
+                          <span className="text-neutral-600 dark:text-neutral-400 mt-1">•</span>
+                          <span className="text-neutral-600 dark:text-neutral-400">
                             {change.description}
                           </span>
                         </div>

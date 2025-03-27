@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import { generateStripeBillingPortalLink } from '@/utils/stripe/api';
-import { dynamic, runtime, preferredRegion } from '@/app/config'
+import { dynamic } from '@/app/config'
 
-export { dynamic, runtime, preferredRegion }
+export { dynamic }
+
+export const runtime = 'nodejs';
+export const preferredRegion = ['iad1']; // US East (N. Virginia)
 
 export async function GET() {
   try {

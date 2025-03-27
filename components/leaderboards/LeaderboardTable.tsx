@@ -60,10 +60,10 @@ export default function LeaderboardTable({ entries }: LeaderboardTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16">Rank</TableHead>
-            <TableHead>Athlete</TableHead>
-            <TableHead className="text-right">Score</TableHead>
-            <TableHead className="text-right hidden md:table-cell">Last Updated</TableHead>
+            <TableHead className="w-16 text-neutral-800 dark:text-neutral-200">Rank</TableHead>
+            <TableHead className="text-neutral-800 dark:text-neutral-200">Athlete</TableHead>
+            <TableHead className="text-right text-neutral-800 dark:text-neutral-200">Score</TableHead>
+            <TableHead className="text-right hidden md:table-cell text-neutral-800 dark:text-neutral-200">Last Updated</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,11 +89,11 @@ export default function LeaderboardTable({ entries }: LeaderboardTableProps) {
                     ) : null}
                     <AvatarFallback>{getInitials(entry)}</AvatarFallback>
                   </Avatar>
-                  <span>{getDisplayName(entry)}</span>
+                  <span className="text-neutral-800 dark:text-neutral-200">{getDisplayName(entry)}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-right font-semibold">{entry.score}</TableCell>
-              <TableCell className="text-right text-muted-foreground hidden md:table-cell">
+              <TableCell className="text-right font-semibold text-neutral-800 dark:text-neutral-200">{entry.score}</TableCell>
+              <TableCell className="text-right text-neutral-800 dark:text-neutral-200 hidden md:table-cell">
                 {entry.last_updated
                   ? formatDistanceToNow(new Date(entry.last_updated), { addSuffix: true })
                   : 'N/A'}
@@ -102,7 +102,7 @@ export default function LeaderboardTable({ entries }: LeaderboardTableProps) {
           ))}
         </TableBody>
       </Table>
-      <div className="text-xs text-muted-foreground mt-2 text-right italic">
+      <div className="text-xs text-neutral-800 dark:text-neutral-200 mt-2 text-right italic">
         Showing top 10 athletes
       </div>
     </>
