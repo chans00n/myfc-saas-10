@@ -14,11 +14,12 @@ export default function Login() {
                 <div className="flex items-center gap-2">
                     <Image 
                         src="/logo.png" 
-                        alt="logo" 
+                        alt="MYFC Logo" 
                         width={60} 
                         height={60}
                         className="invert" 
                         priority
+                        unoptimized
                     />
                 </div>
                 <div className="space-y-4">
@@ -37,11 +38,12 @@ export default function Login() {
                             <Link href='/'>
                                 <Image 
                                     src="/logo.png" 
-                                    alt="logo" 
+                                    alt="MYFC Logo" 
                                     width={70} 
                                     height={70}
                                     className="dark:invert"
                                     priority
+                                    unoptimized
                                 />
                             </Link>
                         </div>
