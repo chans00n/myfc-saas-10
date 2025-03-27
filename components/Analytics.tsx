@@ -37,7 +37,12 @@ export function Analytics() {
               gtag('js', new Date());
               gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
                 page_path: window.location.pathname,
-                cookie_flags: 'max-age=7200;secure;samesite=none'
+                cookie_flags: 'max-age=7200;secure;samesite=none',
+                custom_map: {
+                  'dimension1': 'workout_type',
+                  'dimension2': 'user_type',
+                  'dimension3': 'workout_title'
+                }
               });
             `}
           </Script>

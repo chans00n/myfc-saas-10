@@ -3,6 +3,9 @@ export type EventOptions = {
   label?: string
   value?: number
   nonInteraction?: boolean
+  workout_type?: string
+  user_type?: string
+  workout_title?: string
   [key: string]: any
 }
 
@@ -18,11 +21,20 @@ export function trackPageview(url: string) {
 // Enhanced event tracking
 export function trackEvent(action: string, options: EventOptions = {}) {
   if (typeof window !== 'undefined' && (window as any).gtag) {
-    ;(window as any).gtag('event', action, {
+    const eventParams: { [key: string]: any } = {
       event_category: options.category || 'general',
       event_label: options.label,
       value: options.value,
       non_interaction: options.nonInteraction,
+    };
+
+    // Map custom dimensions
+    if (options.workout_type) eventParams.dimension1 = options.workout_type;
+    if (options.user_type) eventParams.dimension2 = options.user_type;
+    if (options.workout_title) eventParams.dimension3 = options.workout_title;
+
+    ;(window as any).gtag('event', action, {
+      ...eventParams,
       ...options,
     })
   }
