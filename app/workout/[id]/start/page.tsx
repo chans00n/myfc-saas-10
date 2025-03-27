@@ -100,6 +100,33 @@ export default function WorkoutStartPage({ params }: { params: { id: string } })
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col">
+      {/* Test Controls - Only visible in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-24 right-4 z-50 bg-white dark:bg-neutral-800 p-4 rounded-lg shadow-lg">
+          <h3 className="text-sm font-medium mb-2">Analytics Test Controls</h3>
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                featureEvents.startWorkout('facial', 'Test Facial Workout', 'premium');
+                console.log('Sent startWorkout event');
+              }}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+            >
+              Test Start Event
+            </button>
+            <button
+              onClick={() => {
+                featureEvents.completeWorkout('facial', 300, 'Test Facial Workout', 'premium');
+                console.log('Sent completeWorkout event');
+              }}
+              className="w-full bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+            >
+              Test Complete Event
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top navigation */}
       <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 pt-12 md:pt-4 safe-top">
         <button onClick={handleBack} className="text-white">
