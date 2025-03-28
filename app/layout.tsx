@@ -7,6 +7,8 @@ import { ServiceWorkerRegistry } from "@/components/service-worker-registry";
 import { dynamic } from './config';
 import { Providers } from '@/components/Providers';
 import { ClientLayout } from '@/components/client-layout';
+import { PatternBackground } from '@/components/ui/pattern-background';
+import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,16 +33,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <PatternBackground variant="grid" />
           <Providers>
             <ServiceWorkerRegistry />
-            <ClientLayout>{children}</ClientLayout>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
             <Toaster position="bottom-right" closeButton richColors />
           </Providers>
         </ThemeProvider>

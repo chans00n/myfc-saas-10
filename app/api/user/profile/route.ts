@@ -1,9 +1,10 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { db } from '@/utils/db/db';
+import { getDB } from '@/utils/db';
+import { withRetry } from '@/utils/db/retry';
+import { dynamic } from '@/app/config';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from 'drizzle-orm';
-import { dynamic } from '@/app/config'
 
 export { dynamic }
 
@@ -14,83 +15,48 @@ export const preferredRegion = ['iad1']; // US East (N. Virginia)
 const userDataCache: Record<string, {timestamp: number; data: any}> = {};
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const supabase = createClient();
+    const db = getDB();
     
-    // Get auth cookie for cache key
-    const cookies = request.headers.get('cookie') || '';
-    const authCookie = cookies
-      .split(';')
-      .find(c => c.trim().startsWith('sb-'))
-      ?.trim() || '';
-    
-    // Check cache first
-    if (authCookie && userDataCache[authCookie] && 
-        (Date.now() - userDataCache[authCookie].timestamp < CACHE_TTL)) {
-      // Add cache control headers for HTTP caching
-      return NextResponse.json(userDataCache[authCookie].data, {
-        headers: {
-          'Cache-Control': 'private, max-age=300', // 5 minutes
-          'Vary': 'Cookie'
-        }
-      });
-    }
-    
-    // Get auth user
-    const { data, error } = await supabase.auth.getUser();
-    
-    if (error || !data?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    // Get DB user record in the same request
-    const userRecord = await db.select()
-      .from(usersTable)
-      .where(eq(usersTable.email, data.user.email!))
-      .limit(1);
-    
-    // Combine the data
-    const userData = {
-      auth: {
-        id: data.user.id,
-        email: data.user.email,
-        metadata: data.user.user_metadata,
-        created_at: data.user.created_at
-      },
-      profile: userRecord && userRecord.length > 0 ? userRecord[0] : null
-    };
-    
-    // Log the user data to help with debugging
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('User record from DB:', userRecord && userRecord.length > 0 ? {
-        // Log key fields
-        id: userRecord[0].id,
-        email: userRecord[0].email,
-        name: userRecord[0].name,
-        gender: userRecord[0].gender,
-        birthday: userRecord[0].birthday,
-        location: userRecord[0].location
-      } : 'No user record found');
-    }
-    
-    // Cache the result
-    if (authCookie) {
-      userDataCache[authCookie] = {
-        timestamp: Date.now(),
-        data: userData
-      };
-    }
-    
-    // Return with cache headers
-    return NextResponse.json(userData, {
-      headers: {
-        'Cache-Control': 'private, max-age=300',
-        'Vary': 'Cookie'
+    const profile = await withRetry(
+      () => db.select().from(usersTable).limit(1),
+      {
+        retryCount: 3,
+        onRetry: (error, attempt) => {
+          console.warn(`Retrying database operation, attempt ${attempt}:`, error);
+        },
       }
-    });
-  } catch (error) {
-    console.error('Error in consolidated user API:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    );
+
+    if (!profile || profile.length === 0) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Profile not found' }),
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(profile[0]);
+  } catch (error: any) {
+    console.error('Profile fetch error:', error);
+
+    if (error.code === 'XX000' && error.message.includes('Max client connections')) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Service temporarily unavailable. Please try again in a moment.',
+        }),
+        {
+          status: 503,
+          headers: {
+            'Retry-After': '5',
+          },
+        }
+      );
+    }
+
+    return new NextResponse(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500 }
+    );
   }
 } 
