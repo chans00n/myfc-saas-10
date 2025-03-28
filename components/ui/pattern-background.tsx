@@ -27,7 +27,7 @@ export function PatternBackground({ className, variant = 'grid' }: PatternBackgr
   return (
     <div
       className={cn(
-        'pointer-events-none fixed inset-x-0 bottom-0 -z-10 h-[70vh]',
+        'pointer-events-none fixed inset-0 -z-10 h-screen',
         className
       )}
       style={{
