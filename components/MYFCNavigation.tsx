@@ -168,7 +168,7 @@ function AvatarWithSheet({ userEmail, userAvatarUrl }: { userEmail: string | und
             </Link>
             
             <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-4">
-              <form action="/auth/auth/logout" method="post">
+              <form action="/auth/signout" method="post">
                 <button type="submit" className="flex items-center py-2.5 px-1 text-sm text-neutral-800 dark:text-neutral-200 hover:text-rose-600 dark:hover:text-rose-400 transition-colors w-full rounded-md">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -315,7 +315,7 @@ function UserProfileSection({ userEmail, userAvatarUrl }: { userEmail: string | 
           </DropdownMenuGroup>
           <DropdownMenuSeparator className="bg-neutral-200 dark:bg-neutral-700" />
           <DropdownMenuItem className="focus:bg-neutral-100 dark:focus:bg-neutral-700 cursor-pointer text-red-600 dark:text-red-400">
-            <form action="/auth/auth/logout" method="post" className="w-full">
+            <form action="/auth/signout" method="post" className="w-full">
               <button type="submit" className="flex items-center w-full">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
