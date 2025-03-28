@@ -517,30 +517,40 @@ export default function MYFCNavigation() {
 
       {/* Mobile Navigation - minimal bottom tab bar */}
       <div className="md:hidden">
-        {/* Fixed top bar with avatar */}
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 h-16 pt-safe-top z-20">
-          <div className="w-9"></div> {/* Empty div for spacing */}
-          <Image 
-            src="/myfc-logo.png" 
-            alt="MYFC Logo" 
-            width={32} 
-            height={32}
-            className="h-auto w-auto dark:hidden"
-          />
-          <Image 
-            src="/myfc-logo-dark.png" 
-            alt="MYFC Logo" 
-            width={32} 
-            height={32}
-            className="h-auto w-auto hidden dark:block"
-          />
-          <div className="flex-none">
-            <AvatarWithSheet userEmail={userData.email} userAvatarUrl={userData.avatarUrl} />
+        {/* Fixed top bar with avatar - extending into status bar */}
+        <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 z-20">
+          {/* Status bar spacer */}
+          <div className="w-full h-[env(safe-area-inset-top)] absolute top-0 left-0 right-0" />
+          
+          {/* Content with padding for status bar */}
+          <div className="w-full flex justify-between items-center h-16 pt-[env(safe-area-inset-top)]">
+            <div className="w-9"></div> {/* Empty div for spacing */}
+            <Image 
+              src="/myfc-logo.png" 
+              alt="MYFC Logo" 
+              width={32} 
+              height={32}
+              className="h-auto w-auto dark:hidden"
+            />
+            <Image 
+              src="/myfc-logo-dark.png" 
+              alt="MYFC Logo" 
+              width={32} 
+              height={32}
+              className="h-auto w-auto hidden dark:block"
+            />
+            <div className="flex-none">
+              <AvatarWithSheet userEmail={userData.email} userAvatarUrl={userData.avatarUrl} />
+            </div>
           </div>
         </div>
         
         {/* Fixed bottom tab bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 pb-safe-bottom z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 z-10">
+          {/* Bottom safe area spacer */}
+          <div className="w-full h-[env(safe-area-inset-bottom)] absolute bottom-0 left-0 right-0" />
+          
+          {/* Tab bar content */}
           <div className="flex justify-around items-center h-16">
             <Link href="/dashboard" className="flex flex-col items-center justify-center w-full h-full">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -579,8 +589,8 @@ export default function MYFCNavigation() {
           </div>
         </div>
         
-        {/* Padding at the bottom to prevent content from being hidden behind the bottom tab bar */}
-        <div className="pb-16 pt-16"></div>
+        {/* Padding to prevent content from being hidden */}
+        <div className="pb-16 pt-[calc(4rem+env(safe-area-inset-top))]"></div>
       </div>
     </>
   );

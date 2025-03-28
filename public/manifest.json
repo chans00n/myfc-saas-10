@@ -1,14 +1,14 @@
 {
   "name": "MYFC - My Face Coach",
   "short_name": "MYFC",
-  "description": "Elevate your routine with facial fitness. Join MYFC - the ultimate destination for personalized training and support.",
+  "description": "Daily facial exercises and tracking",
   "start_url": "/dashboard",
   "display": "standalone",
   "scope": "/",
   "orientation": "portrait",
   "background_color": "#171717",
   "theme_color": "#171717",
-  "display_override": ["standalone", "fullscreen"],
+  "display_override": ["fullscreen", "standalone"],
   "icons": [
     {
       "src": "/icons/192.png",

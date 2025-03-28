@@ -54,9 +54,12 @@ export default function RootLayout({
       <body className={cn(
         'min-h-screen bg-neutral-50 dark:bg-neutral-900 font-sans antialiased',
         'h-full w-full overflow-x-hidden',
-        'pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right',
+        'relative',
         inter.className
       )}>
+        {/* Background that extends into safe areas */}
+        <div className="fixed inset-0 w-full h-full bg-neutral-50 dark:bg-neutral-900 -z-10" />
+        
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -66,7 +69,9 @@ export default function RootLayout({
           <Providers>
             <ServiceWorkerRegistry />
             <ClientLayout>
-              {children}
+              <div className="pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right">
+                {children}
+              </div>
             </ClientLayout>
             <Toaster position="bottom-right" closeButton richColors />
           </Providers>

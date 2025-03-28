@@ -170,6 +170,29 @@
     padding-left: env(safe-area-inset-left);
     background-color: hsl(var(--background));
   }
+
+  /* iOS PWA status bar fixes */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    /* PWA specific - status bar height fix */
+    html[apple-mobile-web-app-capable="yes"] {
+      --webkit-overflow-scrolling: touch;
+      height: 100vh;
+      height: -webkit-fill-available;
+      overflow: hidden;
+    }
+
+    /* Status bar height spacer */
+    .status-bar-spacer {
+      height: env(safe-area-inset-top);
+      background-color: transparent;
+    }
+
+    /* Content that needs to extend into status bar */
+    .extend-to-status-bar {
+      padding-top: env(safe-area-inset-top);
+      margin-top: calc(-1 * env(safe-area-inset-top));
+    }
+  }
 }
 
 @layer base {
