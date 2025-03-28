@@ -10,7 +10,7 @@ export default function SplashPage() {
           {/* Logo */}
           <div className="mx-auto">
             <Image 
-              src="/logo.png" 
+              src="/myfc-logo.png" 
               alt="My Face Coach Logo" 
               width={120} 
               height={120} 
@@ -18,7 +18,7 @@ export default function SplashPage() {
               priority
             />
             <Image 
-              src="/logo_white.png" 
+              src="/myfc-logo-dark.png" 
               alt="My Face Coach Logo" 
               width={120} 
               height={120} 

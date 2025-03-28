@@ -13,7 +13,7 @@ export default function Login() {
             <div className="hidden w-1/2 bg-black p-8 lg:flex lg:flex-col lg:justify-between">
                 <div className="flex items-center gap-2">
                     <Image 
-                        src="/logo.png" 
+                        src="/myfc-logo.png" 
                         alt="MYFC Logo" 
                         width={60} 
                         height={60}
@@ -37,7 +37,7 @@ export default function Login() {
                         <div className="lg:hidden flex justify-center py-4">
                             <Link href='/'>
                                 <Image 
-                                    src="/logo.png" 
+                                    src="/myfc-logo.png" 
                                     alt="MYFC Logo" 
                                     width={70} 
                                     height={70}

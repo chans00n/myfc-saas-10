@@ -7,7 +7,6 @@ import { ServiceWorkerRegistry } from "@/components/service-worker-registry";
 import { dynamic } from './config';
 import { Providers } from '@/components/Providers';
 import { ClientLayout } from '@/components/client-layout';
-import { PatternBackground } from '@/components/ui/pattern-background';
 import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -66,7 +65,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PatternBackground variant="grid" />
           <Providers>
             <ServiceWorkerRegistry />
             <ClientLayout>
