@@ -521,14 +521,14 @@ export default function MYFCNavigation() {
         <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 h-16 pt-safe-top z-20">
           <div className="w-9"></div> {/* Empty div for spacing */}
           <Image 
-            src="/logo.png" 
+            src="/myfc-logo.png" 
             alt="MYFC Logo" 
             width={32} 
             height={32}
             className="h-auto w-auto dark:hidden"
           />
           <Image 
-            src="/logo_white.png" 
+            src="/myfc-logo-dark.png" 
             alt="MYFC Logo" 
             width={32} 
             height={32}

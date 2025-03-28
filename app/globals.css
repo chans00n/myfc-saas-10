@@ -4,6 +4,10 @@
 
 @layer base {
   :root {
+    --sat: env(safe-area-inset-top);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+    --sar: env(safe-area-inset-right);
     --safe-area-top: env(safe-area-inset-top);
     --safe-area-bottom: env(safe-area-inset-bottom);
     --safe-area-left: env(safe-area-inset-left);
@@ -114,7 +118,24 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* iOS safe area utilities */
+  /* iOS safe area utilities with alternative variables */
+  .pt-safe-top {
+    padding-top: var(--sat);
+  }
+  
+  .pb-safe-bottom {
+    padding-bottom: var(--sab);
+  }
+  
+  .pl-safe-left {
+    padding-left: var(--sal);
+  }
+  
+  .pr-safe-right {
+    padding-right: var(--sar);
+  }
+
+  /* Original safe area utilities */
   .pt-safe {
     padding-top: var(--safe-area-top);
   }
@@ -142,7 +163,11 @@
 
   /* Ensure content fills the safe area */
   body {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* Use direct environment variables for more reliable behavior */
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
     background-color: hsl(var(--background));
   }
 }
