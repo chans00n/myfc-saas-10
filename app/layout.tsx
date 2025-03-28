@@ -13,19 +13,20 @@ import { cn } from '@/lib/utils';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Rise & Lift",
-  description: "Your daily facial fitness companion",
+  title: "MYFC - My Face Coach",
+  description: "Daily facial exercises and tracking",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "Rise & Lift",
+    statusBarStyle: "black-translucent",
+    title: "MYFC",
   },
   viewport: {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: "cover"
   },
 };
 
@@ -56,8 +57,7 @@ export default function RootLayout({
       </head>
       <body className={cn(
         'min-h-screen bg-background font-sans antialiased',
-        'min-h-[100dvh]', // Use dynamic viewport height
-        'pt-safe', // Add safe area padding
+        'min-h-[100dvh]',
         inter.className
       )}>
         <ThemeProvider
