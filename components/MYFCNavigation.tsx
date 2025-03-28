@@ -518,14 +518,21 @@ export default function MYFCNavigation() {
       {/* Mobile Navigation - minimal bottom tab bar */}
       <div className="md:hidden">
         {/* Fixed top bar with avatar */}
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-white border-b border-neutral-200 px-4 h-16 z-20">
+        <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 px-4 h-16 pt-safe-top z-20">
           <div className="w-9"></div> {/* Empty div for spacing */}
           <Image 
             src="/logo.png" 
             alt="MYFC Logo" 
             width={32} 
             height={32}
-            className="h-auto w-auto"
+            className="h-auto w-auto dark:hidden"
+          />
+          <Image 
+            src="/logo_white.png" 
+            alt="MYFC Logo" 
+            width={32} 
+            height={32}
+            className="h-auto w-auto hidden dark:block"
           />
           <div className="flex-none">
             <AvatarWithSheet userEmail={userData.email} userAvatarUrl={userData.avatarUrl} />
@@ -533,7 +540,7 @@ export default function MYFCNavigation() {
         </div>
         
         {/* Fixed bottom tab bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 pb-safe-bottom z-10">
           <div className="flex justify-around items-center h-16">
             <Link href="/dashboard" className="flex flex-col items-center justify-center w-full h-full">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">

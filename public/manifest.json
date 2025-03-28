@@ -1,7 +1,7 @@
 {
   "name": "MYFC - My Face Coach",
   "short_name": "MYFC",
-  "description": "Daily facial exercises and tracking",
+  "description": "Elevate your routine with facial fitness. Join MYFC - the ultimate destination for personalized training and support.",
   "start_url": "/dashboard",
   "display": "standalone",
   "scope": "/",
@@ -21,6 +21,18 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/apple-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "id": "/",

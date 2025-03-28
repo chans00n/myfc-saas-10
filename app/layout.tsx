@@ -12,21 +12,29 @@ import { cn } from '@/lib/utils';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MYFC - My Face Coach",
-  description: "Daily facial exercises and tracking",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "MYFC",
-  },
+  title: 'MYFC',
+  description: 'Elevate your routine with facial fitness. Join MYFC - the ultimate destination for personalized training and support.',
+  manifest: '/manifest.json',
   viewport: {
-    width: "device-width",
+    width: 'device-width',
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
-    viewportFit: "cover"
+    viewportFit: 'cover'
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'MYFC',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#171717' },
+  ],
 };
 
 export const viewport: Viewport = {
@@ -49,14 +57,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className={cn(
         'min-h-screen bg-neutral-50 dark:bg-neutral-900 font-sans antialiased',
-        'h-screen overflow-x-hidden',
+        'h-full w-full overflow-x-hidden',
+        'pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right',
         inter.className
       )}>
         <ThemeProvider
