@@ -15,12 +15,42 @@ export const preferredRegion = ['iad1']; // US East (N. Virginia)
 const userDataCache: Record<string, {timestamp: number; data: any}> = {};
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const db = getDB();
+    const supabase = createClient();
     
-    const profile = await withRetry(
-      () => db.select().from(usersTable).limit(1),
+    // Get auth cookie for cache key
+    const cookies = request.headers.get('cookie') || '';
+    const authCookie = cookies
+      .split(';')
+      .find(c => c.trim().startsWith('sb-'))
+      ?.trim() || '';
+    
+    // Check cache first
+    if (authCookie && userDataCache[authCookie] && 
+        (Date.now() - userDataCache[authCookie].timestamp < CACHE_TTL)) {
+      return NextResponse.json(userDataCache[authCookie].data, {
+        headers: {
+          'Cache-Control': 'private, max-age=300', // 5 minutes
+          'Vary': 'Cookie'
+        }
+      });
+    }
+    
+    // Get auth user
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !authData?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get DB user record with retry logic
+    const db = getDB();
+    const userRecord = await withRetry(
+      () => db.select()
+        .from(usersTable)
+        .where(eq(usersTable.email, authData.user.email!))
+        .limit(1),
       {
         retryCount: 3,
         onRetry: (error, attempt) => {
@@ -29,14 +59,31 @@ export async function GET() {
       }
     );
 
-    if (!profile || profile.length === 0) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Profile not found' }),
-        { status: 404 }
-      );
+    // Combine the data
+    const userData = {
+      auth: {
+        id: authData.user.id,
+        email: authData.user.email,
+        metadata: authData.user.user_metadata,
+        created_at: authData.user.created_at
+      },
+      profile: userRecord && userRecord.length > 0 ? userRecord[0] : null
+    };
+
+    // Cache the result
+    if (authCookie) {
+      userDataCache[authCookie] = {
+        timestamp: Date.now(),
+        data: userData
+      };
     }
 
-    return NextResponse.json(profile[0]);
+    return NextResponse.json(userData, {
+      headers: {
+        'Cache-Control': 'private, max-age=300',
+        'Vary': 'Cookie'
+      }
+    });
   } catch (error: any) {
     console.error('Profile fetch error:', error);
 
