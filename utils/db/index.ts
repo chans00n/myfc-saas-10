@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-// Connection pool configuration
+// Connection pool configuration - keeping a minimal pool to prevent connection issues
 const POOL_SIZE = 1;
 const POOL_IDLE_TIMEOUT = 10; // seconds
 
@@ -20,7 +20,8 @@ function getConnectionPool() {
   return globalPool;
 }
 
-export function getDB() {
+// This is used only for new features that need connection pooling
+export function getPooledDB() {
   const pool = getConnectionPool();
   return drizzle(pool, { schema });
 }

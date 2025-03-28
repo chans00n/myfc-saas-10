@@ -1,10 +1,9 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { getDB } from '@/utils/db';
-import { withRetry } from '@/utils/db/retry';
-import { dynamic } from '@/app/config';
+import { db } from '@/utils/db/db';
 import { usersTable } from '@/utils/db/schema';
 import { eq } from 'drizzle-orm';
+import { dynamic } from '@/app/config';
 
 export { dynamic }
 
@@ -29,6 +28,7 @@ export async function GET(request: Request) {
     // Check cache first
     if (authCookie && userDataCache[authCookie] && 
         (Date.now() - userDataCache[authCookie].timestamp < CACHE_TTL)) {
+      // Add cache control headers for HTTP caching
       return NextResponse.json(userDataCache[authCookie].data, {
         headers: {
           'Cache-Control': 'private, max-age=300', // 5 minutes
@@ -38,38 +38,42 @@ export async function GET(request: Request) {
     }
     
     // Get auth user
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getUser();
     
-    if (authError || !authData?.user) {
+    if (error || !data?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    // Get DB user record with retry logic
-    const db = getDB();
-    const userRecord = await withRetry(
-      () => db.select()
-        .from(usersTable)
-        .where(eq(usersTable.email, authData.user.email!))
-        .limit(1),
-      {
-        retryCount: 3,
-        onRetry: (error, attempt) => {
-          console.warn(`Retrying database operation, attempt ${attempt}:`, error);
-        },
-      }
-    );
-
+    
+    // Get DB user record in the same request
+    const userRecord = await db.select()
+      .from(usersTable)
+      .where(eq(usersTable.email, data.user.email!))
+      .limit(1);
+    
     // Combine the data
     const userData = {
       auth: {
-        id: authData.user.id,
-        email: authData.user.email,
-        metadata: authData.user.user_metadata,
-        created_at: authData.user.created_at
+        id: data.user.id,
+        email: data.user.email,
+        metadata: data.user.user_metadata,
+        created_at: data.user.created_at
       },
       profile: userRecord && userRecord.length > 0 ? userRecord[0] : null
     };
-
+    
+    // Log the user data to help with debugging
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('User record from DB:', userRecord && userRecord.length > 0 ? {
+        // Log key fields
+        id: userRecord[0].id,
+        email: userRecord[0].email,
+        name: userRecord[0].name,
+        gender: userRecord[0].gender,
+        birthday: userRecord[0].birthday,
+        location: userRecord[0].location
+      } : 'No user record found');
+    }
+    
     // Cache the result
     if (authCookie) {
       userDataCache[authCookie] = {
@@ -77,33 +81,16 @@ export async function GET(request: Request) {
         data: userData
       };
     }
-
+    
+    // Return with cache headers
     return NextResponse.json(userData, {
       headers: {
         'Cache-Control': 'private, max-age=300',
         'Vary': 'Cookie'
       }
     });
-  } catch (error: any) {
-    console.error('Profile fetch error:', error);
-
-    if (error.code === 'XX000' && error.message.includes('Max client connections')) {
-      return new NextResponse(
-        JSON.stringify({
-          error: 'Service temporarily unavailable. Please try again in a moment.',
-        }),
-        {
-          status: 503,
-          headers: {
-            'Retry-After': '5',
-          },
-        }
-      );
-    }
-
-    return new NextResponse(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error('Error in consolidated user API:', error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 } 
