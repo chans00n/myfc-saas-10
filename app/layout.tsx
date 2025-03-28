@@ -1,88 +1,46 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ServiceWorkerRegistry } from "@/components/ServiceWorkerRegistry";
 import { Toaster } from "sonner";
-import { cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { db } from "@/utils/db/db";
-import { usersTable } from "@/utils/db/schema";
-import { eq } from "drizzle-orm";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ServiceWorkerRegistry } from "@/components/service-worker-registry";
 import { dynamic } from './config';
 import { Providers } from '@/components/Providers';
+import { ClientLayout } from '@/components/client-layout';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MYFC",
-  description: "My Face Coach App",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "MYFC",
-  },
+  title: "Rise & Lift",
+  description: "Your daily facial fitness companion",
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
-// Force dynamic rendering for authenticated routes
-export const revalidate = 0;
-export const dynamicParams = true;
 export { dynamic };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let theme: 'light' | 'dark' = 'light';
-  
-  try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (user) {
-      try {
-        const userRecord = await db
-          .select()
-          .from(usersTable)
-          .where(eq(usersTable.email, user.email!))
-          .limit(1);
-        
-        if (userRecord.length > 0 && userRecord[0]?.theme_preference) {
-          theme = userRecord[0].theme_preference as 'light' | 'dark';
-        }
-      } catch (dbError) {
-        console.error("Database error fetching theme preference:", dbError);
-      }
-    }
-  } catch (error) {
-    console.error("Authentication error:", error);
-  }
-
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
-      <head>
-        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
-        <link rel="apple-touch-icon" href="/icons/192.png" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#000000" />
-      </head>
-      
-      <body className={`${inter.className} min-h-screen bg-neutral-50 dark:bg-neutral-900 h-full`}>
-        <ThemeProvider initialTheme={theme}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <Providers>
             <ServiceWorkerRegistry />
-            {children}
+            <ClientLayout>{children}</ClientLayout>
             <Toaster position="bottom-right" closeButton richColors />
           </Providers>
         </ThemeProvider>

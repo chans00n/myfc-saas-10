@@ -230,7 +230,7 @@ export default function WorkoutLibraryClient({
             <select
               value={intensity || ''}
               onChange={(e) => handleFilterChange('intensity', e.target.value || null)}
-              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="">All Intensities</option>
               <option value="beginner">Beginner</option>
@@ -249,7 +249,7 @@ export default function WorkoutLibraryClient({
             <select
               value={focusArea || ''}
               onChange={(e) => handleFilterChange('focusArea', e.target.value || null)}
-              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="">All Focus Areas</option>
               {focusAreas.map((area) => (
@@ -268,7 +268,7 @@ export default function WorkoutLibraryClient({
             <select
               value={sort}
               onChange={(e) => handleFilterChange('sort', e.target.value)}
-              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
+              className="appearance-none px-3 py-2 border border-neutral-700 rounded-lg pr-8 bg-white dark:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-transparent text-sm"
             >
               <option value="created_at">Date Added</option>
               <option value="title">Title</option>

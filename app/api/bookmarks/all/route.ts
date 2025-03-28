@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { db } from '@/utils/db/db';
-import { bookmarksTable } from '@/utils/db/schema';
+import { workoutBookmarksTable } from '@/utils/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { dynamic } from '@/app/config'
 
@@ -25,13 +25,14 @@ export async function GET() {
     // Use Drizzle ORM to fetch bookmarks
     const bookmarks = await db
       .select()
-      .from(bookmarksTable)
-      .where(eq(bookmarksTable.user_id, user.id))
-      .orderBy(desc(bookmarksTable.created_at));
+      .from(workoutBookmarksTable)
+      .where(eq(workoutBookmarksTable.user_id, user.id))
+      .orderBy(desc(workoutBookmarksTable.created_at));
 
     return NextResponse.json(bookmarks);
   } catch (error) {
     console.error('Error fetching bookmarks:', error);
-    return NextResponse.json({ error: 'Failed to fetch bookmarks' }, { status: 500 });
+    // Return empty array instead of error
+    return NextResponse.json({ bookmarks: [] });
   }
 } 

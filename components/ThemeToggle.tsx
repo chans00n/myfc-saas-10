@@ -1,15 +1,16 @@
 'use client';
 
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   
   const handleToggle = async () => {
-    // Toggle theme in context (instant visual feedback)
-    toggleTheme();
+    // Toggle theme (instant visual feedback)
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
     
     // Update preference in database
     setIsLoading(true);
@@ -17,7 +18,7 @@ export function ThemeToggle() {
       await fetch('/api/profile/update-theme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: theme === 'light' ? 'dark' : 'light' })
+        body: JSON.stringify({ theme: newTheme })
       });
     } catch (error) {
       console.error('Failed to update theme preference:', error);

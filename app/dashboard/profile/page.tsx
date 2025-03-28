@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { SimpleAvatar } from "@/components/ui/simple-avatar";
 import { redirect, useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from 'next-themes';
 import { BillingSection } from '@/components/BillingSection';
 import { PushNotificationSettings } from '@/components/PushNotificationSettings';
 import { WorkoutNotificationSettings } from '@/components/WorkoutNotificationSettings';
@@ -14,10 +14,12 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCrisp } from '@/hooks/useCrisp';
+import { haptics } from '@/utils/haptics';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export default function ProfilePage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const { show: showCrisp } = useCrisp();
   
   // Only log in development
   useEffect(() => {

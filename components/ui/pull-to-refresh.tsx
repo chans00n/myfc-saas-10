@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 interface PullToRefreshProps {
-  onRefresh: () => Promise<void> | void;
+  onRefresh: () => Promise<void>;
   children: React.ReactNode;
   className?: string;
   threshold?: number;
   maxPull?: number;
-  indicator?: React.ReactNode;
+  loadingIndicator?: React.ReactNode;
 }
 
 export function PullToRefresh({
@@ -19,7 +19,7 @@ export function PullToRefresh({
   className,
   threshold = 100, // Distance in px needed to trigger refresh
   maxPull = 150,   // Maximum pull distance
-  indicator = <Loader2 className="h-6 w-6 animate-spin" />
+  loadingIndicator = <Loader2 className="h-6 w-6 animate-spin" />
 }: PullToRefreshProps) {
   const [isPulling, setIsPulling] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
@@ -30,7 +30,12 @@ export function PullToRefresh({
 
   useEffect(() => {
     isMounted.current = true;
-    
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       // Only enable pull if at top of the page
       if (window.scrollY === 0) {
@@ -91,7 +96,6 @@ export function PullToRefresh({
     }
 
     return () => {
-      isMounted.current = false;
       if (element) {
         element.removeEventListener("touchstart", handleTouchStart);
         element.removeEventListener("touchmove", handleTouchMove);
@@ -104,20 +108,29 @@ export function PullToRefresh({
     <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
       {/* Pull indicator */}
       <div 
-        className="absolute left-0 right-0 flex justify-center transition-transform duration-200"
+        className={cn(
+          'absolute left-0 right-0 flex justify-center -mt-8 transition-all duration-200',
+          'pull-indicator'
+        )}
         style={{ 
-          transform: `translateY(${pullDistance - 50}px)`,
-          opacity: pullDistance / threshold
+          transform: `translateY(${pullDistance}px)`,
+          opacity: Math.min(1, pullDistance / threshold)
         }}
       >
-        {isRefreshing ? indicator : indicator}
+        <div className={cn(
+          'rounded-full bg-background/80 backdrop-blur-sm p-3 shadow-lg',
+          isRefreshing && 'animate-spin'
+        )}>
+          {loadingIndicator}
+        </div>
       </div>
       
       {/* Content with pull effect */}
       <div 
+        className="transition-transform duration-200 ease-out"
         style={{ 
-          transform: `translateY(${pullDistance}px)`, 
-          transition: isPulling ? 'none' : 'transform 0.2s ease-out' 
+          transform: `translateY(${pullDistance}px)`,
+          transition: isPulling ? 'none' : 'transform 0.2s cubic-bezier(0.33, 1, 0.68, 1)'
         }}
       >
         {children}
