@@ -113,6 +113,38 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  /* iOS safe area utilities */
+  .pt-safe {
+    padding-top: var(--safe-area-top);
+  }
+  
+  .pb-safe {
+    padding-bottom: var(--safe-area-bottom);
+  }
+  
+  .pl-safe {
+    padding-left: var(--safe-area-left);
+  }
+  
+  .pr-safe {
+    padding-right: var(--safe-area-right);
+  }
+
+  /* Fix for mobile viewport height issues */
+  html, body {
+    height: 100%;
+    height: 100dvh; /* dynamic viewport height */
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure content fills the safe area */
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background-color: hsl(var(--background));
+  }
 }
 
 @layer base {
@@ -153,13 +185,6 @@
   .myfc-badge-yellow {
     @apply bg-neutral-300 text-neutral-800;
   }
-}
-
-/* Fix for mobile viewport issues */
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
 }
 
 /* Make sure images in Image components display properly */
